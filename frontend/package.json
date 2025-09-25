@@ -1,5 +1,5 @@
 {
-  "name": "refop-fe",
+  "name": "fundify-fe",
   "version": "0.1.3",
   "scripts": {
     "ng": "ng",
@@ -13,12 +13,6 @@
     "test:e2e-generate": "npx playwright codegen localhost:4200/ --viewport-size='1920,1080' --load-storage='e2e/config/.auth/funder.json'",
     "test:e2e-generate-login": "npx playwright codegen localhost:4200/ --save-storage='e2e/config/.auth/admin.json'",
     "lint": "ng lint",
-    "ci:install": "npm install",
-    "ci:build": "ng build",
-    "ci:lint": "ng lint",
-    "ci:test": "ng test --watch=false --browsers=ChromeHeadless",
-    "ci:e2e": "ng e2e",
-    "ci:coverage": "ng run refop-fe:test --configuration ci-coverage",
     "prepare": "husky"
   },
   "private": true,

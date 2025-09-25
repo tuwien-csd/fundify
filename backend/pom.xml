@@ -4,8 +4,8 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>at.ac.tuwien.refop</groupId>
-  <artifactId>refop-be</artifactId>
+  <groupId>at.ac.tuwien.fundify</groupId>
+  <artifactId>fundify-be</artifactId>
   <version>${revision}</version>
   <packaging>pom</packaging>
   <modules>
@@ -255,7 +255,7 @@
         </plugins>
       </build>
       <properties>
-        <sonar.projectKey>at.ac.tuwien.refop:refop-be</sonar.projectKey>
+        <sonar.projectKey>at.ac.tuwien.fundify:fundify-be</sonar.projectKey>
         <sonar.moduleKey>${project.artifactId}</sonar.moduleKey>
         <sonar.coverage.jacoco.xmlReportPaths>${project.build.directory}/jacoco-report/jacoco.xml
         </sonar.coverage.jacoco.xmlReportPaths>

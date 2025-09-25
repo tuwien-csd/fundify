@@ -4,8 +4,8 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>at.ac.tuwien.refop</groupId>
-    <artifactId>refop-be</artifactId>
+    <groupId>at.ac.tuwien.fundify</groupId>
+    <artifactId>fundify-be</artifactId>
     <version>${revision}</version>
   </parent>
 
@@ -20,7 +20,7 @@
   <dependencies>
     <!-- Internal -->
     <dependency>
-      <groupId>at.ac.tuwien.refop</groupId>
+      <groupId>at.ac.tuwien.fundify</groupId>
       <artifactId>application</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -184,7 +184,7 @@
               </inputSpec>
               <language>java</language>
               <generateModels>true</generateModels>
-              <modelPackage>at.ac.tuwien.refop.adapters.common.ris.model.v1</modelPackage>
+              <modelPackage>at.ac.tuwien.fundify.adapters.common.ris.model.v1</modelPackage>
               <generateApis>false</generateApis>
               <generateSupportingFiles>false</generateSupportingFiles>
               <generateModelTests>false</generateModelTests>
@@ -213,7 +213,7 @@
               </inputSpec>
               <language>java</language>
               <generateModels>true</generateModels>
-              <modelPackage>at.ac.tuwien.refop.adapters.common.ris.model.v1</modelPackage>
+              <modelPackage>at.ac.tuwien.fundify.adapters.common.ris.model.v1</modelPackage>
               <generateApis>false</generateApis>
               <generateSupportingFiles>false</generateSupportingFiles>
               <generateModelTests>false</generateModelTests>
@@ -238,7 +238,7 @@
               <inputSpec>${project.basedir}/src/main/resources/openapi/info-spec-v1.json</inputSpec>
               <language>java</language>
               <generateModels>true</generateModels>
-              <modelPackage>at.ac.tuwien.refop.adapters.common.ris.model.v1</modelPackage>
+              <modelPackage>at.ac.tuwien.fundify.adapters.common.ris.model.v1</modelPackage>
               <generateApis>false</generateApis>
               <generateSupportingFiles>false</generateSupportingFiles>
               <generateModelTests>false</generateModelTests>
@@ -271,8 +271,8 @@
               <generatorName>java</generatorName>
               <library>resteasy</library>
               <generateModels>true</generateModels>
-              <apiPackage>at.ac.tuwien.refop.adapters.common.jira.api</apiPackage>
-              <modelPackage>at.ac.tuwien.refop.adapters.common.jira.model</modelPackage>
+              <apiPackage>at.ac.tuwien.fundify.adapters.common.jira.api</apiPackage>
+              <modelPackage>at.ac.tuwien.fundify.adapters.common.jira.model</modelPackage>
               <generateApis>true</generateApis>
               <apisToGenerate>Issues,IssueSearch,IssueComments</apisToGenerate>
               <generateSupportingFiles>true</generateSupportingFiles>

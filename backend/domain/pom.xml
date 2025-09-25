@@ -4,8 +4,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>at.ac.tuwien.refop</groupId>
-        <artifactId>refop-be</artifactId>
+        <groupId>at.ac.tuwien.fundify</groupId>
+        <artifactId>fundify-be</artifactId>
         <version>${revision}</version>
     </parent>
     <artifactId>domain</artifactId>
