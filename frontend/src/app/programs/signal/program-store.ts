@@ -6,7 +6,11 @@ import {
   withMethods,
   withProps,
 } from '@ngrx/signals';
-import { setAllEntities, withEntities } from '@ngrx/signals/entities';
+import {
+  removeEntity,
+  setAllEntities,
+  withEntities,
+} from '@ngrx/signals/entities';
 import { BackendServiceV2 } from '../../core/services/backend-service-v2.service';
 import { NotificationService } from '../../shared/services/notification-service.service';
 import { ProgramWebModel } from '../models/program.interface';
@@ -35,6 +39,35 @@ export const ProgramStore = signalStore(
       } catch (error) {
         console.error('Error fetching funders:', error);
       }
+    },
+    async delete(programId: string): Promise<void> {
+      try {
+        const { response } = await backendService.client.DELETE(
+          '/api/program/delete/{id}',
+          {
+            params: {
+              path: {
+                id: programId,
+              },
+            },
+          }
+        );
+        if (response.ok) {
+          patchState(store, removeEntity(programId));
+          notificationService.success(
+            PROGRAM_DETIALS_CONSTANTS.MESSAGES.DELETE.SUCCESS
+          );
+        } else {
+          notificationService.error(
+            PROGRAM_DETIALS_CONSTANTS.MESSAGES.DELETE.ERROR
+          );
+        }
+      } catch (error) {
+        console.error(
+          `Unexpected error while trying to delete program with id '${programId}': ${error}`
+        );
+      }
+      return;
     },
   })),
   withHooks({

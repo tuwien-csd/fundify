@@ -35,7 +35,7 @@
           }
         </div>
       </div>
-      <mat-table [dataSource]="dataSource" matSort class="programs-table">
+      <mat-table [dataSource]="dataSource()" matSort class="programs-table">
         @for (column of PROGRAMS_CONSTANTS.TABLE_COLUMNS; track column) {
           <ng-container [matColumnDef]="column.field">
             <mat-header-cell *matHeaderCellDef mat-sort-header>
