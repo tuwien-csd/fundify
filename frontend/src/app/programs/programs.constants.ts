@@ -45,4 +45,10 @@ export const PROGRAM_DETIALS_CONSTANTS = {
     FETCH_ALL_ERROR:
       'An unexpected error occurred when retrieving all programs.',
   },
+  MESSAGES: {
+    DELETE: {
+      SUCCESS: 'The program has been successfully deleted.',
+      ERROR: 'An unexpected error occurred when deleting the program.',
+    },
+  },
 };

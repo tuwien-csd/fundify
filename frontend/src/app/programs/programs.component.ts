@@ -1,9 +1,8 @@
 import {
-  AfterViewInit,
   Component,
+  computed,
   inject,
   OnDestroy,
-  OnInit,
   ViewChild,
 } from '@angular/core';
 import {
@@ -21,22 +20,18 @@ import {
 } from '@angular/material/table';
 import { PROGRAMS_CONSTANTS } from './programs.constants';
 import { ROUTER_LINKS } from '../core/router-links.constants';
-import { Program } from './models/program.interface';
-import { takeUntil } from 'rxjs/operators';
+import { ProgramWebModel } from './models/program.interface';
 import { BUTTON_LABELS } from '../shared/shared.constants';
 import { PermissionService } from '../core/auth/services/permission.service';
 import { MatSort, MatSortHeader } from '@angular/material/sort';
 import { MatPaginator } from '@angular/material/paginator';
 import { Subject } from 'rxjs';
-import { Store } from '@ngrx/store';
-import * as fromPrograms from './store';
 import { UserRoleEnum } from '../core/auth/models/user-role.enum';
 import { TabInfo, TopNavbarComponent } from '../shared/ui/top-navbar.component';
 import {
   MatSlideToggle,
   MatSlideToggleChange,
 } from '@angular/material/slide-toggle';
-import { Call } from '../calls/models/call.interface';
 import { PublicationStatusEnum } from '../shared/models/enums/publication-status.enum';
 import { PublicationStatus } from '../calls/components/call-annotation-list/call-annotation-list.component';
 import { AuthService } from '../core/auth/services/auth.service';
@@ -52,6 +47,7 @@ import { MatButton, MatIconButton } from '@angular/material/button';
 import { RouterLink } from '@angular/router';
 import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
 import { ProgramDisplayPipe } from './pipes/program-display.pipe';
+import { ProgramStore } from './signal/program-store';
 
 @Component({
   selector: 'app-programs',
@@ -89,8 +85,8 @@ import { ProgramDisplayPipe } from './pipes/program-display.pipe';
     ProgramDisplayPipe,
   ],
 })
-export class ProgramsComponent implements OnInit, OnDestroy, AfterViewInit {
-  private store = inject(Store);
+export class ProgramsComponent implements OnDestroy {
+  private readonly programStore = inject(ProgramStore);
   permissionService = inject(PermissionService);
 
   protected readonly ROUTER_LINKS = ROUTER_LINKS;
@@ -110,7 +106,26 @@ export class ProgramsComponent implements OnInit, OnDestroy, AfterViewInit {
 
   authService = inject(AuthService);
 
-  dataSource = new MatTableDataSource<Program>();
+  dataSource = computed(() => {
+    const dataSource = new MatTableDataSource<ProgramWebModel>(
+      this.programStore.entities()
+    );
+
+    dataSource.filterPredicate = this.createFilterPredicate();
+    dataSource.sortingDataAccessor = (item, property) => {
+      if (property === 'name') {
+        return item.name?.map((name) => name.text).join('') ?? 0;
+      }
+      return (item[property as keyof typeof item] as string) ?? 0;
+    };
+    dataSource.sort = this.sort;
+    dataSource.paginator = this.paginator;
+    dataSource.sort.active = 'status';
+    dataSource.sort.direction = 'asc';
+
+    return dataSource;
+  });
+
   hideClosedPrograms = false;
   filterValue = '';
 
@@ -124,16 +139,6 @@ export class ProgramsComponent implements OnInit, OnDestroy, AfterViewInit {
 
   private unsubscribe$ = new Subject<void>();
 
-  ngOnInit(): void {
-    this.store.dispatch(fromPrograms.loadPrograms({ skipIfPresent: false }));
-    this.initMatDataSource();
-  }
-
-  ngAfterViewInit(): void {
-    this.dataSource.sort = this.sort;
-    this.dataSource.paginator = this.paginator;
-  }
-
   changeFilterValue(event: Event) {
     this.filterValue = (event.target as HTMLInputElement).value
       .trim()
@@ -142,7 +147,7 @@ export class ProgramsComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   onDelete(programId: string): void {
-    this.store.dispatch(fromPrograms.deleteProgram({ programId }));
+    this.programStore.delete(programId);
   }
 
   toggleHideClosedPrograms(event: MatSlideToggleChange) {
@@ -155,30 +160,17 @@ export class ProgramsComponent implements OnInit, OnDestroy, AfterViewInit {
     this.unsubscribe$.complete();
   }
 
-  private initMatDataSource(): void {
-    this.dataSource.filterPredicate = this.createFilterPredicate();
-    this.dataSource.sortingDataAccessor = (item, property) => {
-      if (property === 'name') {
-        return item.name?.map((name) => name.text).join('') ?? 0;
-      }
-      return (item[property as keyof typeof item] as string) ?? 0;
-    };
-    this.sort.active = 'status';
-    this.sort.direction = 'asc';
-    this.store
-      .select(fromPrograms.selectAllPrograms)
-      .pipe(takeUntil(this.unsubscribe$))
-      .subscribe((programs) => (this.dataSource.data = programs));
-  }
-
   private applyFilters() {
-    this.dataSource.filter = JSON.stringify({
+    this.dataSource().filter = JSON.stringify({
       searchTerm: this.filterValue,
       hideClosedCalls: this.hideClosedPrograms,
     });
   }
 
-  private createFilterPredicate(): (data: Call, filter: string) => boolean {
+  private createFilterPredicate(): (
+    data: ProgramWebModel,
+    filter: string
+  ) => boolean {
     return (data, filter) => {
       const filterObject = JSON.parse(filter);
       const searchTerm = filterObject.searchTerm;
@@ -199,7 +191,7 @@ export class ProgramsComponent implements OnInit, OnDestroy, AfterViewInit {
     };
   }
 
-  private getProgramStatus(program: Program): PublicationStatus {
+  private getProgramStatus(program: ProgramWebModel): PublicationStatus {
     if (program.status === PublicationStatusEnum.DRAFT) {
       return 'Draft';
     }
@@ -217,7 +209,7 @@ export class ProgramsComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
-  private combineProgramFields(program: Program): string {
+  private combineProgramFields(program: ProgramWebModel): string {
     const names: string[] = [];
     const funderNames: string[] = [];
     program.name?.forEach((name) => names.push(name.text));

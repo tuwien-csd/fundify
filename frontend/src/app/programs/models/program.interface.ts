@@ -14,7 +14,7 @@ import { components } from '../../../generated/refop-be';
 
 export interface Program {
   id?: string;
-  entryOrigin?: EntryOriginEnum;
+  entryOrigin: EntryOriginEnum;
   status?: PublicationStatusEnum;
   registrationDate?: string;
   lastSync?: string;
