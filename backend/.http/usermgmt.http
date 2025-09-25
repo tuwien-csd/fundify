@@ -1,0 +1,20 @@
+### Obtain Keycloak access token
+POST {{tokenEndpoint}}
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=password&client_id=admin-cli&username= {{admin.username}}&password={{admin.password}}
+
+> {% client.global.set("auth_token", response.body.access_token) %}
+
+
+### Update permissions of user
+@userId = changeme
+PUT {{baseUrl}}/api/users/{{userId}}/permissions
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+# Roles: oneOf: FUNDER | ADMIN | ANNOTATOR | EXTERNAL_API_CLIENT
+{
+  "roles": ["FUNDER"],
+  "affiliationId": "andamp"
+}

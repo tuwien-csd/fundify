@@ -1,0 +1,13 @@
+target/
+.git/
+.github/
+.mvn/
+.idea/
+.vscode/
+.ci/
+compose/
+*.iml
+*.md
+./mvnw
+./mvnw.cmd
+

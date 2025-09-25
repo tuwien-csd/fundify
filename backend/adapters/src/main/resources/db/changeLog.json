@@ -1,0 +1,198 @@
+{
+  "databaseChangeLog": [
+    {
+      "changeSet": {
+        "id": "1",
+        "author": "Yana",
+        "comment": "Populate funders collection with mock funders - FOR DEVELOPMENT",
+        "changes": [
+          {
+            "insertMany": {
+              "collectionName": "funders",
+              "documents": {
+                "$rawJson": [
+                  {
+                    "name": [
+                      {
+                        "text": "Austrian Science Fund",
+                        "language": "ENGLISH",
+                        "translation": "ORIGINAL"
+                      },
+                      {
+                        "text": "Fonds zur Förderung der wissenschaftlichen Forschung",
+                        "language": "GERMAN",
+                        "translation": "TRANSLATION_HUMAN"
+                      }
+                    ],
+                    "acronym": "FWF",
+                    "risId": "ris:FWF:orgunit:FWF_testId",
+                    "crossRefDoi": "http://dx.doi.org/10.13039/501100002428",
+                    "emailDomain": "fwf.ac.at",
+                    "website": "https://www.fwf.ac.at/",
+                    "submissionSystem": "https://elane.fwf.ac.at/",
+                    "phone": "+43-1-5056740-0",
+                    "postAddress": {
+                      "streetLine": "Sensengasse 1",
+                      "city": "Wien",
+                      "postalCode": "1090",
+                      "countryCode": "AT"
+                    }
+                  },
+                  {
+                    "name": [
+                      {
+                        "text": "Austrian Research Promotion Agency",
+                        "language": "ENGLISH",
+                        "translation": "ORIGINAL"
+                      },
+                      {
+                        "text": "Österreichische Forschungsförderungsgesellschaft mbH",
+                        "language": "GERMAN",
+                        "translation": "TRANSLATION_HUMAN"
+                      }
+                    ],
+                    "acronym": "FFG",
+                    "risId": "ris:FFG:orgunit:0000",
+                    "crossRefDoi": "http://dx.doi.org/10.13039/501100004955",
+                    "website": "https://www.ffg.at/",
+                    "emailDomain": "ffg.at"
+                  },
+                  {
+                    "name": [
+                      {
+                        "text": "Vienna Science and Technology Fund",
+                        "language": "ENGLISH",
+                        "translation": "ORIGINAL"
+                      },
+                      {
+                        "text": "Wiener Wissenschafts-, Forschungs- und Technologiefonds",
+                        "language": "GERMAN",
+                        "translation": "TRANSLATION_HUMAN"
+                      }
+                    ],
+                    "acronym": "WWTF",
+                    "risId": "ris:WWTF:orgunit:0000",
+                    "crossRefDoi": "http://dx.doi.org/10.13039/501100001821",
+                    "website": "https://www.wwtf.at/",
+                    "emailDomain": "wwtf.at"
+                  },
+                  {
+                    "name": [
+                      {
+                        "text": "Christian Doppler Research Association",
+                        "language": "ENGLISH",
+                        "translation": "ORIGINAL"
+                      },
+                      {
+                        "text": "Christian Doppler Forschungsgesellschaft",
+                        "language": "GERMAN",
+                        "translation": "TRANSLATION_HUMAN"
+                      }
+                    ],
+                    "acronym": "CDG",
+                    "risId": "ris:CDG:orgunit:0000",
+                    "crossRefDoi": "http://dx.doi.org/10.13039/501100006012",
+                    "website": "https://www.cdg.ac.at/",
+                    "emailDomain": "cdg.ac.at"
+                  },
+                  {
+                    "name": [
+                      {
+                        "text": "Ludwig Boltzmann Society",
+                        "language": "ENGLISH",
+                        "translation": "ORIGINAL"
+                      },
+                      {
+                        "text": "Ludwig Boltzmann Gesellschaft",
+                        "language": "GERMAN",
+                        "translation": "TRANSLATION_HUMAN"
+                      }
+                    ],
+                    "acronym": "LBG",
+                    "risId": "ris:LBG:orgunit:0000",
+                    "crossRefDoi": "http://dx.doi.org/10.13039/501100016168",
+                    "website": "https://lbg.ac.at/",
+                    "emailDomain": "lbg.ac.at"
+                  },
+                  {
+                    "name": [
+                      {
+                        "text": "Klima- und Energiefonds",
+                        "language": "ENGLISH",
+                        "translation": "ORIGINAL"
+                      },
+                      {
+                        "text": "Klima- und Energiefonds",
+                        "language": "GERMAN",
+                        "translation": "ORIGINAL"
+                      }
+                    ],
+                    "acronym": "KEF",
+                    "risId": "ris:KEF:orgunit:0000",
+                    "crossRefDoi": "http://dx.doi.org/10.13039/100008559",
+                    "website": "https://www.klimafonds.gv.at/",
+                    "emailDomain": "klimafonds.gv.at"
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "changeSet": {
+        "id": "2",
+        "author": "Daniel",
+        "comment": "Populate universities collection with mock universities - FOR DEVELOPMENT",
+        "changes": [
+          {
+            "insertMany": {
+              "collectionName": "universities",
+              "documents": {
+                "$rawJson": [
+                  {
+                    "risId": "ris:UE:orgunit:3000",
+                    "name": [
+                      {
+                        "text": "Vienna University of Technology",
+                        "language": "ENGLISH",
+                        "translation": "TRANSLATION_HUMAN"
+                      },
+                      {
+                        "text": "Technische Universität Wien",
+                        "language": "GERMAN",
+                        "translation": "ORIGINAL"
+                      }
+                    ],
+                    "acronym": "TUW",
+                    "emailDomain": "tuwien.ac.at",
+                    "website": "www.tuwien.ac.at"
+                  },
+                  {
+                    "name": [
+                      {
+                        "text": "University of Vienna",
+                        "language": "ENGLISH",
+                        "translation": "TRANSLATION_HUMAN"
+                      },
+                      {
+                        "text": "Universität Wien",
+                        "language": "GERMAN",
+                        "translation": "ORIGINAL"
+                      }
+                    ],
+                    "acronym": "univie",
+                    "risId": "ris:UA:orgunit:0000",
+                    "emailDomain": "univie.ac.at",
+                    "website": "www.univie.ac.at"
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,89 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Info Api",
+    "version": "1.0"
+  },
+  "servers": [
+    {
+      "url": "https://cris-staging.aau.at/ris-synergy/info"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Info",
+      "description": "Information about Endpoints"
+    }
+  ],
+  "paths": {
+    "/v1/info/": {
+      "get": {
+        "tags": [
+          "Info"
+        ],
+        "summary": "GET Endpoint for Information",
+        "description": "Get Endpoint for Information about Api Implementation",
+        "operationId": "getInfo",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Info"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Endpoint": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "$ref": "#/components/schemas/EndpointEnum"
+          },
+          "majorVersion": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "minorVersion": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "EndpointEnum": {
+        "type": "string",
+        "enum": [
+          "FUNDING",
+          "FUNDINGS",
+          "PROJECT",
+          "ORGUNIT",
+          "ORGANIGRAM"
+        ]
+      },
+      "Info": {
+        "type": "object",
+        "properties": {
+          "endpoints": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/Endpoint"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

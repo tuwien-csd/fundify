@@ -1,0 +1,79 @@
+services:
+  mongo:
+    image: mongo:5.0.14@sha256:6cf671de7c85493d6dde9aafef383570161809336d6c41f431ac3a692155ece9
+    restart: 'unless-stopped'
+    container_name: refop-mongo
+    environment:
+      - 'MONGO_INITDB_ROOT_USERNAME=admin'
+      - 'MONGO_INITDB_ROOT_PASSWORD=admin'
+    ports:
+      - '27017:27017'
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - refop-network
+
+  refop-be:
+    container_name: refop-be
+    build:
+      context: ../
+    ports:
+      - "8081:8080"
+    environment:
+      - REFOP_AUTH_CLIENT_ID=${REFOP_AUTH_CLIENT_ID}
+      - REFOP_AUTH_CLIENT_SECRET=${REFOP_AUTH_CLIENT_SECRET}
+      - REFOP_AUTH_CLIENT_TOKENPATH=${REFOP_AUTH_CLIENT_TOKENPATH}
+      - QUARKUS_SWAGGER_UI_ALWAYS_INCLUDE=true
+      - QUARKUS_SWAGGER_UI_PATH=/api/docs
+      - QUARKUS_SMALLRYE_OPENAPI_PATH=/api/openapi
+    networks:
+      - refop-network
+
+  refop-fe:
+    container_name: refop-fe
+    build:
+      context: ../../refop-fe
+      args:
+      - CONFIG=${FRONTEND_BUILD_CONFIG:-production}
+    ports:
+      - "8082:8080"
+    networks:
+      - refop-network
+
+  keycloak:
+    container_name: refop-keycloak
+    restart: 'unless-stopped'
+    image: keycloak/keycloak:26.03@sha256:922e443a962b8ad0dffa3c17061e8136583d7bc59209a1d1fc059816467c3f69
+    environment:
+    - KC_BOOTSTRAP_ADMIN_USERNAME=admin
+    - KC_BOOTSTRAP_ADMIN_PASSWORD=admin
+    command:
+      - "start-dev"
+      - "--import-realm"
+    ports:
+    - "8083:8080"
+    volumes:
+      - keycloak-data:/opt/keycloak/data
+      - ./refop-dev-realm.json:/opt/keycloak/data/import/refop-dev-realm.json
+    networks:
+      - refop-network
+
+  proxy:
+    container_name: refop-proxy
+    image: nginx
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    ports:
+      - "8080:80"
+    networks:
+      - refop-network
+
+volumes:
+  mongo-data:
+    driver: local
+  keycloak-data:
+    driver: local
+
+networks:
+  refop-network:
+    driver: bridge

@@ -1,0 +1,282 @@
+# custom config settings
+# replace these in the config of your project or by overriding these variables
+refop:
+  auth:
+    server:
+      url: http://localhost:8083/realms/refop-dev
+  cors:
+    origins: http://localhost:8080, http://localhost:4200
+    headers: accept, authorization, content-type, x-requested-with
+    methods: GET, POST, PUT, DELETE, OPTIONS, HEAD
+fundify:
+  ticketing:
+    jira:
+      # Important note regarding base-url:
+      # - If you are using an api-token that has limited scopes, you need to access the Jira Cloud API using your cloud id.
+      #   - You can get your cloud id e.g. here: https://andamp.atlassian.net/_edge/tenant_info
+      # - If you are using an api-token that has full access to your account, you can use the base-url of your Jira Cloud instance.
+      #   - e.g. https://andamp.atlassian.net
+      base-url: "https://api.atlassian.com/ex/jira/fef9d7b3-4826-4920-a389-5bf53a82cf09/"
+      auth:
+        user-email: "<set this in your .env in the bootstrap module>"
+        api-token: "<set this in your .env in the bootstrap module>"
+      ticket-properties:
+        issue-type-id: "10006" # Task in the CEFUN project
+        labels:
+          - "Kontaktformular"
+        project-id: "10164" # CEFUN project
+  external-fundings:
+    sync-enabled: true
+    run-sync-on-startup: true
+    data-providers:
+      # When you add a provider here, you also need to add it in the rest-client configuration below.
+      fwf-test:
+        id: "fwf-test"
+        enabled: false
+        base-url: "https://risapi.test.fwf.ac.at"
+        credentials:
+          id: "<set this in your .env in the bootstrap module>"
+          secret: "<set this in your .env in the bootstrap module>"
+          tokenpath: "https://tsso.fwf.ac.at/auth/realms/sso/protocol/openid-connect/token"
+      fwf:
+        id: "fwf"
+        enabled: true
+        base-url: "https://risapi.prod.fwf.ac.at"
+        credentials:
+          id: "<set this in your .env in the bootstrap module>"
+          secret: "<set this in your .env in the bootstrap module>"
+          tokenpath: "https://sso.fwf.ac.at/auth/realms/sso/protocol/openid-connect/token"
+      wwtf:
+        # No auth needed, API is public
+        id: "wwtf"
+        enabled: false
+        base-url: "https://fundingportal.wwtf.at"
+
+frontend:
+  auth:
+    url: http://localhost:8083/realms/refop-dev
+    client: 'refop-fe'
+    scope: 'openid profile email offline_access'
+  env: DEV
+
+# general config settings
+quarkus:
+  swagger-ui:
+    always-include: true
+    path: /api/docs
+    enable: true
+    management:
+      enabled: false
+  smallrye-openapi:
+    path: /api/openapi
+    open-api-version: 3.1.1
+    management:
+      enabled: false
+  http:
+    cors:
+      ~: true
+      origins: ${refop.cors.origins}
+
+  log:
+    console:
+      enable: true
+      format: "%d{HH:mm:ss} %-5p [%c{2.}] (%t) %s%e%n"
+      level: DEBUG
+
+
+  oidc: # This is used to verify the bearer tokens sent by users
+    auth-server-url: ${refop.auth.server.url}
+
+  # Below configuration acquires tokens for the sync from external funding providers
+  oidc-client:
+    fwf-test:
+      client-id: ${fundify.external-fundings.data-providers.fwf-test.credentials.id}
+      credentials:
+        secret: ${fundify.external-fundings.data-providers.fwf-test.credentials.secret}
+      token-path: ${fundify.external-fundings.data-providers.fwf-test.credentials.tokenpath}
+      early-tokens-acquisition: false # Delay token acquisition until the first request is made.
+    fwf:
+      client-id: ${fundify.external-fundings.data-providers.fwf.credentials.id}
+      credentials:
+        secret: ${fundify.external-fundings.data-providers.fwf.credentials.secret}
+      token-path: ${fundify.external-fundings.data-providers.fwf.credentials.tokenpath}
+      early-tokens-acquisition: false # Delay token acquisition until the first request is made.
+
+  rest-client:
+    fwf-test:
+      url: ${fundify.external-fundings.data-providers.fwf-test.base-url}
+      connect-timeout: 5000
+      read-timeout: 10000
+    fwf:
+      url: ${fundify.external-fundings.data-providers.fwf.base-url}
+      connect-timeout: 5000
+      read-timeout: 10000
+    wwtf:
+      url: ${fundify.external-fundings.data-providers.wwtf.base-url}
+      connect-timeout: 5000
+      read-timeout: 10000
+
+
+  liquibase-mongodb:
+    migrate-at-start: true
+    change-log: db/changeLog.json
+
+  cache:
+    caffeine:
+      "user-permissions":
+        expire-after-write: PT5M # Expire user-permissions cache after 5 minutes
+  management:
+    enabled: true
+    port: 9000
+    root-path: "/q"
+  micrometer:
+    export:
+      prometheus:
+        enabled: true
+        path: "/q/metrics"
+
+
+cron:
+  expr:
+    sync:
+      funding: 0 0/5 * ? * *
+
+"%dev":
+  quarkus:
+    liquibase-mongodb:
+      clean-at-start: false # keep this at default.
+    mongodb:
+      database: refop
+      connection-string: mongodb://admin:admin@127.0.0.1:27017?retryWrites=false&retryReads=false&directConnection=true
+      credentials:
+        auth-source: admin
+  cron:
+    expr:
+      sync:
+        # for dev purposes synchronize every 5 minutes
+        funding: 0 0/1 * ? * *
+  fundify:
+    development:
+      enableDevController: true
+    auth:
+      permissions:
+        enableDebugLogging: true
+        # This property maps userIds to their roles and affiliations
+        # A valid entry looks like this:
+        # - userid: "ffg"
+        #   roles:
+        #     - "FUNDER" (see the enum Role in the domain package)
+        #   affiliationid: "ffg"
+        #
+        mapping:
+          - userid: "8b67b5b6-ad75-46c1-961b-9588b9cbba25"
+            roles:
+              - "FUNDER"
+            affiliationid: "ffg"
+          - userid: "49642e82-6105-457b-883b-f2dc1e025595"
+            roles:
+              - "ANNOTATOR"
+            affiliationid: "TUW"
+          - userid: "14af2908-f8c3-4d37-b057-ff0179c88d89"
+            roles:
+              - "ANNOTATOR"
+            affiliationid: "univie"
+          - userid: "fca4ae52-738c-47df-87ce-db3dea3c188f"
+            roles:
+              - "ADMIN"
+            affiliationid: "admin"
+          - userid: "cba6faaa-efad-412b-abd1-fec38263f355"
+            roles:
+              - "EXTERNAL_API_CLIENT"
+            affiliationid: "TUW"
+
+"%test":
+  quarkus:
+    mongodb:
+      devservices:
+        enabled: true
+        image-name: mongo:5.0.14
+      credentials:
+        auth-source: admin
+    oidc:
+      enabled: false
+    oidc-client:
+      enabled: false
+  fundify:
+    external-fundings:
+      run-sync-on-startup: false
+    auth:
+      permissions:
+        enableDebugLogging: false
+        mapping:
+          - userid: "test_admin_id"
+            roles:
+              - "ADMIN"
+            affiliationid: "admin"
+          - userid: "test_ffg_funder_id"
+            roles:
+              - "FUNDER"
+            affiliationid: "TEST_FFG"
+          - userid: "test_xyz_funder_id"
+            roles:
+              - "FUNDER"
+            affiliationid: "xyz"
+          - userid: "test_tuw_id"
+            roles:
+              - "ANNOTATOR"
+            affiliationid: "TEST_TUW"
+          - userid: "test_univie_id"
+            roles:
+              - "ANNOTATOR"
+            affiliationid: "univie"
+          - userid: "test_tuw_api_client_id"
+            roles:
+              - "EXTERNAL_API_CLIENT"
+            affiliationid: "TEST_TUW"
+          - userid: "test_univie_api_id"
+            roles:
+              - "EXTERNAL_API_CLIENT"
+            affiliationid: "univie"
+"%docker":
+  quarkus:
+    mongodb:
+      database: refop
+      connection-string: mongodb://admin:admin@mongo:27017
+      credentials:
+        auth-source: admin
+    oidc:
+      auth-server-url: http://keycloak:8080/realms/refop-dev
+    http:
+      cors:
+        ~: true
+        origins: http://localhost:8080
+
+  frontend:
+    auth:
+      url: http://localhost:8083/realms/refop-dev
+
+"%prod":
+  quarkus:
+    log:
+      console:
+        level: INFO
+  fundify:
+    auth:
+      permissions:
+        enableDebugLogging: true
+        initial-admin:
+          # Overriding the mapping list can be tricky with environment variables, so this one can also be used
+          userid: "fca4ae52-738c-47df-87ce-db3dea3c188f"
+          roles: ["ADMIN"]
+          affiliationid: "admin"
+        # This mapping should only be used for an initial admin user, which can then create other permissions that will be stored in the db
+        mapping:
+          - userid: "fca4ae52-738c-47df-87ce-db3dea3c188f"
+            roles:
+              - "ADMIN"
+            affiliationid: "admin"
+  mp:
+    openapi:
+      scan:
+        disable: true
+
