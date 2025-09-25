@@ -10,7 +10,6 @@ import { FunderWebModel } from './models/funder.interface';
 import { FUNDERS_CONSTANTS } from './funders.constants';
 import { ROUTER_LINKS } from '../core/router-links.constants';
 import { BUTTON_LABELS } from '../shared/shared.constants';
-import { Store } from '@ngrx/store';
 import { MatSort, MatSortHeader } from '@angular/material/sort';
 import {
   MatCell,
@@ -26,7 +25,6 @@ import {
   MatTableDataSource,
 } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
-import { AppState } from '../store';
 import { PermissionService } from '../core/auth/services/permission.service';
 import { EntryOriginEnum } from '../shared/models/enums/entry-origin.enum';
 import { PublicationStatusEnum } from '../shared/models/enums/publication-status.enum';
@@ -83,7 +81,6 @@ import { FundersStore } from './signal/funders-store';
   ],
 })
 export class FundersComponent implements OnInit, AfterViewInit {
-  store = inject<Store<AppState>>(Store);
   permissionService = inject(PermissionService);
   authService = inject(AuthService);
   fundersStore = inject(FundersStore);
