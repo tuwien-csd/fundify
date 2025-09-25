@@ -1,0 +1,23 @@
+@use '@angular/material' as mat;
+@use '../../../../styles/colors' as col;
+
+:host {
+  --text-field-container-padding: 1.25rem 1.25rem 1rem;
+  --text-field-container-margin: 0.5rem;
+}
+
+.url-field {
+  flex-grow: 1;
+
+  .form-item-container {
+    padding: var(--text-field-container-padding, 1.25rem 1.25rem 1rem);
+    margin: var(--text-field-container-margin, 0.5rem);
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+  }
+
+  mat-form-field {
+    margin-bottom: -1.35rem;
+  }
+}

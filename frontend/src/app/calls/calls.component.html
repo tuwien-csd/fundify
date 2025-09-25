@@ -1,0 +1,126 @@
+<div class="page-container">
+  <app-top-navbar [tabs]="FUNDING_TABS"></app-top-navbar>
+  <mat-card appearance="outlined" class="table-card">
+    <mat-card-content>
+      <div class="controls-container">
+        <div class="search-container">
+          <mat-form-field>
+            <mat-label>{{ CALL_CONSTANTS.SEARCH_FIELD_LABEL }}</mat-label>
+            <input
+              matInput
+              (keyup)="changeFilterValue($event)"
+              [placeholder]="CALL_CONSTANTS.SEARCH_FIELD_PLACEHOLDER"
+            />
+            <mat-icon matSuffix>search</mat-icon>
+          </mat-form-field>
+          <mat-slide-toggle
+            [checked]="hideClosedCalls"
+            (change)="toggleHideClosedCalls($event)"
+            color="primary"
+          >
+            hide closed calls
+          </mat-slide-toggle>
+        </div>
+        <div class="action-container">
+            <button
+              mat-raised-button
+              class="form-item-button"
+              color="primary"
+              [routerLink]="['new']"
+            >
+              <mat-icon>add</mat-icon>
+              {{ CALL_CONSTANTS.ADD_BUTTON_LABEL }}
+            </button>
+        </div>
+      </div>
+      <mat-table [dataSource]="dataSource()" matSort class="calls-table">
+        @for (column of CALL_CONSTANTS.TABLE_COLUMNS; track column) {
+          <ng-container [matColumnDef]="column.field">
+            <mat-header-cell *matHeaderCellDef mat-sort-header>
+              {{ column.header }}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let call">
+              {{ call | displayCallField: column.field }}
+            </mat-cell>
+          </ng-container>
+        }
+        <ng-container matColumnDef="menu">
+          <mat-header-cell *matHeaderCellDef></mat-header-cell>
+          <mat-cell *matCellDef="let call">
+            <button
+              mat-icon-button
+              [matMenuTriggerFor]="menu"
+              (click)="$event.stopPropagation()"
+            >
+              <mat-icon>more_vert</mat-icon>
+            </button>
+            <mat-menu #menu="matMenu">
+              <button mat-menu-item [routerLink]="[call.id]">
+                <mat-icon>visibility</mat-icon>
+                <span>{{ BUTTON_LABELS.VIEW }}</span>
+              </button>
+              <button
+                mat-menu-item
+                [routerLink]="[call.id, 'edit']"
+                [disabled]="
+                  !this.permissionService.canEdit(
+                    call.origin,
+                    call.status,
+                    authService.isFunder() ? call.funder?.acronym : call.callOwner?.acronym
+                  )
+                "
+              >
+                <mat-icon>edit</mat-icon>
+                <span>{{ BUTTON_LABELS.EDIT }}</span>
+              </button>
+              <button
+                mat-menu-item
+                [disabled]="
+                  !this.permissionService.canDelete(
+                    call.origin,
+                    call.status,
+                    authService.isFunder() ? call.funder?.acronym : call.callOwner?.acronym
+                  )
+                "
+                (click)="this.onDelete(call.id)"
+              >
+                <mat-icon>delete</mat-icon>
+                <span>{{ BUTTON_LABELS.DELETE }}</span>
+              </button>
+              @if (!authService.isFunder()) {
+                @if (
+                  call.subscriptionStatus ===
+                  CALL_CONSTANTS.SUBSCRIPTION_STATUS_UNSUBSCRIBED
+                ) {
+                  <button mat-menu-item (click)="this.onSubscribe(call.id)">
+                    <mat-icon>email</mat-icon>
+                    <span>{{ BUTTON_LABELS.SUBSCRIBE }}</span>
+                  </button>
+                } @else {
+                  <button mat-menu-item (click)="this.onUnsubscribe(call.id)">
+                    <mat-icon>unsubscribe</mat-icon>
+                    <span>{{ BUTTON_LABELS.UNSUBSCRIBE }}</span>
+                  </button>
+                }
+              }
+            </mat-menu>
+          </mat-cell>
+        </ng-container>
+
+        <mat-header-row
+          *matHeaderRowDef="displayedColumnsWithMenu"
+        ></mat-header-row>
+        <mat-row
+          *matRowDef="let row; columns: displayedColumnsWithMenu"
+          [routerLink]="[row.id]"
+          class="clickable-row"
+        ></mat-row>
+      </mat-table>
+
+      <mat-paginator
+        [pageSizeOptions]="[10, 20, 30]"
+        [showFirstLastButtons]="true"
+      ></mat-paginator>
+    </mat-card-content>
+  </mat-card>
+</div>

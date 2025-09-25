@@ -1,0 +1,30 @@
+<div class="url-field">
+  <div class="form-item-label">{{ label }}</div>
+  <div class="form-item-container">
+    <ng-container>
+      <mat-form-field appearance="fill" floatLabel="auto" [formGroup]="urlForm">
+        <mat-label>{{ label }}</mat-label>
+        <input
+          matInput
+          formControlName="url"
+          [required]="required"
+          [placeholder]="placeholder"
+          (blur)="onTouched()"
+        />
+        @if (urlForm.invalid && (urlForm.dirty || urlForm.touched)) {
+          <mat-error>
+            <ng-container>{{
+              validationService.getValidationErrorMessage(
+                url,
+                validators.REQUIRED
+              )
+            }}</ng-container>
+            <ng-container>{{
+              validationService.getValidationErrorMessage(url, validators.URL)
+            }}</ng-container>
+          </mat-error>
+        }
+      </mat-form-field>
+    </ng-container>
+  </div>
+</div>

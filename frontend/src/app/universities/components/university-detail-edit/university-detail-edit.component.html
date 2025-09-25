@@ -1,0 +1,91 @@
+<app-generic-details-container>
+  <container-header>
+    <mat-card-title>{{ UNIVERSITY_DETAILS_CONSTANTS.TITLE }}</mat-card-title>
+  </container-header>
+  <container-content>
+    @if (detailsForm()) {
+      <form [formGroup]="detailsForm()">
+        <div>
+          <app-translated-text-field-v2
+            [inputFormGroupArray]="nameFormArray()"
+            [label]="UNIVERSITY_DETAILS_CONSTANTS.NAME_LABEL"
+            [textLabel]="UNIVERSITY_DETAILS_CONSTANTS.NAME_LABEL"
+            [placeholder]="UNIVERSITY_DETAILS_CONSTANTS.NAME_PLACEHOLDER"
+            [required]="true"
+          />
+          <app-text-field
+            formControlName="risId"
+            [label]="UNIVERSITY_DETAILS_CONSTANTS.RIS_ID_LABEL"
+            [textLabel]="UNIVERSITY_DETAILS_CONSTANTS.RIS_ID_LABEL"
+            [placeholder]="UNIVERSITY_DETAILS_CONSTANTS.RIS_ID_PLACEHOLDER"
+            [required]="false"
+          >
+          </app-text-field>
+          <app-text-field
+            formControlName="acronym"
+            [label]="UNIVERSITY_DETAILS_CONSTANTS.ACRONYM_LABEL"
+            [textLabel]="UNIVERSITY_DETAILS_CONSTANTS.ACRONYM_LABEL"
+            [placeholder]="UNIVERSITY_DETAILS_CONSTANTS.ACRONYM_PLACEHOLDER"
+            [required]="false"
+          >
+          </app-text-field>
+          <app-text-field
+            formControlName="crossRefDoi"
+            [label]="UNIVERSITY_DETAILS_CONSTANTS.CROSSREF_DOI_LABEL"
+            [textLabel]="UNIVERSITY_DETAILS_CONSTANTS.CROSSREF_DOI_LABEL"
+            [placeholder]="
+              UNIVERSITY_DETAILS_CONSTANTS.CROSSREF_DOI_PLACEHOLDER
+            "
+            [required]="false"
+          >
+          </app-text-field>
+          <app-text-field
+            formControlName="submissionSystem"
+            [label]="UNIVERSITY_DETAILS_CONSTANTS.SUBMISSION_SYSTEM_LABEL"
+            [textLabel]="UNIVERSITY_DETAILS_CONSTANTS.SUBMISSION_SYSTEM_LABEL"
+            [placeholder]="
+              UNIVERSITY_DETAILS_CONSTANTS.SUBMISSION_SYSTEM_PLACEHOLDER
+            "
+            [required]="false"
+          >
+          </app-text-field>
+          <app-address-form [inputFormGroup]="addressForm()" [required]="true">
+          </app-address-form>
+          <app-text-field
+            formControlName="emailDomain"
+            [label]="UNIVERSITY_DETAILS_CONSTANTS.MAIL_DOMAIN_LABEL"
+            [textLabel]="UNIVERSITY_DETAILS_CONSTANTS.MAIL_DOMAIN_LABEL"
+            [placeholder]="UNIVERSITY_DETAILS_CONSTANTS.MAIL_DOMAIN_PLACEHOLDER"
+            [required]="false"
+          >
+          </app-text-field>
+          <app-text-field
+            formControlName="website"
+            [label]="UNIVERSITY_DETAILS_CONSTANTS.WEBSITE_LABEL"
+            [textLabel]="UNIVERSITY_DETAILS_CONSTANTS.WEBSITE_LABEL"
+            [placeholder]="UNIVERSITY_DETAILS_CONSTANTS.WEBSITE_PLACEHOLDER"
+            [required]="true"
+          >
+          </app-text-field>
+        </div>
+      </form>
+    }
+  </container-content>
+  <container-actions class="flex flex-row w-full justify-between p-1 m-2">
+    <button mat-stroked-button class="form-item-button" (click)="onBack()">
+      <mat-icon>arrow_back</mat-icon>
+      {{ BUTTON_LABELS.BACK }}
+    </button>
+    <div class="spacer"></div>
+    <button
+      mat-raised-button
+      class="submit-button form-item-button"
+      color="primary"
+      type="submit"
+      [disabled]="!formValidSignal()"
+      (click)="onSave()"
+    >
+      {{ BUTTON_LABELS.SUBMIT }}
+    </button>
+  </container-actions>
+</app-generic-details-container>

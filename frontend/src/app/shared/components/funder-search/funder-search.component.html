@@ -1,0 +1,45 @@
+<div [formGroup]="form" class="funding-entity-selector">
+  <div class="form-item-label">{{ label }}</div>
+  <div class="form-item-container">
+    <mat-form-field appearance="fill" class="search-field">
+      <input
+        matInput
+        formControlName="search"
+        [placeholder]="constants.SEARCH_LABEL"
+        [matAutocomplete]="auto"
+      />
+      <mat-autocomplete
+        #auto="matAutocomplete"
+        [displayWith]="displayFn"
+        (optionSelected)="setSelectedFunder()"
+      >
+        @for (funder of filteredEntities(); track funder) {
+          <mat-option [value]="funder">{{ funder.name[0].text }}</mat-option>
+        }
+      </mat-autocomplete>
+    </mat-form-field>
+    @if (form.invalid && (form.dirty || form.touched)) {
+      <mat-error>
+        {{
+          validationService.getValidationErrorMessage(form, validators.REQUIRED)
+        }}
+      </mat-error>
+    }
+    <mat-chip-listbox class="chip-list">
+      @for (
+        funder of fundingEntityFormArray.controls;
+        track funder;
+        let i = $index
+      ) {
+        <mat-chip
+          color="accent"
+          [removable]="true"
+          (removed)="removeFunder(i)"
+        >
+          {{ funder.value?.name?.[0]?.text }}
+          <mat-icon matChipRemove>cancel</mat-icon>
+        </mat-chip>
+      }
+    </mat-chip-listbox>
+  </div>
+</div>

@@ -1,0 +1,139 @@
+<div class="translated-text">
+  <div class="form-item-label">{{ label }}</div>
+  @if (expanded) {
+    <div class="form-item-container">
+      @for (form of translatedTextForm.controls; track form; let i = $index) {
+        <div class="translation-row">
+          <div class="translation-fields">
+            <mat-form-field class="text-field" appearance="fill">
+              <mat-label>{{ textLabel }}</mat-label>
+              @if (!multilineText) {
+                <input
+                  matInput
+                  [required]="required"
+                  ngDefaultControl
+                  [formControl]="getTextControl(i)"
+                  [placeholder]="placeholder"
+                  (blur)="onTouched()"
+                />
+              }
+              @if (multilineText) {
+                <textarea
+                  matInput
+                  cdkTextareaAutosize
+                  [required]="required"
+                  ngDefaultControl
+                  [formControl]="getTextControl(i)"
+                  [placeholder]="placeholder"
+                  (blur)="onTouched()"
+                  rows="1"
+                ></textarea>
+              }
+              @if (
+                getTextControl(i).invalid ||
+                (form.invalid && !getTextControl(i).value)
+              ) {
+                <mat-error>
+                  {{
+                    validationService.getValidationErrorMessage(
+                      getTextControl(i),
+                      validators.REQUIRED
+                    )
+                  }}
+                  {{
+                    validationService.getValidationErrorMessage(
+                      getTextControl(i),
+                      validators.PATTERN
+                    )
+                  }}
+                </mat-error>
+              }
+            </mat-form-field>
+            <mat-form-field class="language-field" appearance="fill">
+              <mat-label>{{ languageLabel }}</mat-label>
+              <mat-select
+                [required]="required"
+                ngDefaultControl
+                [formControl]="getLanguageControl(i)"
+                (selectionChange)="updateSelectedLangCodes($event, i)"
+              >
+                <mat-option hidden>{{
+                  constants.SELECT_PLACEHOLDER
+                }}</mat-option>
+                @for (langCode of langCodes; track langCode) {
+                  @if (
+                    !selectedLangCodes.includes(langCode) ||
+                    selectedLangCodes.indexOf(langCode) === i
+                  ) {
+                    <mat-option [value]="langCode">
+                      {{ langCode }}
+                    </mat-option>
+                  }
+                }
+              </mat-select>
+              @if (getLanguageControl(i).invalid) {
+                <mat-error>
+                  {{
+                    validationService.getValidationErrorMessage(
+                      getLanguageControl(i),
+                      validators.REQUIRED
+                    )
+                  }}
+                </mat-error>
+              }
+            </mat-form-field>
+          </div>
+          <div class="translation-actions">
+            @if (translatedTextForm.length > 1) {
+              <button
+                mat-icon-button
+                color="primary"
+                (click)="deleteTextForm(i)"
+                matTooltip="remove translation"
+                matTooltipPosition="above"
+              >
+                <mat-icon>remove_circle</mat-icon>
+              </button>
+            }
+            @if (
+              translatedTextForm.length === i + 1 &&
+              langCodes.length > selectedLangCodes.length &&
+              translatedTextForm.length < langCodes.length
+            ) {
+              <button
+                mat-icon-button
+                color="primary"
+                [disabled]="form.invalid"
+                (click)="addTextForm()"
+                matTooltip="add translation"
+                matTooltipPosition="above"
+              >
+                <mat-icon>add_circle</mat-icon>
+              </button>
+            }
+          </div>
+          @if (
+            form.invalid &&
+            !required &&
+            (getTextControl(i).touched || getTextControl(i).dirty) &&
+            (getLanguageControl(i).touched || getLanguageControl(i).dirty)
+          ) {
+            <mat-error class="form-error">
+              {{
+                validationService.getValidationErrorMessage(
+                  form,
+                  validators.TRANSLATION
+                )
+              }}
+            </mat-error>
+          }
+        </div>
+      }
+    </div>
+  }
+  @if (!expanded) {
+    <button mat-stroked-button color="primary" (click)="addTextForm()">
+      {{ constants.ADD_BUTTON_LABEL }}
+    </button>
+  }
+</div>

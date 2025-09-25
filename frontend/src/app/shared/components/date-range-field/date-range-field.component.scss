@@ -1,0 +1,20 @@
+@use '@angular/material' as mat;
+@use '../../../../styles/colors' as col;
+
+:host {
+  --date-range-container-padding: 0.75rem;
+  --date-range-container-margin: 0.5rem;
+}
+
+.date-range {
+  .form-item-container {
+    padding: var(--date-range-container-padding, 0.75rem);
+    margin: var(--date-range-container-padding, 0.5rem);
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+  }
+  mat-form-field {
+    margin-bottom: -1.35rem;
+  }
+}

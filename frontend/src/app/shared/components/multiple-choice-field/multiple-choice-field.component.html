@@ -1,0 +1,47 @@
+<div class="form-check" [formGroup]="multipleChoiceForm">
+  <div class="form-item-label">{{ label }}</div>
+  <div class="form-item-container">
+    @if (enableSelectAll) {
+      <mat-checkbox
+        class="form-check select-all"
+        [checked]="allSelected"
+        [color]="'primary'"
+        [indeterminate]="someSelected()"
+        (change)="onChangeSelectedAll($event.checked)"
+      >
+        @if (allSelected) {
+          unselect all
+        }
+        @if (!allSelected) {
+          select all
+        }
+      </mat-checkbox>
+    }
+    <div class="checkbox-grid">
+      @for (item of checkboxGroup.items; track item) {
+        <mat-checkbox
+          ngDefaultControl
+          class="form-check"
+          [color]="'primary'"
+          [id]="item.value"
+          [formControl]="item.control"
+          (change)="onChangeCheckbox($event.checked)"
+        >
+          {{ item.label }}
+        </mat-checkbox>
+      }
+    </div>
+    @if (checkboxes.invalid && (checkboxes.dirty || checkboxes.touched)) {
+      <mat-error>
+        <ng-container>
+          {{
+            validationService.getValidationErrorMessage(
+              checkboxes,
+              validators.REQUIRED
+            )
+          }}
+        </ng-container>
+      </mat-error>
+    }
+  </div>
+</div>

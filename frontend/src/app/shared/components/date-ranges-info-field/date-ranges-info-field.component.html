@@ -1,0 +1,48 @@
+<div class="date-ranges-info" [formGroup]="dateRangesInfoForm">
+  <div class="form-item-label">{{ label }}</div>
+  @for (
+    dateRangeInfoControl of dateRangesInfo.controls;
+    track dateRangeInfoControl;
+    let i = $index
+  ) {
+    <ng-container formArrayName="dateRangesInfo">
+      <div [formGroupName]="i" class="form-item-container">
+        <app-date-range-field
+          ngDefaultControl
+          [formFieldLabel]="labelRange"
+          formControlName="duration"
+          [required]="isRangeRequired(i)"
+        ></app-date-range-field>
+        <app-translated-text-field
+          ngDefaultControl
+          [textLabel]="labelInfo"
+          formControlName="description"
+          [required]="false"
+        ></app-translated-text-field>
+        <div>
+          @if (dateRangesInfo.length === i + 1) {
+            <button
+              mat-stroked-button
+              class="form-item-button"
+              [color]="'primary'"
+              [disabled]="dateRangeInfoControl.invalid"
+              (click)="addEmptyGroup(i + 1)"
+            >
+              {{ constants.ADD_BUTTON_LABEL }}
+            </button>
+          }
+          @if (dateRangesInfo.length > i && i > 0) {
+            <button
+              mat-stroked-button
+              class="form-item-button"
+              [color]="'primary'"
+              (click)="deleteGroup(i)"
+            >
+              {{ constants.REMOVE_BUTTON_LABEL }}
+            </button>
+          }
+        </div>
+      </div>
+    </ng-container>
+  }
+</div>

@@ -1,0 +1,103 @@
+@use '@angular/material' as mat;
+@use './colors' as col;
+
+// Button styles
+.fundify-button-outlined {
+  $primary-color: mat.m2-get-color-from-palette(col.$custom-primary-color, 500);
+  border: 1px solid $primary-color !important;
+  color: $primary-color !important;
+}
+
+.fundify-button-flex-wrapper-full-width {
+  display: flex;
+  justify-content: flex-end;
+  button {
+    margin-left: 10px;
+    margin-bottom: 10px;
+  }
+}
+
+// Snackbar styles
+.mat-mdc-snack-bar-container {
+  &.fundify-success {
+    --mat-snackbar-container-color: mat.m2-get-color-from-palette(
+      col.$custom-success-color,
+      500
+    );
+    --mat-mdc-snack-bar-button-color: mat.m2-get-contrast-color-from-palette(
+      col.$custom-success-color,
+      500
+    );
+    --mat-snackbar-supporting-text-color: mat.m2-get-contrast-color-from-palette(
+      col.$custom-success-color,
+      500
+    );
+  }
+  &.fundify-info {
+    --mat-snackbar-container-color: mat.m2-get-color-from-palette(
+      col.$custom-primary-color,
+      500
+    );
+    --mat-mdc-snack-bar-button-color: mat.m2-get-contrast-color-from-palette(
+      col.$custom-primary-color,
+      500
+    );
+    --mat-snackbar-supporting-text-color: mat.m2-get-contrast-color-from-palette(
+      col.$custom-primary-color,
+      500
+    );
+  }
+  &.fundify-error {
+    --mat-snackbar-container-color: mat.m2-get-color-from-palette(
+      col.$custom-warn-color,
+      500
+    );
+    --mat-mdc-snack-bar-button-color: mat.m2-get-contrast-color-from-palette(
+      col.$custom-warn-color,
+      500
+    );
+    --mat-snackbar-supporting-text-color: mat.m2-get-contrast-color-from-palette(
+      col.$custom-warn-color,
+      500
+    );
+  }
+}
+
+// Container Styles
+.form-item-label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: mat.m2-get-color-from-palette(col.$custom-accent-color, 300);
+  display: block;
+  margin-bottom: 0.1rem;
+  margin-left: 0.5rem;
+}
+
+.form-item-container {
+  background-color: white;
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  margin: 0.5rem;
+}
+
+.form-item-button {
+  margin: 0.5rem;
+}
+
+.detail-item {
+  background-color: mat.m2-get-color-from-palette(
+    col.$custom-primary-color,
+    background
+  );
+  border-radius: 0.5rem;
+  padding: 1rem;
+}
+
+.detail-label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: mat.m2-get-color-from-palette(col.$custom-accent-color, 300);
+  display: block;
+  margin-bottom: 0.5rem;
+  margin-left: 0.5rem;
+}

@@ -1,0 +1,109 @@
+// Define a reusable mixin for button styles
+@mixin button-styles {
+  padding: var(--spacing-medium) var(--spacing-large);
+  border-radius: 4px;
+  font-size: 16px;
+  background-color: var(--main-color);
+  color: var(--main-color-contrast);
+}
+
+// Define a reusable mixin for container styles for automatic grid arrangement
+@mixin container-styles {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-content: flex-start;
+}
+
+.label-cell {
+  font-weight: bold;
+}
+
+// Styles for the table
+.mat-mdc-table {
+  border-collapse: initial;
+  border-spacing: 0;
+  box-shadow: none;
+
+  //   // Apply width styles to specific cells
+  .label-cell {
+    max-width: 40%;
+    font-weight: bold;
+  }
+
+  .value-cell {
+    width: 70%;
+  }
+
+  //   Apply background color and cursor on hover to data rows
+  mat-row:hover {
+    background-color: var(--hover-color);
+    cursor: pointer;
+  }
+}
+
+// // Styles for the main card
+.call-details-card {
+  width: 100%;
+  max-width: 1200px;
+  margin: var(--spacing-large);
+
+  // Apply title and content styles to card elements
+  .mat-mdc-card-title {
+    font-size: 36px;
+    font-weight: 600;
+    margin-bottom: var(--spacing-large);
+  }
+
+  .mat-mdc-card-content {
+    @include container-styles;
+  }
+}
+
+.form-label {
+  font-weight: bold;
+}
+
+.form-group-field {
+  flex: 1;
+  margin-right: 16px;
+}
+
+// Styles for the action buttons
+.action-buttons {
+  @include container-styles;
+  justify-content: flex-end;
+  margin-top: var(--spacing-large);
+
+  // Apply button styles to all buttons inside container
+  button.mat-mdc-raised-button {
+    @include button-styles;
+    margin-left: var(--spacing-medium);
+  }
+
+  // Apply margin and padding styles to both header and content
+  & ~ .card-header,
+  & ~ .card-content {
+    padding: var(--spacing-large) !important;
+    margin: var(--spacing-large) !important;
+  }
+}
+
+// Styles for the no-data message
+.no-data {
+  text-align: center;
+  padding: var(--spacing-large);
+}
+
+//Styles for the edit button container
+.actions {
+  display: flex !important;
+  justify-content: flex-end !important;
+
+  // Apply margin and padding styles to both header and content
+  & ~ .card-header,
+  & ~ .card-content {
+    padding: var(--spacing-large) !important;
+    margin: var(--spacing-large) !important;
+  }
+}

@@ -1,0 +1,145 @@
+@use '@angular/material' as mat;
+@use '../../../../styles/colors' as col;
+
+.landing-page {
+  .section-divider {
+    height: 0.1rem;
+    background-color: rgba(0, 0, 0, 0.1);
+    margin: 0 25rem;
+    border-radius: 3rem;
+  }
+
+  .hero {
+    background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.2));
+    background-size: cover;
+    color: white;
+    padding: 7rem 0;
+    text-align: center;
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 2.5rem;
+    }
+
+    p {
+      font-size: 1.6em;
+      font-weight: 400;
+      margin-bottom: 4rem;
+    }
+
+    a {
+      color: mat.m2-get-color-from-palette(col.$custom-primary-color, 500);
+      font-weight: bold;
+    }
+  }
+
+  .features {
+    padding: 4rem 20rem;
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 5rem;
+
+      @media (max-width: 1024px) {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .feature {
+      text-align: left;
+
+      h3 {
+        margin: 1rem 1rem 1rem 0;
+        font-size: 1.7rem;
+      }
+
+      p {
+        font-size: 1.2rem;
+        display: block;
+        line-height: 1.7rem;
+        text-align: left;
+      }
+    }
+  }
+
+  .faq {
+    padding: 4rem 20rem;
+
+    .section-header {
+      display: flex;
+      margin-bottom: 2rem;
+
+      mat-icon {
+        font-size: 2rem;
+        height: 2rem;
+        width: 2rem;
+        margin-right: 1rem;
+      }
+
+      h2 {
+        margin: 0;
+      }
+    }
+
+    .faq-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+
+      @media (max-width: 1024px) {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      @media (max-width: 768px) {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .faq-item {
+      mat-panel-title {
+        font-size: 1rem;
+      }
+
+      mat-expansion-panel {
+        padding: 0.5rem;
+      }
+    }
+
+    p {
+      font-size: 1rem;
+      display: block;
+      line-height: 1.7rem;
+    }
+  }
+
+  .links {
+    padding: 4rem 15rem;
+
+    .links-container {
+      display: flex;
+      justify-content: space-evenly;
+      align-items: center;
+
+      @media (max-width: 768px) {
+        flex-wrap: wrap;
+      }
+    }
+
+    .link-item {
+      color: mat.m2-get-color-from-palette(col.$custom-primary-color, 500);
+      transition: color 0.3s ease;
+
+      &:hover {
+        color: mat.m2-get-color-from-palette(col.$custom-primary-color, 300);
+        cursor: pointer;
+      }
+
+      mat-icon {
+        width: 2.5rem;
+        height: 2.5rem;
+        font-size: 2.5rem;
+      }
+    }
+  }
+}

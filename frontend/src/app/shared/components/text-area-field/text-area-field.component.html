@@ -1,0 +1,68 @@
+<div class="form-group">
+  <div class="form-item-label">{{ displayLabel() }}</div>
+  <div class="form-item-container">
+    <mat-form-field class="text-field" appearance="fill" [formGroup]="areaForm">
+      <mat-label>{{ textLabel() }}</mat-label>
+
+      @if (autoGrow()) {
+        <textarea
+          matInput
+          formControlName="text"
+          [placeholder]="placeholder()"
+          [required]="required()"
+          cdkTextareaAutosize
+          [cdkAutosizeMinRows]="minRows()"
+          [cdkAutosizeMaxRows]="maxRows()"
+          [attr.maxlength]="maxlength() ?? null"
+          (blur)="onTouched()"
+        ></textarea>
+      } @else {
+        <textarea
+          matInput
+          formControlName="text"
+          [placeholder]="placeholder()"
+          [required]="required()"
+          [rows]="minRows()"
+          [attr.maxlength]="maxlength() ?? null"
+          (blur)="onTouched()"
+        ></textarea>
+      }
+
+      @if (hint()) {
+        <mat-hint>{{ hint() }}</mat-hint>
+      }
+      @if (maxlength() !== null) {
+        <mat-hint align="end">
+          {{ (text.value?.length || 0) + ' / ' + maxlength() }}
+        </mat-hint>
+      }
+
+      @if (
+        !hideValidation() &&
+        areaForm.invalid &&
+        (areaForm.dirty || areaForm.touched)
+      ) {
+        <mat-error>
+          <ng-container>
+            {{
+              validationService.getValidationErrorMessage(
+                text,
+                validators.REQUIRED
+              )
+            }}
+          </ng-container>
+          @if (maxlength() !== null) {
+            <ng-container>
+              {{
+                validationService.getValidationErrorMessage(
+                  text,
+                  validators.MAX_LENGTH
+                )
+              }}
+            </ng-container>
+          }
+        </mat-error>
+      }
+    </mat-form-field>
+  </div>
+</div>

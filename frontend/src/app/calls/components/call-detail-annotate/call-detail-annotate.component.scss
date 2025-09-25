@@ -1,0 +1,105 @@
+@use '@angular/material' as mat;
+@use '../../../../styles/colors' as col;
+
+.mat-mdc-card {
+  margin: 2rem;
+  padding: 1rem;
+  border-radius: 1rem;
+
+  .mat-mdc-card-title {
+    margin-left: 2rem;
+    margin-top: 1rem;
+    font-size: 2rem;
+    font-weight: 700;
+  }
+
+  mat-form-field {
+    margin-bottom: -1.35rem;
+  }
+
+  .card-title-link {
+    position: relative;
+    display: inline-block;
+    text-decoration: underline;
+    color: mat.m2-get-color-from-palette(col.$custom-primary-color, 500);
+
+    &:hover {
+      color: mat.m2-get-color-from-palette(col.$custom-primary-color, 300);
+    }
+  }
+  mat-card-content {
+    .detail-item {
+      .detail-value {
+        margin-left: 0.5rem;
+      }
+      .content-link {
+        position: relative;
+        display: inline-block;
+        color: mat.m2-get-color-from-palette(col.$custom-primary-color, 500);
+        text-decoration: underline;
+
+        &:hover {
+          color: mat.m2-get-color-from-palette(col.$custom-primary-color, 300);
+        }
+      }
+    }
+  }
+
+  .grid-container-top {
+    display: grid;
+    gap: 1em;
+    padding: 1rem;
+    margin: 0 1rem 1rem;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+  }
+
+  .grid-container-bottom {
+    display: grid;
+    gap: 1em;
+    padding: 1rem;
+    margin: 0 1rem 1rem;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .contact-container {
+    padding: 1rem;
+    display: grid;
+    column-gap: 2rem;
+    row-gap: 1rem;
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+
+  .links-container {
+    padding: 1rem;
+  }
+
+  .form-fields-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+    }
+
+    mat-form-field {
+      width: 100%;
+    }
+  }
+
+  .link-button {
+    margin-left: 0;
+  }
+
+  .action-section {
+    display: flex;
+    justify-content: space-between;
+    padding: 1rem;
+    margin: 1rem 2rem;
+  }
+
+  .spacer {
+    flex: 1;
+  }
+}

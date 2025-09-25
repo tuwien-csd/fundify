@@ -1,0 +1,77 @@
+@use '@angular/material' as mat;
+@use '../../../../styles/colors' as col;
+
+.call-details-container {
+  margin: 2rem;
+
+  mat-chip {
+    margin-left: 0.5rem;
+    margin-top: 1rem;
+  }
+}
+
+.mat-mdc-card {
+  .mat-mdc-card-title {
+    margin-left: 2rem;
+    margin-top: 1rem;
+    font-size: 2rem;
+    font-weight: 700;
+  }
+}
+
+.call-details-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  padding: 1rem;
+  margin: 0 1rem 1rem;
+}
+
+.detail-item {
+  background-color: mat.m2-get-color-from-palette(
+    col.$custom-primary-color,
+    background
+  );
+  border-radius: 0.8rem;
+  padding: 1rem;
+}
+
+.nested-grid-container-column {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+@media (max-width: 768px) {
+  .nested-grid-container-column {
+    grid-template-columns: 1fr;
+  }
+}
+
+.nested-grid-container-row {
+  display: grid;
+  grid-template-columns: repeat(1, 2fr);
+  gap: 1rem;
+}
+
+.mat-mdc-input-element {
+  font-size: 1rem;
+  color: col.$dark-primary-text;
+}
+
+.action-section {
+  display: flex;
+  justify-content: space-between;
+  padding: 1rem;
+  margin: 1rem 2rem;
+}
+
+.spacer {
+  flex: 1;
+}
+
+@media (max-width: 999px) {
+  .call-details-grid {
+    grid-template-columns: 1fr;
+  }
+}

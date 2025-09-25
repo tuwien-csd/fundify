@@ -1,0 +1,14 @@
+@use '@angular/material' as mat;
+@use '../../../../styles/colors' as col;
+
+.form-check {
+  .checkbox-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  }
+
+  mat-checkbox {
+    display: block;
+    margin: 0;
+  }
+}

@@ -1,0 +1,83 @@
+import { FundingEntityRef } from '../../shared/models/interfaces/funding-entity-ref.interface';
+import { AnswerYnEnum } from '../../shared/models/enums/answer-yn.enum';
+import { AustrianStateEnum } from 'src/app/shared/models/enums/austrian-state.enum';
+import { CallTypeEnum } from 'src/app/shared/models/enums/call-type.enum';
+import { CareerStageEnum } from 'src/app/shared/models/enums/career-stage.enum';
+import { DecisionProcessEnum } from 'src/app/shared/models/enums/decision-process.enum';
+import { EntryOriginEnum } from 'src/app/shared/models/enums/entry-origin.enum';
+import { FundingCharacteristicEnum } from 'src/app/shared/models/enums/funding-characteristic.enum';
+import { FundingSchemeEnum } from 'src/app/shared/models/enums/funding-scheme.enum';
+import { LanguageEnum } from 'src/app/shared/models/enums/language.enum';
+import { LegalTypeEnum } from 'src/app/shared/models/enums/legal-type.enum';
+import { ModeOfSubmissionEnum } from 'src/app/shared/models/enums/mode-of-submission.enum';
+import { RegionalScopeEnum } from 'src/app/shared/models/enums/regional-scope.enum';
+import { TargetGroupEnum } from 'src/app/shared/models/enums/target-group.enum';
+import { Contact } from 'src/app/shared/models/interfaces/contact.interface';
+import { DateInfoRange } from 'src/app/shared/models/interfaces/date-info-range.interface';
+import { Duration } from 'src/app/shared/models/interfaces/duration.interface';
+import { MonetaryNumber } from 'src/app/shared/models/interfaces/monetary-number.interface';
+import { TranslatedText } from 'src/app/shared/models/interfaces/translated-text.interface';
+import { Identifier } from '../../shared/models/interfaces/identifier.interface';
+import { StandardizedSubject } from '../../shared/models/interfaces/standardizedSubject.interface';
+import { PublicationStatusEnum } from '../../shared/models/enums/publication-status.enum';
+import { components } from '../../../generated/refop-be';
+import {CallOwner} from "./call-owner-interface";
+
+export interface Call {
+  id?: string;
+  fundingType?: CallTypeEnum;
+  status?: PublicationStatusEnum;
+  entryOrigin?: EntryOriginEnum;
+  registrationDate?: string;
+  lastSync?: string;
+  lastUpdatedAt?: string;
+  // mandatory fields
+  risId?: string;
+  name?: TranslatedText[];
+  targetGroups?: TargetGroupEnum[];
+  subjects?: StandardizedSubject[];
+  characteristics?: FundingCharacteristicEnum[];
+  fundingScheme?: FundingSchemeEnum;
+  legalType?: LegalTypeEnum;
+  minProjectVolume?: MonetaryNumber;
+  maxProjectVolume?: MonetaryNumber;
+  fullyFunded?: AnswerYnEnum;
+  minInkind?: number;
+  maxOverhead?: number;
+  minProjectDuration?: Duration;
+  maxProjectDuration?: Duration;
+  callStages?: DateInfoRange[];
+  applicationLanguages?: LanguageEnum[];
+  submissionModes?: ModeOfSubmissionEnum[];
+  contacts?: Contact[];
+  funder?: FundingEntityRef;
+  subscribed?: boolean;
+  // optional fields
+  acronym?: string;
+  identifiers?: Identifier[];
+  targetGroupDetails?: TranslatedText[];
+  thematicOrientations?: TranslatedText[][];
+  description?: TranslatedText[];
+  careerStages?: CareerStageEnum[];
+  eligibleApplicants?: TranslatedText[];
+  eligibleApplicantsScope?: RegionalScopeEnum;
+  eligibleApplicantsRegions?: AustrianStateEnum[];
+  callVolumeProjects?: number;
+  callVolumeAmount?: MonetaryNumber;
+  inkindDetails?: TranslatedText[];
+  overheadDetails?: TranslatedText[];
+  reportingPeriodDetails?: TranslatedText[];
+  decisionProcess?: DecisionProcessEnum[];
+  decisionProcessDetails?: TranslatedText[];
+  dmpRequired?: AnswerYnEnum;
+  dmpGuidelines?: URL;
+  projectStartDetails?: TranslatedText[];
+  website?: URL[];
+  partOf?: FundingEntityRef;
+  jointCallPartner?: FundingEntityRef[];
+  callOwner?: CallOwner;
+}
+
+export type CallWebModel = components['schemas']['CallWebModel'];
+
+export type CallUpdateWebModel = components['schemas']['CallUpdateWebModel'];

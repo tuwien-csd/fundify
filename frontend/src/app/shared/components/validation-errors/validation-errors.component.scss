@@ -1,0 +1,30 @@
+@use '../../styles/shared.scss';
+
+:host {
+  display: block;
+  margin-top: 1rem;
+}
+
+.mat-mdc-card {
+  background-color: var(--error-bg);
+  color: var(--error-text);
+  border: 2px solid var(--error-border);
+  border-radius: 10px;
+  padding: 1rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.mat-mdc-card-title {
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+ul {
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+}
+
+li {
+  padding: 0.25rem 0;
+}

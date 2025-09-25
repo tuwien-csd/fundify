@@ -1,0 +1,59 @@
+<mat-card appearance="outlined">
+  <mat-card-header>
+    <mat-card-title
+      >{{ call.name?.[0]?.text || (call.name?.[1]?.text ?? 'New Call') }}
+    </mat-card-title>
+    @if (call.status === PublicationStatusEnum.DRAFT) {
+      <mat-chip>
+        {{ call.status }}
+      </mat-chip>
+    }
+  </mat-card-header>
+
+  <mat-card-content>
+    <div class="call-details-grid">
+      @for (detail of callDetails; track detail) {
+        <div class="detail-item">
+          <div class="detail-content">
+            <span class="detail-label">{{ detail.label }}</span>
+            <span class="detail-value">{{ detail.value }}</span>
+          </div>
+        </div>
+      }
+    </div>
+    @if (!callDetails.length) {
+      <div class="no-data">
+        {{ CALL_DETAILS_CONSTANTS.NO_DATA_MESSAGE }}
+      </div>
+    }
+  </mat-card-content>
+
+  <mat-card-actions class="action-section">
+    <button mat-stroked-button class="form-item-button" (click)="onBack()">
+      <mat-icon>arrow_back</mat-icon>
+      {{ BUTTON_LABELS.BACK }}
+    </button>
+    <span class="spacer"></span>
+    @if (call.status === PublicationStatusEnum.DRAFT && permissions.canEdit) {
+      <button
+        mat-raised-button
+        class="form-item-button"
+        color="primary"
+        (click)="onPublish()"
+        [disabled]="!isValid"
+        [matTooltip]="
+          isValid ? '' : CALL_DETAILS_CONSTANTS.PUBLISH_DISABLED_TOOLTIP
+        "
+      >
+        <mat-icon>publish</mat-icon>
+        {{ BUTTON_LABELS.PUBLISH }}
+      </button>
+    }
+    @if (permissions.canEdit) {
+      <button (click)="onEdit()" mat-stroked-button class="form-item-button">
+        <mat-icon>edit</mat-icon>
+        {{ BUTTON_LABELS.EDIT }}
+      </button>
+    }
+  </mat-card-actions>
+</mat-card>

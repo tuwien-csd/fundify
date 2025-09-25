@@ -1,0 +1,49 @@
+<!-- template -->
+<div class="vocabulary-form">
+  <div class="form-item-container">
+    <div class="input-container">
+      <mat-form-field appearance="fill" class="search-field">
+        <mat-label>{{ label }}</mat-label>
+        <input
+          matInput
+          placeholder="Enter value"
+          [formControl]="entryCtrl"
+          [matAutocomplete]="auto"
+          [matChipInputFor]="chipList"
+          [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+          (matChipInputTokenEnd)="add($event.value)"
+        />
+        <mat-autocomplete
+          #auto="matAutocomplete"
+          (optionSelected)="add($event.option.value)"
+        >
+          @for (option of filteredOptions | async; track option) {
+            <mat-option [value]="option">
+              {{ option }}
+            </mat-option>
+          }
+        </mat-autocomplete>
+      </mat-form-field>
+      <button
+        mat-icon-button
+        (click)="manageDialog()"
+        class="form-button"
+        matTooltip="manage vocabulary entries"
+        matTooltipPosition="above"
+      >
+        <mat-icon>edit</mat-icon>
+      </button>
+    </div>
+    @if (!entries.controls.length) {
+      <div class="empty-selection">no selection yet</div>
+    }
+    <mat-chip-grid #chipList aria-label="Selected entries" class="chip-list">
+      @for (entry of entries.controls; track entry; let i = $index) {
+        <mat-chip-row [removable]="true" (removed)="remove(i)">
+          {{ entry.value }}
+          <mat-icon matChipRemove>cancel</mat-icon>
+        </mat-chip-row>
+      }
+    </mat-chip-grid>
+  </div>
+</div>

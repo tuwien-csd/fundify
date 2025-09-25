@@ -1,0 +1,44 @@
+html,
+body {
+  height: 100%;
+  margin: 0;
+  overflow-x: hidden;
+}
+
+.fundify-flex-form-responsive {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+
+.fundify-flex-vertical {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  > div {
+    margin: 1rem;
+  }
+}
+
+.fundify-flex-horizontal {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: flex-start;
+  > div {
+    margin: 1rem;
+  }
+}
+
+// Spacing utilities
+.mb-large {
+  margin-bottom: 8rem;
+}
+.pd-top-m {
+  padding-top: 4rem;
+}
+.pd-top-l {
+  padding-top: 8rem;
+}

@@ -1,0 +1,28 @@
+<div class="date-range">
+  <div class="form-item-label">{{ label }}</div>
+  <div class="form-item-container">
+    <mat-form-field appearance="fill">
+      <mat-label>{{ formFieldLabel }}</mat-label>
+      <mat-date-range-input [formGroup]="rangeForm" [rangePicker]="picker">
+        <input matStartDate formControlName="start" placeholder="mm/dd/yyyy" />
+        <input matEndDate formControlName="end" placeholder="mm/dd/yyyy" />
+      </mat-date-range-input>
+      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-date-range-picker color="primary" #picker></mat-date-range-picker>
+      @if (rangeForm.hasError(validators.DATE_RANGE)) {
+        <mat-error>{{
+          validadionService.getValidationErrorMessage(
+            rangeForm,
+            validators.DATE_RANGE
+          )
+        }}</mat-error>
+      }
+      @if (rangeForm.controls.start.hasError(validators.REQUIRED)) {
+        <mat-error> Start date is required</mat-error>
+      }
+      @if (rangeForm.controls.end.hasError(validators.REQUIRED)) {
+        <mat-error>End date is required</mat-error>
+      }
+    </mat-form-field>
+  </div>
+</div>

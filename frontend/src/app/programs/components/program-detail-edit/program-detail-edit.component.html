@@ -1,0 +1,174 @@
+<div class="program-details-container">
+  <mat-card appearance="outlined">
+    <mat-card-header>
+      <mat-card-title
+        >{{
+          program.name?.[0]?.text || (program.name?.[1]?.text ?? 'New Program')
+        }}
+      </mat-card-title>
+      @if (program.status === PublicationStatusEnum.DRAFT) {
+        <mat-chip>
+          {{ program.status }}
+        </mat-chip>
+      }
+    </mat-card-header>
+    <mat-card-content>
+      @if (detailsForm) {
+        <form [formGroup]="detailsForm" class="program-details-grid">
+          <div class="detail-item">
+            <app-translated-text-field
+              formControlName="name"
+              [placeholder]="PROGRAM_DETAILS_CONSTANTS.NAME_PLACEHOLDER"
+              [label]="PROGRAM_DETAILS_CONSTANTS.NAME_LABEL"
+              [textLabel]="PROGRAM_DETAILS_CONSTANTS.NAME_LABEL"
+              [required]="true"
+            >
+            </app-translated-text-field>
+          </div>
+          <div class="detail-item">
+            <app-translated-texts-field
+              formControlName="programTracks"
+              [label]="PROGRAM_DETAILS_CONSTANTS.PROGRAM_TRACK_LABEL"
+              [textLabel]="PROGRAM_DETAILS_CONSTANTS.PROGRAM_TRACK_LABEL"
+            >
+            </app-translated-texts-field>
+          </div>
+          <div class="detail-item">
+            <app-multiple-choice-field
+              formControlName="targetGroups"
+              [type]="targetGroups"
+              [required]="true"
+              [enableSelectAll]="true"
+              [label]="PROGRAM_DETAILS_CONSTANTS.TARGET_GROUPS_LABEL"
+            >
+            </app-multiple-choice-field>
+          </div>
+          <div class="detail-item">
+            <app-multiple-choice-field
+              formControlName="careerStages"
+              [type]="careerStages"
+              [required]="false"
+              [enableSelectAll]="true"
+              [label]="PROGRAM_DETAILS_CONSTANTS.CAREER_STAGES_LABEL"
+            >
+            </app-multiple-choice-field>
+          </div>
+          <div class="detail-item">
+            <app-text-field
+              formControlName="acronym"
+              [placeholder]="PROGRAM_DETAILS_CONSTANTS.ACRONYM_PLACEHOLDER"
+              [label]="PROGRAM_DETAILS_CONSTANTS.ACRONYM_LABEL"
+              [textLabel]="PROGRAM_DETAILS_CONSTANTS.ACRONYM_LABEL"
+              [required]="false"
+              [textPattern]="PATTERN_FOR_ACRONYM"
+            >
+            </app-text-field>
+          </div>
+          <div class="detail-item">
+            <app-date-range-field
+              formControlName="duration"
+              [label]="PROGRAM_DETAILS_CONSTANTS.PROGRAM_DATE_RANGE_LABEL"
+              [formFieldLabel]="
+                PROGRAM_DETAILS_CONSTANTS.PROGRAM_DATE_RANGE_PLACEHOLDER
+              "
+              [required]="false"
+            >
+            </app-date-range-field>
+          </div>
+          <div class="detail-item">
+            <app-texts-field
+              formControlName="website"
+              [label]="PROGRAM_DETAILS_CONSTANTS.WEBSITE_LABEL"
+              [textLabel]="PROGRAM_DETAILS_CONSTANTS.WEBSITE_PLACEHOLDER"
+              [required]="true"
+            >
+            </app-texts-field>
+          </div>
+          <div class="detail-item">
+            <app-translated-text-field
+              formControlName="description"
+              [placeholder]="PROGRAM_DETAILS_CONSTANTS.DESCRIPTION_PLACEHOLDER"
+              [label]="PROGRAM_DETAILS_CONSTANTS.DESCRIPTION_LABEL"
+              [textLabel]="PROGRAM_DETAILS_CONSTANTS.DESCRIPTION_LABEL"
+              [required]="true"
+              [multilineText]="true"
+            >
+            </app-translated-text-field>
+          </div>
+          <div class="detail-item">
+            <app-multiple-choice-field
+              formControlName="characteristics"
+              [type]="fundingCharacteristics"
+              [required]="true"
+              [label]="PROGRAM_DETAILS_CONSTANTS.CHARACTERISTICS_LABEL"
+            >
+            </app-multiple-choice-field>
+          </div>
+          <div class="detail-item">
+            <app-subject-field
+              formControlName="subjects"
+              [required]="true"
+              [label]="PROGRAM_DETAILS_CONSTANTS.SUBJECTS_LABEL"
+            >
+            </app-subject-field>
+          </div>
+          <div class="detail-item">
+            <app-single-choice-field
+              formControlName="fundingScheme"
+              [type]="fundingSchemes"
+              [required]="true"
+              [label]="PROGRAM_DETAILS_CONSTANTS.FUNDING_SCHEMES_LABEL"
+            >
+            </app-single-choice-field>
+          </div>
+          <div class="detail-item">
+            <app-single-choice-field
+              formControlName="legalType"
+              [type]="legalTypes"
+              [required]="true"
+              [label]="PROGRAM_DETAILS_CONSTANTS.LEGAL_TYPE_LABEL"
+            >
+            </app-single-choice-field>
+          </div>
+        </form>
+      }
+    </mat-card-content>
+    <mat-card-actions class="action-section">
+      <button mat-stroked-button class="form-item-button" (click)="onBack()">
+        <mat-icon>arrow_back</mat-icon>
+        {{ BUTTON_LABELS.BACK }}
+      </button>
+      <span class="spacer"></span>
+      @if (permissions.canEdit) {
+        <button
+          mat-raised-button
+          color="primary"
+          class="form-item-button"
+          (click)="onPublish()"
+          [disabled]="!detailsForm.valid"
+          [matTooltip]="
+            detailsForm.valid
+              ? ''
+              : PROGRAM_DETAILS_CONSTANTS.PUBLISH_DISABLED_TOOLTIP
+          "
+        >
+          <mat-icon>publish</mat-icon>
+          {{ BUTTON_LABELS.PUBLISH }}
+        </button>
+      }
+      @if (program.status !== PublicationStatusEnum.PUBLISHED) {
+        <button
+          mat-stroked-button
+          class="form-item-button"
+          (click)="onSaveAsDraft()"
+        >
+          {{ BUTTON_LABELS.SAVE_AS_DRAFT }}
+        </button>
+      }
+      <button mat-stroked-button class="form-item-button" (click)="onPreview()">
+        <mat-icon>remove_red_eye</mat-icon>
+        {{ BUTTON_LABELS.PREVIEW }}
+      </button>
+    </mat-card-actions>
+  </mat-card>
+</div>
