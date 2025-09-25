@@ -13,7 +13,11 @@ import {
   setEntity,
   withEntities,
 } from '@ngrx/signals/entities';
-import { CallUpdateWebModel, CallWebModel } from '../models/call.interface';
+import {
+  CallUpdateWebModel,
+  CallCreateWebModel,
+  CallWebModel,
+} from '../models/call.interface';
 import { BackendServiceV2 } from '../../core/services/backend-service-v2.service';
 import { NotificationService } from '../../shared/services/notification-service.service';
 import { CALL_DETAILS_CONSTANTS } from '../calls.constants';
@@ -28,7 +32,7 @@ export const CallsStore = signalStore(
   })),
   withMethods(({ backendService, notificationService, ...store }) => ({
     async addCall(
-      callToCreate: CallWebModel
+      callToCreate: CallCreateWebModel
     ): Promise<CallWebModel | undefined> {
       try {
         const response = await backendService.client.POST('/api/call/add', {

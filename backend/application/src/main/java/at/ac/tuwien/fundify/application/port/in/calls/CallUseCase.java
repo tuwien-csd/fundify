@@ -6,13 +6,14 @@ import at.ac.tuwien.fundify.domain.common.FundifyUser;
 import at.ac.tuwien.fundify.domain.common.exceptions.EntityNotFoundException;
 import at.ac.tuwien.fundify.domain.common.exceptions.FundifyException;
 import at.ac.tuwien.fundify.domain.funding.Call;
+import at.ac.tuwien.fundify.domain.funding.CallCreate;
 import at.ac.tuwien.fundify.domain.funding.CallUpdate;
 import lombok.NonNull;
 
 public interface CallUseCase {
 
     // CRUD operations for Call
-    CallId addCall(Call call) throws FundifyException;
+    CallId addCall(CallCreate call) throws FundifyException;
 
     Call getCall(CallId id) throws EntityNotFoundException;
 

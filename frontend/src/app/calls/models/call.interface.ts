@@ -21,7 +21,7 @@ import { Identifier } from '../../shared/models/interfaces/identifier.interface'
 import { StandardizedSubject } from '../../shared/models/interfaces/standardizedSubject.interface';
 import { PublicationStatusEnum } from '../../shared/models/enums/publication-status.enum';
 import { components } from '../../../generated/refop-be';
-import {CallOwner} from "./call-owner-interface";
+import { CallOwner } from "./call-owner-interface";
 
 export interface Call {
   id?: string;
@@ -79,5 +79,5 @@ export interface Call {
 }
 
 export type CallWebModel = components['schemas']['CallWebModel'];
-
+export type CallCreateWebModel = components['schemas']['CallCreateWebModel'];
 export type CallUpdateWebModel = components['schemas']['CallUpdateWebModel'];
