@@ -145,6 +145,9 @@
         "id": "2",
         "author": "Daniel",
         "comment": "Populate universities collection with mock universities - FOR DEVELOPMENT",
+        "validCheckSum": [
+          "9:670117a87677f26edd8d32367a7aa016"
+        ],
         "changes": [
           {
             "insertMany": {
