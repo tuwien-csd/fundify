@@ -16,7 +16,7 @@ import {
 import { BackendServiceV2 } from '../../core/services/backend-service-v2.service';
 import { NotificationService } from '../../shared/services/notification-service.service';
 import { ProgramWebModel } from '../models/program.interface';
-import { PROGRAM_DETIALS_CONSTANTS } from '../programs.constants';
+import { PROGRAM_DETAILS_CONSTANTS } from '../programs.constants';
 
 export const ProgramStore = signalStore(
   { providedIn: 'root' },
@@ -35,7 +35,7 @@ export const ProgramStore = signalStore(
           patchState(store, setAllEntities(response.data));
         } else {
           notificationService.error(
-            PROGRAM_DETIALS_CONSTANTS.ERRORS.FETCH_ALL_ERROR
+            PROGRAM_DETAILS_CONSTANTS.ERRORS.FETCH_ALL_ERROR
           );
         }
       } catch (error) {
@@ -53,12 +53,12 @@ export const ProgramStore = signalStore(
       if (data) {
         patchState(store, addEntity(data));
         notificationService.success(
-          PROGRAM_DETIALS_CONSTANTS.MESSAGES.CREATE.SUCCESS
+          PROGRAM_DETAILS_CONSTANTS.MESSAGES.CREATE.SUCCESS
         );
       } else {
         console.error('Unexpected error while creating program: ', error);
         notificationService.error(
-          PROGRAM_DETIALS_CONSTANTS.MESSAGES.CREATE.ERROR
+          PROGRAM_DETAILS_CONSTANTS.MESSAGES.CREATE.ERROR
         );
       }
     },
@@ -73,12 +73,12 @@ export const ProgramStore = signalStore(
       if (data) {
         patchState(store, updateEntity({ id: data.id, changes: data }));
         notificationService.success(
-          PROGRAM_DETIALS_CONSTANTS.MESSAGES.UPDATE.SUCCESS
+          PROGRAM_DETAILS_CONSTANTS.MESSAGES.UPDATE.SUCCESS
         );
       } else {
         console.error('Unexpected error while creating program: ', error);
         notificationService.error(
-          PROGRAM_DETIALS_CONSTANTS.MESSAGES.UPDATE.ERROR
+          PROGRAM_DETAILS_CONSTANTS.MESSAGES.UPDATE.ERROR
         );
       }
     },
@@ -97,11 +97,11 @@ export const ProgramStore = signalStore(
         if (response.ok) {
           patchState(store, removeEntity(programId));
           notificationService.success(
-            PROGRAM_DETIALS_CONSTANTS.MESSAGES.DELETE.SUCCESS
+            PROGRAM_DETAILS_CONSTANTS.MESSAGES.DELETE.SUCCESS
           );
         } else {
           notificationService.error(
-            PROGRAM_DETIALS_CONSTANTS.MESSAGES.DELETE.ERROR
+            PROGRAM_DETAILS_CONSTANTS.MESSAGES.DELETE.ERROR
           );
         }
       } catch (error) {
