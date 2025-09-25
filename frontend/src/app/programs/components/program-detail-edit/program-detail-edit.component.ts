@@ -19,7 +19,7 @@ import { FundingSchemeEnum } from 'src/app/shared/models/enums/funding-scheme.en
 import { LegalTypeEnum } from 'src/app/shared/models/enums/legal-type.enum';
 import { TargetGroupEnum } from 'src/app/shared/models/enums/target-group.enum';
 import { ViewEnum } from 'src/app/shared/models/enums/view.enum';
-import { PROGRAM_DETIALS_CONSTANTS } from '../../programs.constants';
+import { PROGRAM_DETAILS_CONSTANTS } from '../../programs.constants';
 import { BUTTON_LABELS } from 'src/app/shared/shared.constants';
 import { Router } from '@angular/router';
 import { ROUTER_LINKS } from '../../../core/router-links.constants';
@@ -85,7 +85,7 @@ export class ProgramDetailEditComponent implements OnInit {
   private fb = inject(FormBuilder);
   private localStorageService = inject(LocalStorageService);
 
-  protected readonly PROGRAM_DETAILS_CONSTANTS = PROGRAM_DETIALS_CONSTANTS;
+  protected readonly PROGRAM_DETAILS_CONSTANTS = PROGRAM_DETAILS_CONSTANTS;
   protected readonly BUTTON_LABELS = BUTTON_LABELS;
   protected readonly PublicationStatusEnum = PublicationStatusEnum;
 
