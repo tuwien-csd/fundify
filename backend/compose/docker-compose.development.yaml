@@ -1,0 +1,43 @@
+# Docker compose file to use during development
+services:
+  mongo:
+    image: mongo:5.0.14@sha256:6cf671de7c85493d6dde9aafef383570161809336d6c41f431ac3a692155ece9
+    restart: 'unless-stopped'
+    container_name: refop-mongo-dev
+    environment:
+      - 'MONGO_INITDB_ROOT_USERNAME=admin'
+      - 'MONGO_INITDB_ROOT_PASSWORD=admin'
+    ports:
+      - '27017:27017'
+    volumes:
+      - mongo-data-dev:/data/db
+    networks:
+      - refop-network-dev
+
+  keycloak:
+    container_name: refop-keycloak-dev
+    restart: 'unless-stopped'
+    image: keycloak/keycloak:26.03@sha256:922e443a962b8ad0dffa3c17061e8136583d7bc59209a1d1fc059816467c3f69
+    environment:
+    - KC_BOOTSTRAP_ADMIN_USERNAME=admin
+    - KC_BOOTSTRAP_ADMIN_PASSWORD=admin
+    command:
+      - "start-dev"
+      - "--import-realm"
+    ports:
+    - "8083:8080"
+    volumes:
+      - keycloak-data-dev:/opt/keycloak/data
+      - ./refop-dev-realm.json:/opt/keycloak/data/import/refop-dev-realm.json
+    networks:
+      - refop-network-dev
+
+volumes:
+  mongo-data-dev:
+    driver: local
+  keycloak-data-dev:
+    driver: local
+
+networks:
+  refop-network-dev:
+    driver: bridge

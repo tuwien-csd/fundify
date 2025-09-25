@@ -1,0 +1,25 @@
+### Obtain Keycloak access token
+POST http://localhost:8083/realms/refop-dev/protocol/openid-connect/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=password&client_id=admin-cli&username= {{username}}&password={{password}}
+
+> {% client.global.set("auth_token", response.body.access_token) %}
+
+
+###
+POST http://localhost:8080/api/funder/add
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "name": [
+    {
+      "text": "Test Funder",
+      "language": "En",
+      "translation": "o"
+    }
+  ],
+  "website": "https://example.com",
+  "acronym": "TF"
+}
