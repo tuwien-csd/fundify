@@ -25,9 +25,9 @@ export const mainRoutes: Routes = [
     canActivate: [isAuthenticatedGuard],
   },
   {
-    path: ROUTER_LINKS.FUNDINGS + '/' + ROUTER_LINKS.PROGRAMS,
+    path: ROUTER_LINKS.FUNDINGS,
     loadChildren: () =>
-      import('./programs/programs.module').then((m) => m.ProgramsModule),
+      import('./programs/programs.routes').then((it) => it.programsRoutes),
     canActivate: [isAuthenticatedGuard],
   },
   {

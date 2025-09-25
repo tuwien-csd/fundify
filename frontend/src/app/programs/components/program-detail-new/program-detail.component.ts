@@ -3,7 +3,7 @@ import {
   Component,
   EventEmitter,
   inject,
-  Input,
+  input,
   OnInit,
   Output,
 } from '@angular/core';
@@ -11,13 +11,11 @@ import { ViewEnum } from 'src/app/shared/models/enums/view.enum';
 import { TranslatedText } from 'src/app/shared/models/interfaces/translated-text.interface';
 import { PROGRAM_DETAILS_CONSTANTS } from '../../programs.constants';
 import { BUTTON_LABELS } from 'src/app/shared/shared.constants';
-import { StandardizedSubject } from '../../../shared/models/interfaces/standardizedSubject.interface';
 import { EntryOriginEnum } from '../../../shared/models/enums/entry-origin.enum';
 import { PermissionService } from '../../../core/auth/services/permission.service';
 import { ActionPermissions } from '../../../core/models/ActionPermissions';
-import { Program } from '../../models/program.interface';
+import { ProgramWebModel } from '../../models/program.interface';
 import { DateRange } from '../../../shared/models/interfaces/date-range.interface';
-import { FundingEntityRef } from '../../../shared/models/interfaces/funding-entity-ref.interface';
 import {
   LOCAL_STORAGE_KEYS,
   LocalStorageService,
@@ -36,11 +34,12 @@ import { MatChip } from '@angular/material/chips';
 import { MatButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { MatTooltip } from '@angular/material/tooltip';
+import { ApiModels } from '../../../shared/models/backend-api-models';
 
 @Component({
-  selector: 'app-program-detail-preview',
-  templateUrl: './program-detail-preview.component.html',
-  styleUrls: ['./program-detail-preview.component.scss'],
+  selector: 'app-program-detail',
+  templateUrl: './program-detail.component.html',
+  styleUrls: ['./program-detail.component.scss'],
   imports: [
     MatCard,
     MatCardHeader,
@@ -53,16 +52,15 @@ import { MatTooltip } from '@angular/material/tooltip';
     MatTooltip,
   ],
 })
-export class ProgramDetailPreviewComponent implements OnInit {
-  private localStorageService = inject(LocalStorageService);
-  private permissionService = inject(PermissionService);
-  private validationService = inject(ProgramValidationService);
+export class ProgramDetailComponent implements OnInit {
+  private readonly localStorageService = inject(LocalStorageService);
+  private readonly permissionService = inject(PermissionService);
+  private readonly validationService = inject(ProgramValidationService);
 
   protected readonly CONSTANTS = PROGRAM_DETAILS_CONSTANTS;
   protected readonly BUTTON_LABELS = BUTTON_LABELS;
   protected readonly PublicationStatusEnum = PublicationStatusEnum;
-
-  @Input() program!: Program;
+  program = input.required<ProgramWebModel>();
   @Output() edit = new EventEmitter<ViewEnum>();
   @Output() back = new EventEmitter<void>();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: This was disabled during the proper setup of eslint. If you touch this code, fix it properly.
@@ -78,7 +76,7 @@ export class ProgramDetailPreviewComponent implements OnInit {
     this.loadStagedChanges();
     this.generateProgramDetails();
     this.initPermissions();
-    this.isValid = this.validationService.validate(this.program);
+    this.isValid = this.validationService.validate(this.program());
   }
 
   onBack(): void {
@@ -90,11 +88,11 @@ export class ProgramDetailPreviewComponent implements OnInit {
   }
 
   onPublish(): void {
-    this.publish.emit(this.program);
+    this.publish.emit(this.program());
   }
 
   initPermissions(): void {
-    const context = this.program.id
+    const context = this.program().id
       ? PermissionContext.EXISTING
       : PermissionContext.NEW;
     this.permissions = this.permissionService.getPermissions(
@@ -106,15 +104,15 @@ export class ProgramDetailPreviewComponent implements OnInit {
   }
 
   getOwnerId(): string {
-    return this.program?.funder?.id ?? '';
+    return this.program()?.funder?.id ?? '';
   }
 
   getOrigin(): EntryOriginEnum {
-    return this.program?.entryOrigin ?? EntryOriginEnum.REFOP;
+    return this.program()?.entryOrigin ?? EntryOriginEnum.REFOP;
   }
 
   getStatus(): PublicationStatusEnum {
-    return this.program?.status ?? PublicationStatusEnum.DRAFT;
+    return this.program()?.status ?? PublicationStatusEnum.DRAFT;
   }
 
   private generateProgramDetails(): void {
@@ -122,15 +120,15 @@ export class ProgramDetailPreviewComponent implements OnInit {
     this.programDetails = [
       {
         label: this.CONSTANTS.RIS_ID_LABEL,
-        value: this.program.risId ?? PROGRAM_DETAILS_CONSTANTS.PLACEHOLDER,
+        value: this.program().risId ?? PROGRAM_DETAILS_CONSTANTS.PLACEHOLDER,
       },
       {
         label: this.CONSTANTS.NAME_LABEL,
-        value: this.formatTranslatedText(this.program.name ?? []),
+        value: this.formatTranslatedText(this.program().name ?? []),
       },
       {
         label: this.CONSTANTS.ACRONYM_LABEL,
-        value: this.program.acronym ?? PROGRAM_DETAILS_CONSTANTS.PLACEHOLDER,
+        value: this.program().acronym ?? PROGRAM_DETAILS_CONSTANTS.PLACEHOLDER,
       },
       {
         label: this.CONSTANTS.PROGRAM_TRACK_LABEL,
@@ -139,44 +137,45 @@ export class ProgramDetailPreviewComponent implements OnInit {
       {
         label: this.CONSTANTS.TARGET_GROUPS_LABEL,
         value:
-          this.program.targetGroups?.join(', ') ??
+          this.program().targetGroups?.join(', ') ??
           PROGRAM_DETAILS_CONSTANTS.PLACEHOLDER,
       },
       {
         label: this.CONSTANTS.CAREER_STAGES_LABEL,
         value:
-          this.program.careerStages?.join(', ') ??
+          this.program().careerStages?.join(', ') ??
           PROGRAM_DETAILS_CONSTANTS.PLACEHOLDER,
       },
       {
         label: this.CONSTANTS.PROGRAM_DATE_RANGE_LABEL,
         value:
-          this.formatDateRange(this.program.duration, datePipe) ??
+          this.formatDateRange(this.program().duration, datePipe) ??
           PROGRAM_DETAILS_CONSTANTS.PLACEHOLDER,
       },
       {
         label: this.CONSTANTS.DESCRIPTION_LABEL,
-        value: this.formatTranslatedText(this.program.description ?? []),
+        value: this.formatTranslatedText(this.program().description ?? []),
       },
       {
         label: this.CONSTANTS.CHARACTERISTICS_LABEL,
         value:
-          this.program.characteristics?.join(', ') ??
+          this.program().characteristics?.join(', ') ??
           PROGRAM_DETAILS_CONSTANTS.PLACEHOLDER,
       },
       {
         label: this.CONSTANTS.FUNDING_SCHEMES_LABEL,
         value:
-          this.program.fundingScheme ?? PROGRAM_DETAILS_CONSTANTS.PLACEHOLDER,
+          this.program().fundingScheme ?? PROGRAM_DETAILS_CONSTANTS.PLACEHOLDER,
       },
       {
         label: this.CONSTANTS.LEGAL_TYPE_LABEL,
-        value: this.program.legalType ?? PROGRAM_DETAILS_CONSTANTS.PLACEHOLDER,
+        value:
+          this.program().legalType ?? PROGRAM_DETAILS_CONSTANTS.PLACEHOLDER,
       },
       {
         label: this.CONSTANTS.WEBSITE_LABEL,
         value:
-          this.program.website?.join(', ') ??
+          this.program().website?.join(', ') ??
           PROGRAM_DETAILS_CONSTANTS.PLACEHOLDER,
       },
       {
@@ -215,7 +214,7 @@ export class ProgramDetailPreviewComponent implements OnInit {
 
   private formatProgramTracks(): string {
     const programmeTracks: TranslatedText[][] =
-      this.program.programTracks ?? [];
+      this.program().programTracks ?? [];
     return (
       programmeTracks
         ?.map((tracks) => this.formatTranslatedText(tracks))
@@ -224,15 +223,15 @@ export class ProgramDetailPreviewComponent implements OnInit {
   }
 
   private formatFunder(): string {
-    const funderRef: FundingEntityRef =
-      this.program.funder ?? ({} as FundingEntityRef);
+    const funderRef: ApiModels['FunderRefWebModel'] =
+      this.program().funder ?? ({} as ApiModels['FunderRefWebModel']);
     return funderRef
-      ? `${this.formatTranslatedText(funderRef.name)} (${funderRef.id})`
+      ? `${this.formatTranslatedText(funderRef.name!)} (${funderRef.id})`
       : PROGRAM_DETAILS_CONSTANTS.PLACEHOLDER;
   }
 
   private formatStandardizedSubjects(): string {
-    const subjects: StandardizedSubject[] = this.program.subjects ?? [];
+    const subjects = this.program().subjects ?? [];
     return (
       subjects?.map((subject) => subject.title).join(', ') ??
       PROGRAM_DETAILS_CONSTANTS.PLACEHOLDER
@@ -243,9 +242,10 @@ export class ProgramDetailPreviewComponent implements OnInit {
     const stagedChanges = this.localStorageService.load(
       LOCAL_STORAGE_KEYS.STAGED_PROGRAM_CHANGES
     );
-    if (stagedChanges) {
-      this.program = { ...this.program, ...stagedChanges };
-    }
+    // TODO: Check if we need this
+    // if (stagedChanges) {
+    //   this.program() = { ...this.program(), ...stagedChanges };
+    // }
   }
 
   protected readonly PROGRAM_DETAILS_CONSTANTS = PROGRAM_DETAILS_CONSTANTS;

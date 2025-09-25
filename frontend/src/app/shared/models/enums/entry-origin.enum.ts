@@ -1,4 +1,7 @@
-export enum EntryOriginEnum {
-  REFOP = 'REFOP',
-  ENDPOINT = 'ENDPOINT',
-}
+export const EntryOriginEnum = {
+  REFOP: 'REFOP',
+  ENDPOINT: 'ENDPOINT',
+} as const;
+
+export type EntryOriginEnum =
+  (typeof EntryOriginEnum)[keyof typeof EntryOriginEnum];
