@@ -12,9 +12,13 @@ import static io.restassured.RestAssured.given;
 
 import at.ac.tuwien.fundify.adapters.in.rest.dto.CallWebModel;
 import at.ac.tuwien.fundify.adapters.in.rest.dto.FunderRefWebModel;
+import at.ac.tuwien.fundify.adapters.in.rest.dto.TranslatedTextWebModel;
+import at.ac.tuwien.fundify.adapters.in.rest.dto.enums.ELanguageWebModel;
 import at.ac.tuwien.fundify.adapters.in.rest.dto.enums.EPublicationStatusWebModel;
 import at.ac.tuwien.fundify.adapters.in.rest.dto.enums.ESubscriptionStatusWebModel;
+import at.ac.tuwien.fundify.adapters.in.rest.dto.enums.ETranslationWebModel;
 import at.ac.tuwien.fundify.adapters.in.rest.resources.CallResource;
+import at.ac.tuwien.fundify.adapters.out.fundify.EmailService;
 import at.ac.tuwien.fundify.adapters.out.persistence.mongo.annotating.UniversityMongoEntity;
 import at.ac.tuwien.fundify.adapters.out.persistence.mongo.funding.CallMongoEntity;
 import at.ac.tuwien.fundify.adapters.out.persistence.mongo.funding.FunderMongoEntity;
@@ -27,12 +31,16 @@ import at.ac.tuwien.fundify.domain.common.CallId;
 import at.ac.tuwien.fundify.domain.common.ELanguage;
 import at.ac.tuwien.fundify.domain.common.EPublicationStatus;
 import at.ac.tuwien.fundify.domain.common.ETranslation;
+import at.ac.tuwien.fundify.domain.common.FundifyUser;
 import at.ac.tuwien.fundify.domain.common.TranslatedText;
 import at.ac.tuwien.fundify.domain.funding.vo.enums.EEntryOrigin;
+import io.quarkus.mailer.Mail;
+import io.quarkus.mailer.MockMailbox;
 import io.quarkus.test.common.http.TestHTTPEndpoint;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.security.TestSecurity;
 import io.restassured.http.ContentType;
+import jakarta.inject.Inject;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -55,6 +63,13 @@ class CallTest {
   private static String callIdExternal;
   private static String universityId;
   static final String SUBSCRIBED = "\"SUBSCRIBED\"";
+  static final int BATCH_SIZE = 5;
+
+  @Inject
+  MockMailbox mailbox;
+
+  @Inject
+  EmailService emailService;
 
   @BeforeAll
   static void initAll() {
@@ -111,6 +126,15 @@ class CallTest {
     existingCall.status = EPublicationStatus.DRAFT;
     existingCall.ownerKind = CallOwner.CallOwnerKind.FUNDER.toString();
     existingCall.ownerId = funderId;
+    existingCall.subscriptions = new ArrayList<>();
+    existingCall.subscriptions = List.of(
+        new FundifyUser("1f3e3e3e3e3e3e3e3e3e3e3e", "Chris", null, "foo1@quarkus.io"),
+        new FundifyUser("2f3e3e3e3e3e3e3e3e3e3e3e", "Lena", null, "foo2@quarkus.io"),
+        new FundifyUser("3f3e3e3e3e3e3e3e3e3e3e3e", "Tim", null, "foo3@quarkus.io"),
+        new FundifyUser("4f3e3e3e3e3e3e3e3e3e3e3e", "Emma", null, "foo4@quarkus.io"),
+        new FundifyUser("5f3e3e3e3e3e3e3e3e3e3e3e", "Vincent", null, "foo5@quarkus.io"),
+        new FundifyUser("6f3e3e3e3e3e3e3e3e3e3e3e", "Julia", null, "foo6@quarkus.io")
+    );
     existingCall.persistOrUpdate();
 
     CallMongoEntity existingCallManagedBySync = new CallMongoEntity();
@@ -415,6 +439,36 @@ class CallTest {
 
   @Test
   @WithFFGFunderUser
+  void whenProcessingPendingEmails_thenCorrectNumberOfMailsAreSent() {
+
+    CallWebModel requestCall = generateTestCall(
+        callId,
+        null,
+        FFG_FUNDER_AFFILIATION,
+        funderId,
+        EPublicationStatusWebModel.PUBLISHED
+    );
+
+    given()
+        .contentType(ContentType.JSON)
+        .body(requestCall)
+        .when()
+        .put(UPDATE_ENTITY)
+        .then()
+        .statusCode(200)
+        .extract()
+        .as(CallWebModel.class);
+
+    emailService.processPendingEmails();
+
+    List<Mail> sentToSpecificUser = mailbox.getMailsSentTo("foo1@quarkus.io");
+    Mail actual = sentToSpecificUser.getFirst();
+    Assertions.assertTrue(actual.getHtml().contains("Hello Chris"));
+    Assertions.assertEquals(BATCH_SIZE, mailbox.getTotalMessagesSent());
+  }
+
+  @Test
+  @WithFFGFunderUser
   void givenUnknownCall_whenUpdate_thenReturnNotFound() {
 
     final String validId = "5f3e3e3e3e3e3e3e3e3e3e3e";
@@ -705,7 +759,8 @@ class CallTest {
         null,
         null,
         risId,
-        null,
+        List.of(
+            new TranslatedTextWebModel("FFG", ELanguageWebModel.GERMAN, ETranslationWebModel.ORIGINAL)),
         null,
         null,
         null,

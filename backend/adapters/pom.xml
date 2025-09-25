@@ -95,6 +95,10 @@
       <artifactId>lombok-mapstruct-binding</artifactId>
       <version>0.2.0</version>
     </dependency>
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-mailer</artifactId>
+    </dependency>
 
     <dependency>
       <groupId>io.swagger.core.v3</groupId>
