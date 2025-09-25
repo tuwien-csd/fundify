@@ -1,11 +1,4 @@
-import {
-  AfterViewInit,
-  Component,
-  computed,
-  inject,
-  OnInit,
-  ViewChild,
-} from '@angular/core';
+import { Component, computed, inject, ViewChild } from '@angular/core';
 import {
   MatCell,
   MatCellDef,
@@ -86,7 +79,7 @@ import { CallsStore } from './signal/calls-store';
     CallDisplayPipe,
   ],
 })
-export class CallsComponent implements OnInit, AfterViewInit {
+export class CallsComponent {
   private callsStore = inject(CallsStore);
 
   protected readonly CALL_CONSTANTS = CALLS_CONSTANTS;
@@ -111,6 +104,17 @@ export class CallsComponent implements OnInit, AfterViewInit {
       this.callsStore.entities()
     );
     dataSource.filterPredicate = this.createFilterPredicate();
+    dataSource.sort = this.sort;
+    dataSource.paginator = this.paginator;
+    dataSource.sortingDataAccessor = (item, property) => {
+      if (property === 'name') {
+        return item.name?.map((name) => name.text).join('') ?? 0;
+      }
+      return (item[property as keyof typeof item] as string) ?? 0;
+    };
+    dataSource.sort.active = 'status';
+    dataSource.sort.direction = 'asc';
+
     return dataSource;
   });
 
@@ -124,15 +128,6 @@ export class CallsComponent implements OnInit, AfterViewInit {
 
   @ViewChild(MatSort, { static: true }) sort!: MatSort;
   @ViewChild(MatPaginator, { static: true }) paginator!: MatPaginator;
-
-  ngOnInit(): void {
-    this.initMatDataSource();
-  }
-
-  ngAfterViewInit(): void {
-    this.dataSource().sort = this.sort;
-    this.dataSource().paginator = this.paginator;
-  }
 
   changeFilterValue(event: Event) {
     this.filterValue = (event.target as HTMLInputElement).value
@@ -163,17 +158,6 @@ export class CallsComponent implements OnInit, AfterViewInit {
       searchTerm: this.filterValue,
       hideClosedCalls: this.hideClosedCalls,
     });
-  }
-
-  private initMatDataSource(): void {
-    this.dataSource().sortingDataAccessor = (item, property) => {
-      if (property === 'name') {
-        return item.name?.map((name) => name.text).join('') ?? 0;
-      }
-      return (item[property as keyof typeof item] as string) ?? 0;
-    };
-    this.sort.active = 'status';
-    this.sort.direction = 'asc';
   }
 
   private createFilterPredicate(): (
