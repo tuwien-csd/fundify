@@ -10,6 +10,9 @@ jobs:
     permissions:
       contents: read
       packages: write
+    defaults:
+      run:
+        working-directory: backend
 
     steps:
       - uses: actions/checkout@v5
@@ -21,4 +24,4 @@ jobs:
           distribution: 'temurin'
 
       - name: Build with Maven
-        run: backend/mvn -B package
+        run: mvn -B package
