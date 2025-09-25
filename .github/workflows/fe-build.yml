@@ -10,6 +10,9 @@ jobs:
     permissions:
       contents: read
       packages: write
+    defaults:
+      run:
+        working-directory: frontend
 
     steps:
       - name: Checkout code
