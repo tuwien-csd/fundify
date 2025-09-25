@@ -46,6 +46,14 @@ export const PROGRAM_DETIALS_CONSTANTS = {
       'An unexpected error occurred when retrieving all programs.',
   },
   MESSAGES: {
+    CREATE: {
+      SUCCESS: 'A new program has been successfully created.',
+      ERROR: 'An unexpected error occurred when creating the program.',
+    },
+    UPDATE: {
+      SUCCESS: 'The program has been successfully updated.',
+      ERROR: 'An unexpected error occurred while updating the program.',
+    },
     DELETE: {
       SUCCESS: 'The program has been successfully deleted.',
       ERROR: 'An unexpected error occurred when deleting the program.',

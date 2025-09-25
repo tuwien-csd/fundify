@@ -20,6 +20,7 @@ import {
 import { BackendServiceV2 } from '../../core/services/backend-service-v2.service';
 import { NotificationService } from '../../shared/services/notification-service.service';
 import { FUNDER_DETAILS_CONSTANTS } from '../funders.constants';
+import { equalsIgnoreCase } from '../../utils/string-utils';
 
 export const FundersStore = signalStore(
   { providedIn: 'root' },
@@ -141,7 +142,12 @@ export const FundersStore = signalStore(
       }
     },
     externallyManagedFunders: () => {
-        return store.entities().filter((it) => !!it.externallyAdministered);
+      return store.entities().filter((it) => !!it.externallyAdministered);
+    },
+    getFunderByAcronym: (acronym?: string) => {
+      return store
+        .entities()
+        .find((it) => equalsIgnoreCase(it.acronym, acronym));
     },
   })),
   withHooks({
