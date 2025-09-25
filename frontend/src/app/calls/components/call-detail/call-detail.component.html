@@ -1,0 +1,27 @@
+@if (call$ | async; as call) {
+  @if (activeView$ | async; as activeView) {
+    @if (activeView === 'edit') {
+      <div>
+        <app-call-detail-edit
+          [call]="call"
+          (saveAsDraft)="saveAsDraft($event)"
+          (publish)="publish($event)"
+          (back)="goBack()"
+          (preview)="goTo($event)"
+        ></app-call-detail-edit>
+      </div>
+    }
+    @if (activeView === 'preview') {
+      <div>
+        <app-call-detail-preview
+          [call]="call"
+          (publish)="publish($event)"
+          (edit)="goTo($event)"
+          (back)="goBack()"
+        ></app-call-detail-preview>
+      </div>
+    }
+  }
+} @else {
+  <mat-spinner></mat-spinner>
+}

@@ -1,0 +1,82 @@
+<div [formGroup]="tableForm" class="subject-selector">
+  <div class="form-item-label">{{ label }}</div>
+  <div class="form-item-container">
+    <mat-form-field appearance="fill" class="search-field">
+      <mat-label>{{ constants.SEARCH_LABEL }}</mat-label>
+      <input
+        matInput
+        (keyup)="applyFilter($event)"
+        placeholder="Enter code or title"
+      />
+      <mat-icon matSuffix>search</mat-icon>
+    </mat-form-field>
+    <table mat-table [dataSource]="dataSource" class="subject-table">
+      <ng-container [matColumnDef]="displayedColumns[0]">
+        <th mat-header-cell *matHeaderCellDef>
+          <mat-checkbox
+            [checked]="allSelected"
+            [indeterminate]="someSelected()"
+            [color]="'primary'"
+            (change)="onChangeSelectedAll($event.checked)"
+          >
+          </mat-checkbox>
+        </th>
+        <td mat-cell *matCellDef="let row">
+          <mat-checkbox
+            [formControl]="getSelectionControl(row)"
+            [color]="'primary'"
+            (change)="onChangeSelection($event.checked, row)"
+          >
+          </mat-checkbox>
+        </td>
+      </ng-container>
+      <ng-container [matColumnDef]="displayedColumns[1]">
+        <th mat-header-cell *matHeaderCellDef>
+          {{ constants.TABLE_HEADERS[0] }}
+        </th>
+        <td mat-cell *matCellDef="let subject" (click)="toggleExpand(subject)">
+          {{ subject.code }}
+        </td>
+      </ng-container>
+      <ng-container [matColumnDef]="displayedColumns[2]">
+        <th mat-header-cell *matHeaderCellDef>
+          {{ constants.TABLE_HEADERS[1] }}
+        </th>
+        <td mat-cell *matCellDef="let subject" (click)="toggleExpand(subject)">
+          {{ subject.title }}
+        </td>
+      </ng-container>
+      <ng-container [matColumnDef]="displayedColumns[3]">
+        <th
+          mat-header-cell
+          *matHeaderCellDef
+          style="cursor: pointer"
+          (click)="toggleExpandAll()"
+        >
+          <mat-icon>unfold_more</mat-icon>
+        </th>
+        <td mat-cell *matCellDef="let subject" (click)="toggleExpand(subject)">
+          @if (isParent(subject)) {
+            <mat-icon>{{ getExpandedIcon(subject) }}</mat-icon>
+          }
+        </td>
+      </ng-container>
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr
+        mat-row
+        *matRowDef="let row; columns: displayedColumns"
+        [class.hidden]="isHidden(row)"
+      ></tr>
+    </table>
+    @if (selection.invalid && (selection.dirty || selection.touched)) {
+      <mat-error>
+        {{
+          validationService.getValidationErrorMessage(
+            selection,
+            validators.REQUIRED
+          )
+        }}
+      </mat-error>
+    }
+  </div>
+</div>

@@ -1,0 +1,56 @@
+@use '../../../../../styles/colors' as col;
+@use '../../../../../styles/variables' as vars;
+@use '../../../../../../node_modules/@angular/material/index' as mat;
+
+.sidebar-container {
+  width: 13rem;
+
+  @media (max-width: 999px) {
+    width: 3.5rem;
+
+    a[mat-list-item] {
+      .menu-text {
+        font-size: 0;
+        opacity: 0;
+      }
+    }
+  }
+
+  mat-divider {
+    height: vars.$xs;
+    background-color: mat.m2-get-color-from-palette(
+      col.$custom-accent-color,
+      50
+    );
+  }
+
+  a[mat-list-item] {
+    mat-icon {
+      font-size: 1.5rem;
+    }
+
+    .menu-text {
+      font-size: 1rem;
+      font-weight: 500;
+      color: mat.m2-get-color-from-palette(col.$custom-accent-color, 400);
+    }
+
+    &.active {
+      mat-icon {
+        font-size: 1.6rem;
+        color: mat.m2-get-color-from-palette(col.$custom-primary-color, 500);
+      }
+      .menu-text {
+        color: mat.m2-get-color-from-palette(col.$custom-primary-color, 700);
+      }
+      background-color: mat.m2-get-color-from-palette(
+        col.$custom-accent-color,
+        50
+      );
+    }
+
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.02);
+    }
+  }
+}

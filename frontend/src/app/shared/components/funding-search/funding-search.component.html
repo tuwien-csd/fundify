@@ -1,0 +1,61 @@
+<div [formGroup]="form" class="funding-entity-selector">
+  <div class="form-item-label">{{ label }}</div>
+  <div class="form-item-container">
+    <mat-form-field appearance="fill" class="search-field">
+      <input
+        matInput
+        formControlName="search"
+        [placeholder]="constants.SEARCH_LABEL"
+        [matAutocomplete]="auto"
+      />
+      <mat-autocomplete
+        #auto="matAutocomplete"
+        [displayWith]="displayFn"
+        (optionSelected)="addToList()"
+      >
+        @for (program of filteredEntities(); track program) {
+          <mat-option [value]="program">{{ program.name[0].text }}</mat-option>
+        }
+      </mat-autocomplete>
+      @if (!multiSelect) {
+        <button
+          mat-stroked-button
+          class="form-button"
+          color="primary"
+          matSuffix
+          (click)="createNewProgram(true)"
+        >
+          + {{ labelCreateNew }}
+        </button>
+      }
+    </mat-form-field>
+    @if (form.invalid && (form.dirty || form.touched)) {
+      <mat-error>
+        {{
+          validationService.getValidationErrorMessage(form, validators.REQUIRED)
+        }}
+      </mat-error>
+    }
+    @if (fundingEntityFormArray.value.length === 0 && !required) {
+      <div class="empty-selection">
+        {{ emptySelectionMessage }}
+      </div>
+    }
+    <mat-chip-listbox class="chip-list">
+      @for (
+        program of fundingEntityFormArray.controls;
+        track program;
+        let i = $index
+      ) {
+        <mat-chip
+          color="accent"
+          [removable]="true"
+          (removed)="removeProgram(i)"
+        >
+          {{ program.value?.name?.[0]?.text }}
+          <mat-icon matChipRemove>cancel</mat-icon>
+        </mat-chip>
+      }
+    </mat-chip-listbox>
+  </div>
+</div>

@@ -1,0 +1,12 @@
+<div [formGroup]="rangeInfoForm" class="date-range-info">
+  <app-date-range-field
+    ngDefaultControl
+    formControlName="range"
+    [required]="required"
+  ></app-date-range-field>
+  <app-translated-text-field
+    ngDefaultControl
+    formControlName="info"
+    [required]="false"
+  ></app-translated-text-field>
+</div>

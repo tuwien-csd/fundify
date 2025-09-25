@@ -1,0 +1,239 @@
+@if (annotatedCall$ | async; as annotatedCall) {
+  <mat-card appearance="outlined">
+    <mat-card-header>
+      <a
+        [routerLink]="['/fundings/calls/', annotatedCall.callPreview?.id]"
+        class="card-title-link"
+      >
+        <mat-card-title>{{
+          annotatedCall.callPreview?.name?.[0]?.text
+        }}</mat-card-title>
+      </a>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="grid-container-top">
+        <!-- Column 1 -->
+        <div class="detail-item">
+          <div class="detail-label">Funder</div>
+          <a
+            href="institutions/funders/{{
+              annotatedCall.callPreview?.funder?.id
+            }}"
+            class="content-link detail-value"
+            >{{ annotatedCall.callPreview?.funder?.name?.[0]?.text }}</a
+          >
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Part Of</div>
+          <a
+            href="/fundings/programs/{{
+              annotatedCall.callPreview?.partOf?.id
+            }}"
+            class="content-link detail-value"
+            >{{ annotatedCall.callPreview?.partOf?.name?.[0]?.text ?? '' }}</a
+          >
+        </div>
+        <!-- Column 2 -->
+        <div class="detail-item">
+          <div class="detail-label">Target Groups</div>
+          <mat-chip-listbox class="detail-value">
+            @for (
+              targetGroup of annotatedCall.callPreview?.targetGroups;
+              track targetGroup
+            ) {
+              <mat-chip-option>{{ targetGroup }} </mat-chip-option>
+            }
+          </mat-chip-listbox>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Characteristics</div>
+          <mat-chip-listbox class="detail-value">
+            @for (
+              characteristic of annotatedCall.callPreview?.characteristics;
+              track characteristic
+            ) {
+              <mat-chip-option>{{ characteristic }} </mat-chip-option>
+            }
+          </mat-chip-listbox>
+        </div>
+        <!-- Column 3 -->
+        <div class="detail-item" style="grid-row: 1/3; grid-column: 3/4">
+          <div class="detail-label">Call Stages</div>
+          @for (stage of annotatedCall.callPreview?.callStages; track stage) {
+            <div class="detail-value">
+              <div>Call Stage {{ stage.number }}</div>
+              <div>
+                {{ stage.duration.start | date }} -
+                {{ stage.duration.end | date }}
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+  <mat-card appearance="outlined">
+    <mat-card-header>
+      <mat-card-title>Call Annotation</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <form [formGroup]="annotationForm" class="grid-container-bottom">
+        <div class="detail-item">
+          <app-translated-text-field
+            formControlName="internalDeadline"
+            label="Internal Deadline"
+            textLabel="Internal Deadline"
+            [multilineText]="true"
+          ></app-translated-text-field>
+        </div>
+        <div formArrayName="links" class="detail-item">
+          <div class="detail-label">Web Links</div>
+          @for (link of links.controls; track link; let i = $index) {
+            <ng-container [formGroupName]="i">
+              <div class="form-item-container links-container">
+                <div class="form-fields-container">
+                  <mat-form-field appearance="fill">
+                    <mat-label>URL</mat-label>
+                    <input
+                      matInput
+                      formControlName="url"
+                      placeholder="Enter URL"
+                    />
+                  </mat-form-field>
+                  <mat-form-field appearance="fill">
+                    <mat-label>Description</mat-label>
+                    <textarea
+                      matInput
+                      rows="1"
+                      cdkTextareaAutosize
+                      formControlName="description"
+                      placeholder="Enter Description"
+                    >
+                    </textarea>
+                  </mat-form-field>
+                </div>
+                <div>
+                  @if (links.length === i + 1) {
+                    <button
+                      mat-stroked-button
+                      color="primary"
+                      class="form-item-button link-button"
+                      [disabled]="links.invalid"
+                      (click)="addWebLink()"
+                    >
+                      {{ constants.ADD_BUTTON_LABEL }}
+                    </button>
+                  }
+                  @if (links.length > 1) {
+                    <button
+                      mat-stroked-button
+                      color="primary"
+                      class="form-item-button link-button"
+                      (click)="removeWebLink(i)"
+                    >
+                      {{ constants.REMOVE_BUTTON_LABEL }}
+                    </button>
+                  }
+                </div>
+              </div>
+            </ng-container>
+          }
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Keywords</div>
+          @if (keywordVocabulary$ | async; as keywordVocabulary) {
+            <app-vocabulary-form-field
+              formControlName="keywords"
+              label="Keyword"
+              [vocabulary]="keywordVocabulary"
+              (addEntryToVocabulary)="onAddEntry($event)"
+              (removeEntryFromVocabulary)="onRemoveEntry($event)"
+            ></app-vocabulary-form-field>
+          }
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Target Groups (University)</div>
+          @if (targetGroupVocabulary$ | async; as targetGroupVocabulary) {
+            <app-vocabulary-form-field
+              formControlName="targetGroups"
+              label="Target Group"
+              [vocabulary]="targetGroupVocabulary"
+              (addEntryToVocabulary)="onAddEntry($event)"
+              (removeEntryFromVocabulary)="onRemoveEntry($event)"
+            ></app-vocabulary-form-field>
+          }
+        </div>
+        <div
+          formGroupName="contact"
+          class="detail-item"
+          style="grid-column: 1/3"
+        >
+          <div class="detail-label">Contact</div>
+          <div class="form-item-container contact-container">
+            <mat-form-field appearance="fill">
+              <mat-label>Name</mat-label>
+              <input matInput formControlName="name" placeholder="Enter name" />
+            </mat-form-field>
+            <mat-form-field appearance="fill">
+              <mat-label>Email</mat-label>
+              <input
+                matInput
+                formControlName="email"
+                type="email"
+                placeholder="Enter email"
+              />
+            </mat-form-field>
+            <mat-form-field appearance="fill">
+              <mat-label>Phone</mat-label>
+              <input
+                matInput
+                formControlName="phone"
+                type="tel"
+                placeholder="Enter phone"
+              />
+            </mat-form-field>
+            <mat-form-field appearance="fill">
+              <mat-label>Website</mat-label>
+              <input
+                matInput
+                formControlName="website"
+                placeholder="Enter website"
+              />
+            </mat-form-field>
+            <mat-form-field appearance="fill">
+              <mat-label>Department</mat-label>
+              <input
+                matInput
+                formControlName="department"
+                placeholder="Enter department"
+              />
+            </mat-form-field>
+          </div>
+        </div>
+      </form>
+    </mat-card-content>
+    <mat-card-actions class="action-section">
+      <button mat-stroked-button class="form-item-button" (click)="cancel()">
+        <mat-icon>arrow_back</mat-icon>
+        {{ BUTTON_LABELS.BACK }}
+      </button>
+      <div class="spacer"></div>
+      <button
+        mat-raised-button
+        color="primary"
+        class="form-item-button"
+        (click)="saveAndPublish()"
+      >
+        <mat-icon>publish</mat-icon>
+        {{ BUTTON_LABELS.PUBLISH }}
+      </button>
+      @if (annotatedCall.status !== PublicationStatusEnum.PUBLISHED) {
+        <button mat-stroked-button class="form-item-button" (click)="save()">
+          {{ BUTTON_LABELS.SAVE_AS_DRAFT }}
+        </button>
+      }
+    </mat-card-actions>
+  </mat-card>
+} @else {
+  <mat-spinner></mat-spinner>
+}

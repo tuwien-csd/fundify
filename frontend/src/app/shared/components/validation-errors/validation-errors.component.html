@@ -1,0 +1,19 @@
+@if (getErrorKeys().length > 0) {
+  <mat-card appearance="outlined">
+    <mat-card-title>Validation Errors</mat-card-title>
+    <mat-card-content>
+      <ul>
+        @for (key of getErrorKeys(); track key) {
+          <li>
+            <strong>{{ formatKey(key) }}:</strong>
+            <ul>
+              @for (error of errors[key]; track error) {
+                <li>{{ error | json }}</li>
+              }
+            </ul>
+          </li>
+        }
+      </ul>
+    </mat-card-content>
+  </mat-card>
+}

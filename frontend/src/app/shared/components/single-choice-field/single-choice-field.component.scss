@@ -1,0 +1,14 @@
+@use '@angular/material' as mat;
+@use '../../../../styles/colors' as col;
+
+.single-choice {
+  .radio-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  }
+
+  mat-radio-button {
+    display: block;
+    margin: 0;
+  }
+}

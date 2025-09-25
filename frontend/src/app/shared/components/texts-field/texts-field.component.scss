@@ -1,0 +1,36 @@
+@use '@angular/material' as mat;
+@use '../../../../styles/colors' as col;
+
+.texts {
+  .form-item-container {
+    display: flex;
+    flex-direction: column;
+
+    @media (min-width: 768px) {
+      flex-direction: row;
+      align-items: flex-start;
+    }
+  }
+
+  .form-item-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-self: flex-end;
+    gap: 0;
+    margin: 1rem 0;
+
+    @media (min-width: 768px) {
+      align-self: flex-start;
+    }
+  }
+
+  app-text-field {
+    --text-field-container-padding: 0;
+    display: flex;
+    flex: 1;
+
+    form-group {
+      width: 100%;
+    }
+  }
+}

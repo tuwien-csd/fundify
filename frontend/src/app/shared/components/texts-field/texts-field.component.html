@@ -1,0 +1,40 @@
+<div class="texts">
+  <div class="form-item-label">{{ label }}</div>
+  @for (
+    textFormGroup of textsForm.controls;
+    track textFormGroup;
+    let i = $index
+  ) {
+    <div
+      [formGroup]="convertToFormGroup(textFormGroup)"
+      class="form-item-container"
+    >
+      <app-text-field
+        ngDefaultControl
+        formControlName="text"
+        [textLabel]="getTextItemLabel(i)"
+        [textPattern]="textPattern"
+        [required]="isTextItemRequired(i)"
+      >
+      </app-text-field>
+      <div class="form-item-actions">
+        <button
+          mat-icon-button
+          color="primary"
+          [disabled]="textFormGroup.invalid"
+          (click)="addTextItem(i)"
+        >
+          <mat-icon>add_circle</mat-icon>
+        </button>
+        <button
+          mat-icon-button
+          color="primary"
+          [disabled]="textsForm.length < 2"
+          (click)="deleteTextItem(i)"
+        >
+          <mat-icon>remove_circle</mat-icon>
+        </button>
+      </div>
+    </div>
+  }
+</div>

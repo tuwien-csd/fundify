@@ -1,0 +1,12 @@
+<div class="confirmation-modal">
+  <h2 mat-dialog-title>Discard changes?</h2>
+  <mat-dialog-content>
+    <p>You will lose all unsaved form changes.</p>
+  </mat-dialog-content>
+  <mat-dialog-actions align="end">
+    <button mat-stroked-button (click)="onAbort()">Keep editing</button>
+    <button mat-raised-button color="warn" (click)="onConfirm()">
+      Discard Changes
+    </button>
+  </mat-dialog-actions>
+</div>

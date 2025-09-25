@@ -1,0 +1,45 @@
+<div class="translated-texts">
+  <div class="form-item-label">{{ label }}</div>
+  @for (
+    itemFormGroup of itemsForm.controls;
+    track itemFormGroup;
+    let i = $index
+  ) {
+    <div
+      class="form-item-container"
+      [formGroup]="convertToFormGroup(itemFormGroup)"
+    >
+      <app-translated-text-field
+        ngDefaultControl
+        formControlName="itemText"
+        [textLabel]="textLabel"
+        [required]="isTextItemRequired(i)"
+        [expandEmpty]="true"
+      >
+      </app-translated-text-field>
+      <div>
+        @if (itemsForm.length === i + 1) {
+          <button
+            mat-stroked-button
+            color="primary"
+            class="form-item-button"
+            [disabled]="itemsForm.invalid"
+            (click)="addTextItem(i)"
+          >
+            {{ constants.ADD_BUTTON_LABEL }}
+          </button>
+        }
+        @if (itemsForm.length > 1) {
+          <button
+            mat-stroked-button
+            color="primary"
+            class="form-item-button"
+            (click)="deleteTextItem(i)"
+          >
+            {{ constants.REMOVE_BUTTON_LABEL }}
+          </button>
+        }
+      </div>
+    </div>
+  }
+</div>

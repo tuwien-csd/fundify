@@ -1,0 +1,57 @@
+@use '@angular/material' as mat;
+@use '../../../../styles/colors' as col;
+
+.mat-mdc-card {
+  margin: 2rem;
+  padding: 1rem;
+
+  .mat-mdc-card-title {
+    margin-left: 2rem;
+    margin-top: 1rem;
+    font-size: 2rem;
+    font-weight: 700;
+  }
+}
+
+.university-details-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  padding: 16px;
+  margin: 0 1rem 1rem;
+}
+
+.detail-content {
+  display: flex;
+  flex-direction: column;
+  margin: 0.3rem;
+}
+
+.detail-value {
+  font-size: 16px;
+  color: col.$dark-primary-text;
+  margin-left: 0.5rem;
+}
+
+.action-section {
+  display: flex;
+  justify-content: space-between;
+  padding: 1rem;
+  margin: 1rem 2rem;
+}
+
+.spacer {
+  flex: 1;
+}
+
+.no-data {
+  text-align: center;
+  padding: 16px;
+  color: #666;
+}
+
+@media (max-width: 999px) {
+  .university-details-grid {
+    grid-template-columns: 1fr;
+  }
+}

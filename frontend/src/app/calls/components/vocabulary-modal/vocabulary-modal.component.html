@@ -1,0 +1,26 @@
+<h2 mat-dialog-title>{{ data.title }}</h2>
+<mat-dialog-content>
+  <mat-chip-listbox>
+    @for (entry of data.entries; track entry) {
+      <mat-chip-option removable="true" (removed)="removeEntry(entry)">
+        {{ entry }}
+        <button matChipRemove [attr.aria-label]="'remove ' + entry">
+          <mat-icon>cancel</mat-icon>
+        </button>
+      </mat-chip-option>
+    }
+  </mat-chip-listbox>
+  <mat-form-field appearance="fill">
+    <mat-label>{{ data.inputLabel }}</mat-label>
+    <!--TODO: ANGULAR_MIGRATION: Check if the use of ngModel is fine here    -->
+    <input
+      matInput
+      placeholder="Enter a keyword"
+      [(ngModel)]="newEntry"
+      (keyup.enter)="addEntry()"
+    />
+  </mat-form-field>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Close</button>
+</mat-dialog-actions>

@@ -1,0 +1,37 @@
+<div class="form-group">
+  <div class="form-item-label">{{ label }}</div>
+  <div class="form-item-container">
+    <mat-form-field class="text-field" appearance="fill" [formGroup]="textForm">
+      <mat-label>{{ textLabel }}</mat-label>
+      <input
+        matInput
+        type="text"
+        formControlName="text"
+        [required]="required"
+        [placeholder]="placeholder"
+        (blur)="onTouched()"
+      />
+      <mat-hint>{{ hint }}</mat-hint>
+      @if (textForm.invalid && (textForm.dirty || textForm.touched)) {
+        <mat-error>
+          <ng-container>
+            {{
+              validationService.getValidationErrorMessage(
+                text,
+                validators.REQUIRED
+              )
+            }}
+          </ng-container>
+          <ng-container>
+            {{
+              validationService.getValidationErrorMessage(
+                text,
+                validators.PATTERN
+              )
+            }}
+          </ng-container>
+        </mat-error>
+      }
+    </mat-form-field>
+  </div>
+</div>

@@ -1,0 +1,95 @@
+<app-generic-details-container>
+  <container-header>
+    <mat-card-title>{{ FUNDER_DETAILS_CONSTANTS.TITLE }}</mat-card-title>
+  </container-header>
+  <container-content>
+    @if (detailsForm()) {
+      <form [formGroup]="detailsForm()">
+        <div>
+          <app-translated-text-field-v2
+            [inputFormGroupArray]="nameFormArray()"
+            [label]="FUNDER_DETAILS_CONSTANTS.NAME_LABEL"
+            [textLabel]="FUNDER_DETAILS_CONSTANTS.NAME_LABEL"
+            [placeholder]="FUNDER_DETAILS_CONSTANTS.NAME_PLACEHOLDER"
+            [required]="true"
+          />
+          <app-text-field
+            formControlName="acronym"
+            [label]="FUNDER_DETAILS_CONSTANTS.ACRONYM_LABEL"
+            [textLabel]="FUNDER_DETAILS_CONSTANTS.ACRONYM_LABEL"
+            [placeholder]="FUNDER_DETAILS_CONSTANTS.ACRONYM_PLACEHOLDER"
+            [required]="false"
+          >
+          </app-text-field>
+          <app-text-field
+            formControlName="crossRefDoi"
+            [label]="FUNDER_DETAILS_CONSTANTS.CROSSREF_DOI_LABEL"
+            [textLabel]="FUNDER_DETAILS_CONSTANTS.CROSSREF_DOI_LABEL"
+            [placeholder]="FUNDER_DETAILS_CONSTANTS.CROSSREF_DOI_PLACEHOLDER"
+            [required]="false"
+          >
+          </app-text-field>
+          <app-text-field
+            formControlName="submissionSystem"
+            [label]="FUNDER_DETAILS_CONSTANTS.SUBMISSION_SYSTEM_LABEL"
+            [textLabel]="FUNDER_DETAILS_CONSTANTS.SUBMISSION_SYSTEM_LABEL"
+            [placeholder]="
+              FUNDER_DETAILS_CONSTANTS.SUBMISSION_SYSTEM_PLACEHOLDER
+            "
+            [required]="false"
+          >
+          </app-text-field>
+          <app-text-field
+            formControlName="phone"
+            [label]="FUNDER_DETAILS_CONSTANTS.PHONE_LABEL"
+            [textLabel]="FUNDER_DETAILS_CONSTANTS.PHONE_LABEL"
+            [placeholder]="FUNDER_DETAILS_CONSTANTS.PHONE_PLACEHOLDER"
+            [required]="false"
+          >
+          </app-text-field>
+          <app-text-field
+            formControlName="risId"
+            [label]="FUNDER_DETAILS_CONSTANTS.RIS_ID_LABEL"
+            [textLabel]="FUNDER_DETAILS_CONSTANTS.RIS_ID_LABEL"
+            [placeholder]="FUNDER_DETAILS_CONSTANTS.RIS_ID_PLACEHOLDER"
+            [required]="false"
+          >
+          </app-text-field>
+          <app-address-form [inputFormGroup]="addressForm()" [required]="true">
+          </app-address-form>
+          <app-text-field
+            formControlName="website"
+            [label]="FUNDER_DETAILS_CONSTANTS.WEBSITE_LABEL"
+            [textLabel]="FUNDER_DETAILS_CONSTANTS.WEBSITE_LABEL"
+            [placeholder]="FUNDER_DETAILS_CONSTANTS.WEBSITE_PLACEHOLDER"
+            [required]="true"
+          >
+          </app-text-field>
+          <mat-checkbox
+            formControlName="externallyAdministered"
+            [required]="false"
+          >
+            {{ FUNDER_DETAILS_CONSTANTS.EXTERNALLY_ADMINISTERED_LABEL }}
+          </mat-checkbox>
+        </div>
+      </form>
+    }
+  </container-content>
+  <container-actions class="flex flex-row w-full justify-between p-1 m-2">
+    <button mat-stroked-button class="form-item-button" (click)="onBack()">
+      <mat-icon>arrow_back</mat-icon>
+      {{ BUTTON_LABELS.BACK }}
+    </button>
+    <div class="spacer"></div>
+    <button
+      mat-raised-button
+      class="submit-button form-item-button"
+      color="primary"
+      type="submit"
+      [disabled]="!formValidSignal()"
+      (click)="onSave()"
+    >
+      {{ BUTTON_LABELS.SUBMIT }}
+    </button>
+  </container-actions>
+</app-generic-details-container>

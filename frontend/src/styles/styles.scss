@@ -1,0 +1,68 @@
+@use 'tailwindcss';
+
+@use '@angular/material' as mat;
+
+@use './variables';
+@use './colors' as col;
+@use './typography';
+@use './themes';
+@use './layout';
+@use './components';
+
+@include mat.elevation-classes();
+@include mat.app-background();
+@include mat.elevation-classes();
+@include mat.app-background();
+@include mat.button-base(themes.$fundify-light-theme);
+@include mat.all-component-themes(themes.$fundify-light-theme);
+@include mat.all-component-typographies(typography.$typography-config);
+
+:root {
+  --primary-color: #{mat.m2-get-color-from-palette(
+      themes.$fundify-light-primary
+    )};
+  --accent-color: #{mat.m2-get-color-from-palette(
+      themes.$fundify-light-accent,
+      100
+    )};
+
+  .snackbar-success {
+    @include mat.snack-bar-overrides(
+      (
+        container-color: mat.m2-get-color-from-palette(
+            col.$custom-success-color,
+            500
+          ),
+        supporting-text-color: white,
+        supporting-text-size: 20px,
+      )
+    );
+  }
+
+  .snackbar-error {
+    @include mat.snack-bar-overrides(
+      (
+        container-color: mat.m2-get-color-from-palette(
+            col.$custom-warn-color,
+            200
+          ),
+        button-color: white,
+        supporting-text-color: white,
+        supporting-text-size: 20px,
+      )
+    );
+  }
+  .snackbar-info {
+    @include mat.snack-bar-overrides(
+      (
+        container-color: mat.m2-get-color-from-palette(
+            col.$custom-primary-color,
+            300
+          ),
+        button-color: white,
+        supporting-text-color: white,
+        supporting-text-size: 20px,
+      )
+    );
+  }
+}

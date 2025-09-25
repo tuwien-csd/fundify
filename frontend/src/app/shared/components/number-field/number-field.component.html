@@ -1,0 +1,33 @@
+<div class="number-field">
+  @if (label) {
+    <div class="form-item-label">{{ label }}</div>
+  }
+  <div class="form-item-container">
+    <mat-form-field class="number" appearance="fill">
+      <mat-label>{{ formFieldLabel }}</mat-label>
+      <input
+        matInput
+        appNumbersOnly
+        type="text"
+        [formControl]="numberForm"
+        [integer]="integer"
+        [nonNegative]="nonNegative"
+        [decimalPlaces]="decimalPlaces"
+      />
+      @if (
+        !hideValidation &&
+        numberForm.invalid &&
+        (numberForm.dirty || numberForm.touched)
+      ) {
+        <mat-error>
+          <ng-container>{{
+            validationService.getValidationErrorMessage(
+              numberForm,
+              validators.REQUIRED
+            )
+          }}</ng-container>
+        </mat-error>
+      }
+    </mat-form-field>
+  </div>
+</div>

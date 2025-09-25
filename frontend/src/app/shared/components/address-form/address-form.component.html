@@ -1,0 +1,39 @@
+<form [formGroup]="inputFormGroup()">
+  <div class="form-item-label">
+    {{ label }}
+  </div>
+  <div class="pl-5 pt-3 ml-8 mt-4 mb-10 border-l-5 border-gray-100">
+    <app-text-field
+      formControlName="streetLine"
+      [label]="constants.STREET_LINE_LABEL"
+      [textLabel]="constants.STREET_LINE_LABEL"
+      [placeholder]="constants.STREET_LINE_PLACEHOLDER"
+      [required]="true"
+    >
+    </app-text-field>
+    <app-text-field
+      formControlName="city"
+      [label]="constants.CITY_LABEL"
+      [textLabel]="constants.CITY_LABEL"
+      [placeholder]="constants.CITY_PLACEHOLDER"
+      [required]="true"
+    >
+    </app-text-field>
+    <app-text-field
+      formControlName="postalCode"
+      [label]="constants.POSTAL_CODE_LABEL"
+      [textLabel]="constants.POSTAL_CODE_LABEL"
+      [placeholder]="constants.POSTAL_CODE_PLACEHOLDER"
+      [required]="true"
+    >
+    </app-text-field>
+    <app-text-field
+      formControlName="countryCode"
+      [label]="constants.COUNTRY_CODE_LABEL"
+      [textLabel]="constants.COUNTRY_CODE_LABEL"
+      [placeholder]="constants.COUNTRY_CODE_PLACEHOLDER"
+      [required]="true"
+    >
+    </app-text-field>
+  </div>
+</form>

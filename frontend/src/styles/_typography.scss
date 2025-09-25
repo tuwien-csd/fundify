@@ -1,0 +1,32 @@
+@use '../../node_modules/@angular/material/index' as mat;
+
+$typography-config: mat.m2-define-typography-config(
+  $font-family: 'Roboto, sans-serif',
+  $headline-1: mat.m2-define-typography-level(
+      200px,
+      70px,
+      400,
+      $letter-spacing: -0.02em
+    ),
+  $headline-2: mat.m2-define-typography-level(
+      50px,
+      56px,
+      400,
+      $letter-spacing: -0.02em
+    ),
+  $headline-3: mat.m2-define-typography-level(
+      42px,
+      48px,
+      400,
+      $letter-spacing: -0.005em
+    ),
+  $headline-4: mat.m2-define-typography-level(34px, 40px, 300),
+  $headline-5: mat.m2-define-typography-level(200px, 32px, 400),
+  $subtitle-1: mat.m2-define-typography-level(18px, 24px, 400),
+  $subtitle-2: mat.m2-define-typography-level(14px, 20px, 500),
+  $body-1: mat.m2-define-typography-level(16px, 20px, 400),
+  $body-2: mat.m2-define-typography-level(14px, 20px, 400),
+  $caption: mat.m2-define-typography-level(12px, 28px, 400),
+  $button: mat.m2-define-typography-level(14px, 20px, 400),
+  $overline: mat.m2-define-typography-level(24px, 32px, 500),
+);

@@ -1,0 +1,14 @@
+<div class="generic-details-container">
+  <mat-card appearance="outlined">
+    <mat-card-header>
+      <ng-content select="container-header"></ng-content>
+    </mat-card-header>
+    <mat-card-content>
+      <ng-content select="container-content"></ng-content>
+    </mat-card-content>
+    <mat-card-actions>
+      <ng-content select="container-actions"></ng-content>
+    </mat-card-actions>
+    <ng-content></ng-content>
+  </mat-card>
+</div>

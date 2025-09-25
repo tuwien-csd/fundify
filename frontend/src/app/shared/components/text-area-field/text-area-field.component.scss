@@ -1,0 +1,19 @@
+/* Intentionally mirrors the layout hooks used by text-field.component */
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-item-label {
+  margin-bottom: 0.25rem;
+  font-weight: 500;
+}
+
+.form-item-container {
+  width: 100%;
+  padding-left: 0;
+}
+
+.text-field {
+  width: 100%;
+}

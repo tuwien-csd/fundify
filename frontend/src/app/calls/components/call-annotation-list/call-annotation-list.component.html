@@ -1,0 +1,132 @@
+<div class="page-container">
+  <app-top-navbar [tabs]="ANNOTATIONS_TABS"></app-top-navbar>
+  <mat-card appearance="outlined" class="table-container">
+    <mat-card-content>
+      <div class="controls-container" [formGroup]="filtersForm">
+        <mat-form-field>
+          <mat-label>{{
+            CALL_ANNOTATION_LIST_CONSTANTS.SEARCH_FIELD_LABEL
+          }}</mat-label>
+          <input
+            matInput
+            formControlName="searchText"
+            [placeholder]="
+              CALL_ANNOTATION_LIST_CONSTANTS.SEARCH_FIELD_PLACEHOLDER
+            "
+          />
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+        <div class="button-container">
+          <button mat-raised-button (click)="addFilter()" class="filter-btn">
+            Add Filter
+          </button>
+          <button mat-raised-button (click)="clearFilters()" class="filter-btn">
+            Clear Filters
+          </button>
+        </div>
+        <mat-slide-toggle formControlName="closedCallsToggle" color="primary">
+          hide closed calls
+        </mat-slide-toggle>
+      </div>
+      <form [formGroup]="filtersForm">
+        <div formArrayName="filters" class="filters-container">
+          @for (filter of filters.controls; track filter; let i = $index) {
+            <div [formGroupName]="i" class="filter-row">
+              <mat-form-field class="property-select">
+                <mat-label>Property</mat-label>
+                <mat-select
+                  formControlName="property"
+                  (selectionChange)="onPropertyChange($event.value, i)"
+                >
+                  @for (option of filterOptions; track option) {
+                    <mat-option [value]="option.value">
+                      {{ option.display }}
+                    </mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+              <mat-form-field class="values-select">
+                <mat-label>Values</mat-label>
+                <mat-select formControlName="values" multiple>
+                  @for (val of getValues(i); track val) {
+                    <mat-option [value]="val">
+                      {{ val }}
+                    </mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+              <button
+                mat-icon-button
+                (click)="removeFilter(i)"
+                class="remove-filter-btn"
+              >
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          }
+        </div>
+      </form>
+      <mat-table [dataSource]="dataSource" matSort class="calls-table">
+        @for (
+          column of CALL_ANNOTATION_LIST_CONSTANTS.TABLE_COLUMNS;
+          track column
+        ) {
+          <ng-container [matColumnDef]="column.field">
+            <mat-header-cell *matHeaderCellDef mat-sort-header>
+              {{ column.header }}</mat-header-cell
+            >
+            <mat-cell *matCellDef="let listViewEl">
+              {{
+                listViewEl | displayCallAnnotationListViewElement: column.field
+              }}
+            </mat-cell>
+          </ng-container>
+        }
+        <ng-container matColumnDef="menu">
+          <mat-header-cell *matHeaderCellDef></mat-header-cell>
+          <mat-cell *matCellDef="let listViewEl">
+            <button
+              mat-icon-button
+              [matMenuTriggerFor]="menu"
+              (click)="$event.stopPropagation()"
+            >
+              <mat-icon>more_vert</mat-icon>
+            </button>
+            <mat-menu #menu="matMenu">
+              <button mat-menu-item [routerLink]="[listViewEl.callId]">
+                <mat-icon>edit</mat-icon>
+                <span>{{
+                  listViewEl?.status
+                    ? BUTTON_LABELS.EDIT
+                    : BUTTON_LABELS.ANNOTATE
+                }}</span>
+              </button>
+              @if (listViewEl?.annotatedCallId) {
+                <button
+                  mat-menu-item
+                  (click)="
+                    this.onDelete(listViewEl.annotatedCallId, listViewEl.callId)
+                  "
+                >
+                  <mat-icon>delete</mat-icon>
+                  <span>{{ BUTTON_LABELS.DELETE }}</span>
+                </button>
+              }
+            </mat-menu>
+          </mat-cell>
+        </ng-container>
+        <mat-header-row
+          *matHeaderRowDef="displayedColumnsWithMenu"
+        ></mat-header-row>
+        <mat-row
+          *matRowDef="let row; columns: displayedColumnsWithMenu"
+          [routerLink]="[row.callId]"
+        ></mat-row>
+      </mat-table>
+      <mat-paginator
+        [pageSizeOptions]="[10, 20, 30]"
+        [showFirstLastButtons]="true"
+      ></mat-paginator>
+    </mat-card-content>
+  </mat-card>
+</div>

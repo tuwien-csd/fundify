@@ -1,0 +1,9 @@
+@use '@angular/material' as mat;
+@use '../../../../styles/colors' as col;
+
+.translated-texts {
+  app-translated-text-field {
+    --translated-text-container-padding: 0;
+    --translated-text-container-margin: 0;
+  }
+}

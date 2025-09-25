@@ -1,0 +1,470 @@
+<div class="call-details-container">
+  <mat-card appearance="outlined">
+    <mat-card-header>
+      <mat-card-title
+        >{{ call.name?.[0]?.text || (call.name?.[1]?.text ?? 'New Call') }}
+      </mat-card-title>
+      @if (call.status === PublicationStatusEnum.DRAFT) {
+        <mat-chip>
+          {{ call.status }}
+        </mat-chip>
+      }
+    </mat-card-header>
+    <mat-card-content>
+      @if (detailsForm) {
+        <form [formGroup]="detailsForm" class="call-details-grid">
+          <div class="nested-grid-container-column">
+          @if (authService.isFunder()) {
+              <div class="detail-item">
+                  <span class="detail-label"> {{ CALL_DETAILS_CONSTANTS.MAIN_FUNDER_LABEL }} </span>
+                  <span class="detail-value">{{ funderRefDisplay() }}</span>
+              </div>
+          } @else {
+              <div class="detail-item">
+                  <app-funder-search
+                            formControlName="funder"
+                            [placeholder]="CALL_DETAILS_CONSTANTS.JOINT_CALL_PARTNER_PLACEHOLDER"
+                            [label]="CALL_DETAILS_CONSTANTS.MAIN_FUNDER_LABEL"
+                            [multiSelect]="false"
+                            [required]= "true"
+                            [showOnlyExternalFunders]="true"
+                    >
+                    </app-funder-search>
+              </div>
+            }
+            <div class="detail-item">
+                <app-single-choice-field
+                         formControlName="fundingType"
+                          [type]="fundingTypes"
+                          [required]="true"
+                          [label]="CALL_DETAILS_CONSTANTS.FUNDING_TYPE_LABEL"
+                >
+                </app-single-choice-field>
+            </div>
+          </div>
+          <div class="detail-item">
+            <app-translated-text-field
+              formControlName="name"
+              [label]="CALL_DETAILS_CONSTANTS.NAME_LABEL"
+              [textLabel]="CALL_DETAILS_CONSTANTS.NAME_PLACEHOLDER"
+              [required]="true"
+            >
+            </app-translated-text-field>
+          </div>
+            <div class="nested-grid-container-column">
+                <div class="detail-item">
+                    <app-text-field
+                            formControlName="acronym"
+                            [placeholder]="CALL_DETAILS_CONSTANTS.ACRONYM_PLACEHOLDER"
+                            [label]="CALL_DETAILS_CONSTANTS.ACRONYM_LABEL"
+                            [textLabel]="CALL_DETAILS_CONSTANTS.ACRONYM_LABEL"
+                            [textPattern]="PATTERN_FOR_ACRONYM"
+                    >
+                    </app-text-field>
+                </div>
+                <div class="detail-item">
+                    <app-multiple-choice-field
+                            formControlName="applicationLanguages"
+                            [type]="applicationLanguages"
+                            [required]="true"
+                            [enableSelectAll]="false"
+                            [label]="CALL_DETAILS_CONSTANTS.APPlICATION_LANGUAGE_LABEL"
+                    >
+                    </app-multiple-choice-field>
+                </div>
+            </div>
+          <div class="detail-item">
+            <app-translated-text-field
+              formControlName="description"
+              [placeholder]="CALL_DETAILS_CONSTANTS.DESCRIPTION_PLACEHOLDER"
+              [label]="CALL_DETAILS_CONSTANTS.DESCRIPTION_LABEL"
+              [textLabel]="CALL_DETAILS_CONSTANTS.DESCRIPTION_LABEL"
+              [multilineText]="true"
+            >
+            </app-translated-text-field>
+          </div>
+          <div class="detail-item">
+            <app-funding-search
+              formControlName="partOf"
+              [placeholder]="CALL_DETAILS_CONSTANTS.PART_OF_PLACEHOLDER"
+              [label]="CALL_DETAILS_CONSTANTS.PART_OF_LABEL"
+              [pathCreateNew]="ROUTER_LINKS.CREATE_NEW_PROGRAM"
+              [emptySelectionMessage]="
+                CALL_DETAILS_CONSTANTS.NO_PROGRAMS_SELECTED_LABEL
+              "
+              [entityStore]="programStore"
+            >
+            </app-funding-search>
+          </div>
+          <div class="detail-item">
+            <app-funding-search
+              formControlName="jointCallPartner"
+              [placeholder]="
+                CALL_DETAILS_CONSTANTS.JOINT_CALL_PARTNER_PLACEHOLDER
+              "
+              [label]="CALL_DETAILS_CONSTANTS.JOINT_CALL_PARTNER_LABEL"
+              [multiSelect]="true"
+              [emptySelectionMessage]="
+                CALL_DETAILS_CONSTANTS.NO_JOINT_CALL_PARTNERS_SELECTED_LABEL
+              "
+              [entityStore]="fundersStore"
+            >
+            </app-funding-search>
+          </div>
+          <div class="detail-item">
+            <app-translated-texts-field
+              formControlName="thematicOrientations"
+              [label]="CALL_DETAILS_CONSTANTS.THEMATIC_ORIENTATIONS_LABEL"
+              [textLabel]="CALL_DETAILS_CONSTANTS.THEMATIC_ORIENTATIONS_LABEL"
+            >
+            </app-translated-texts-field>
+          </div>
+          <div class="detail-item">
+            <app-multiple-choice-field
+              formControlName="careerStages"
+              [type]="careerStages"
+              [label]="CALL_DETAILS_CONSTANTS.CAREER_STAGE_LABEL"
+            >
+            </app-multiple-choice-field>
+          </div>
+          <div class="detail-item">
+            <app-multiple-choice-field
+              formControlName="characteristics"
+              [type]="fundingCharacteristics"
+              [required]="true"
+              [label]="CALL_DETAILS_CONSTANTS.CHARACTERISTICS_LABEL"
+            >
+            </app-multiple-choice-field>
+          </div>
+          <div class="detail-item">
+            <app-multiple-choice-field
+              formControlName="targetGroups"
+              [type]="targetGroups"
+              [required]="true"
+              [enableSelectAll]="true"
+              [label]="CALL_DETAILS_CONSTANTS.TARGET_GROUP_LABEL"
+            >
+            </app-multiple-choice-field>
+          </div>
+          <div class="detail-item">
+            <app-translated-text-field
+              formControlName="targetGroupDetails"
+              [label]="CALL_DETAILS_CONSTANTS.TARGET_GROUP_SPECIFIED_LABEL"
+              [textLabel]="CALL_DETAILS_CONSTANTS.TARGET_GROUP_SPECIFIED_LABEL"
+              [multilineText]="true"
+            >
+            </app-translated-text-field>
+          </div>
+          <div class="nested-grid-container-column">
+            <div class="detail-item">
+              <app-single-choice-field
+                formControlName="legalType"
+                [type]="legalTypes"
+                [required]="true"
+                [label]="CALL_DETAILS_CONSTANTS.LEGAL_TYPE_LABEL"
+              >
+              </app-single-choice-field>
+            </div>
+            <div class="detail-item">
+              <app-single-choice-field
+                formControlName="eligibleApplicantsScope"
+                [type]="eligibleApplicantsScopes"
+                [label]="CALL_DETAILS_CONSTANTS.ELIGIBLE_APPLICANTS_SCOPE_LABEL"
+              >
+              </app-single-choice-field>
+            </div>
+          </div>
+          <div class="detail-item">
+            <app-translated-text-field
+              formControlName="eligibleApplicants"
+              [label]="CALL_DETAILS_CONSTANTS.ELIGIBLE_APPLICANTS_LABEL"
+              [textLabel]="
+                CALL_DETAILS_CONSTANTS.ELIGIBLE_APPLICANTS_PLACEHOLDER
+              "
+              [multilineText]="true"
+            >
+            </app-translated-text-field>
+          </div>
+          <div class="detail-item">
+            <app-multiple-choice-field
+              formControlName="eligibleApplicantsRegions"
+              [type]="eligibleApplicantsRegions"
+              [enableSelectAll]="true"
+              [label]="CALL_DETAILS_CONSTANTS.ELIGIBLE_APPLICANTS_REGION_LABEL"
+            >
+            </app-multiple-choice-field>
+          </div>
+          <div class="detail-item">
+            <app-single-choice-field
+              formControlName="fundingScheme"
+              [type]="fundingSchemes"
+              [required]="true"
+              [label]="CALL_DETAILS_CONSTANTS.FUNDING_SCHEMES_LABEL"
+            >
+            </app-single-choice-field>
+          </div>
+          <div class="detail-item">
+            <app-single-choice-field
+              formControlName="fullyFunded"
+              [type]="binaryChoice"
+              [required]="true"
+              [label]="CALL_DETAILS_CONSTANTS.FULLY_FUNDED_LABEL"
+            >
+            </app-single-choice-field>
+          </div>
+          <div class="nested-grid-container-column">
+            <div class="detail-item">
+              <app-monetary-field
+                formControlName="minProjectVolume"
+                [required]="true"
+                [label]="CALL_DETAILS_CONSTANTS.MIN_PROJECT_VOLUME_LABEL"
+              >
+              </app-monetary-field>
+            </div>
+            <div class="detail-item">
+              <app-monetary-field
+                formControlName="maxProjectVolume"
+                [required]="true"
+                [label]="CALL_DETAILS_CONSTANTS.MAX_PROJECT_VOLUME_LABEL"
+              >
+              </app-monetary-field>
+            </div>
+          </div>
+          <div class="nested-grid-container-column">
+            <div class="detail-item">
+              <app-number-field
+                formControlName="callVolumeProjects"
+                [integer]="true"
+                [nonNegative]="true"
+                [hideValidation]="false"
+                [label]="CALL_DETAILS_CONSTANTS.CALL_VOLUME_PROJCETS_LABEL"
+                [formFieldLabel]="
+                  CALL_DETAILS_CONSTANTS.CALL_VOLUME_PROJCETS_LABEL
+                "
+              >
+              </app-number-field>
+            </div>
+            <div class="detail-item">
+              <app-monetary-field
+                formControlName="callVolumeAmount"
+                [label]="CALL_DETAILS_CONSTANTS.CALL_VOLUME_AMOUNT_LABEL"
+              >
+              </app-monetary-field>
+            </div>
+          </div>
+          <div class="nested-grid-container-column">
+            <div class="detail-item">
+              <app-duration-field
+                formControlName="minProjectDuration"
+                [required]="true"
+                [label]="CALL_DETAILS_CONSTANTS.MIN_PROJECT_DURATION_LABEL"
+              >
+              </app-duration-field>
+            </div>
+            <div class="detail-item">
+              <app-duration-field
+                formControlName="maxProjectDuration"
+                [required]="true"
+                [label]="CALL_DETAILS_CONSTANTS.MAX_PROJECT_DURATION_LABEL"
+              >
+              </app-duration-field>
+            </div>
+          </div>
+          <div class="nested-grid-container-column">
+            <div class="detail-item">
+              <app-number-field
+                formControlName="maxOverhead"
+                [required]="true"
+                [nonNegative]="true"
+                [decimalPlaces]="2"
+                [hideValidation]="false"
+                [label]="CALL_DETAILS_CONSTANTS.MAX_OVERHEAD_LABEL"
+                [formFieldLabel]="CALL_DETAILS_CONSTANTS.MAX_OVERHEAD_LABEL"
+              >
+              </app-number-field>
+            </div>
+            <div class="detail-item">
+              <app-number-field
+                formControlName="minInkind"
+                [required]="true"
+                [nonNegative]="true"
+                [decimalPlaces]="2"
+                [hideValidation]="false"
+                [label]="CALL_DETAILS_CONSTANTS.MIN_INKIND_LABEL"
+                [formFieldLabel]="CALL_DETAILS_CONSTANTS.MIN_INKIND_LABEL"
+              >
+              </app-number-field>
+            </div>
+          </div>
+          <div class="detail-item">
+            <app-translated-text-field
+              formControlName="inkindDetails"
+              [placeholder]="CALL_DETAILS_CONSTANTS.INKIND_DETAILS_PLACEHOLDER"
+              [label]="CALL_DETAILS_CONSTANTS.INKIND_DETAILS_LABEL"
+              [textLabel]="CALL_DETAILS_CONSTANTS.INKIND_DETAILS_LABEL"
+              [multilineText]="true"
+            >
+            </app-translated-text-field>
+          </div>
+          <div class="detail-item">
+            <app-translated-text-field
+              formControlName="overheadDetails"
+              [placeholder]="
+                CALL_DETAILS_CONSTANTS.OVERHEAD_DETAILS_PLACEHOLDER
+              "
+              [label]="CALL_DETAILS_CONSTANTS.OVERHEAD_DETAILS_LABEL"
+              [textLabel]="CALL_DETAILS_CONSTANTS.OVERHEAD_DETAILS_LABEL"
+              [multilineText]="true"
+            >
+            </app-translated-text-field>
+          </div>
+          <div class="detail-item">
+            <app-subject-field
+              formControlName="subjects"
+              [required]="true"
+              [label]="CALL_DETAILS_CONSTANTS.SUBJECT_LABEL"
+            >
+            </app-subject-field>
+          </div>
+          <div class="nested-grid-container-row">
+            <div class="detail-item">
+              <app-date-ranges-info-field
+                formControlName="callStages"
+                [label]="CALL_DETAILS_CONSTANTS.STAGES_LABEL"
+                [labelStage]="CALL_DETAILS_CONSTANTS.CALL_STAGE_LABEL"
+                [labelRange]="
+                  CALL_DETAILS_CONSTANTS.CALL_STAGE_DATE_RANGE_LABEL
+                "
+                [labelInfo]="CALL_DETAILS_CONSTANTS.CALL_STAGE_DETAILS_LABEL"
+                [required]="true"
+              >
+              </app-date-ranges-info-field>
+            </div>
+            <div class="detail-item">
+              <app-contact-field formControlName="contacts" [required]="true">
+              </app-contact-field>
+            </div>
+          </div>
+          <div class="detail-item">
+            <app-multiple-choice-field
+              formControlName="decisionProcess"
+              [type]="decisionProcesses"
+              [label]="CALL_DETAILS_CONSTANTS.DECISION_PROCESS_LABEL"
+            >
+            </app-multiple-choice-field>
+          </div>
+          <div class="detail-item">
+            <app-multiple-choice-field
+              formControlName="submissionModes"
+              [type]="modesOfSubmission"
+              [required]="true"
+              [label]="CALL_DETAILS_CONSTANTS.MODE_OF_SUBMISSION_LABEL"
+            >
+            </app-multiple-choice-field>
+          </div>
+          <div class="detail-item">
+            <app-translated-text-field
+              formControlName="decisionProcessDetails"
+              [placeholder]="
+                CALL_DETAILS_CONSTANTS.DECISION_PROCESS_DETAILS_LABEL
+              "
+              [label]="CALL_DETAILS_CONSTANTS.DECISION_PROCESS_DETAILS_LABEL"
+              [textLabel]="
+                CALL_DETAILS_CONSTANTS.DECISION_PROCESS_DETAILS_LABEL
+              "
+              [multilineText]="true"
+            >
+            </app-translated-text-field>
+          </div>
+          <div class="detail-item">
+            <app-translated-text-field
+              formControlName="reportingPeriodDetails"
+              [placeholder]="
+                CALL_DETAILS_CONSTANTS.REPORTING_PERIODS_PLACEHOLDER
+              "
+              [label]="CALL_DETAILS_CONSTANTS.REPORTING_PERIODS_LABEL"
+              [textLabel]="CALL_DETAILS_CONSTANTS.REPORTING_PERIODS_LABEL"
+              [multilineText]="true"
+            >
+            </app-translated-text-field>
+          </div>
+          <div class="detail-item">
+            <app-single-choice-field
+              formControlName="dmpRequired"
+              [type]="binaryChoice"
+              [label]="CALL_DETAILS_CONSTANTS.DMP_REQUIRED_LABEL"
+            >
+            </app-single-choice-field>
+          </div>
+          <div class="detail-item">
+            <app-url-field
+              formControlName="dmpGuidelines"
+              [placeholder]="CALL_DETAILS_CONSTANTS.DMP_GUIDELINES_PLACEHOLDER"
+              [label]="CALL_DETAILS_CONSTANTS.DMP_GUIDELINES_LABEL"
+            >
+            </app-url-field>
+          </div>
+          <div class="detail-item">
+            <app-translated-text-field
+              formControlName="projectStartDetails"
+              [placeholder]="
+                CALL_DETAILS_CONSTANTS.PROJECT_START_DETAILS_PLACEHOLDER
+              "
+              [label]="CALL_DETAILS_CONSTANTS.PROJECT_START_DETAILS_LABEL"
+              [textLabel]="CALL_DETAILS_CONSTANTS.PROJECT_START_LABEL"
+              [multilineText]="true"
+            >
+            </app-translated-text-field>
+          </div>
+          <div class="detail-item">
+            <app-texts-field
+              formControlName="website"
+              [required]="true"
+              [label]="CALL_DETAILS_CONSTANTS.WEBSITE_LABEL"
+              [textLabel]="CALL_DETAILS_CONSTANTS.WEBSITE_PLACEHOLDER"
+            >
+            </app-texts-field>
+          </div>
+        </form>
+      }
+    </mat-card-content>
+    <mat-card-actions class="action-section">
+      <button mat-stroked-button class="form-item-button" (click)="onBack()">
+        <mat-icon>arrow_back</mat-icon>
+        {{ BUTTON_LABELS.BACK }}
+      </button>
+      <div class="spacer"></div>
+      @if (permissions.canEdit) {
+        <button
+          mat-raised-button
+          class="form-item-button"
+          color="primary"
+          (click)="onPublish()"
+          [disabled]="!detailsForm.valid"
+          [matTooltip]="
+            detailsForm.valid
+              ? ''
+              : CALL_DETAILS_CONSTANTS.PUBLISH_DISABLED_TOOLTIP
+          "
+        >
+          <mat-icon>publish</mat-icon>
+          {{ BUTTON_LABELS.PUBLISH }}
+        </button>
+      }
+      @if (call.status !== PublicationStatusEnum.PUBLISHED) {
+        <button
+          mat-stroked-button
+          class="form-item-button"
+          (click)="onSaveAsDraft()"
+          [disabled]="!detailsForm.get('funder')?.value"
+        >
+          {{ BUTTON_LABELS.SAVE_AS_DRAFT }}
+        </button>
+      }
+      <button mat-stroked-button class="form-item-button" (click)="onPreview()">
+        <mat-icon>remove_red_eye</mat-icon>
+        {{ BUTTON_LABELS.PREVIEW }}
+      </button>
+    </mat-card-actions>
+  </mat-card>
+</div>

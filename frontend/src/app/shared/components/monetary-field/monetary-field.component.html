@@ -1,0 +1,47 @@
+<div class="monetary-field">
+  <div class="form-item-label">{{ label }}</div>
+  <div
+    [formGroup]="monetaryForm"
+    class="form-item-container monetary-container"
+  >
+    <div class="amount-field">
+      <app-number-field
+        ngDefaultControl
+        formControlName="amount"
+        [required]="required"
+        [decimalPlaces]="2"
+        [nonNegative]="true"
+        [hideValidation]="false"
+        formFieldLabel="{{ constants.AMOUNT_LABEL }}"
+      >
+      </app-number-field>
+    </div>
+    <div class="currency-field">
+      <mat-form-field appearance="fill">
+        <mat-label>{{ constants.CURRENCY_LABEL }}</mat-label>
+        <mat-select
+          formControlName="currency"
+          ngDefaultControl
+          [required]="required"
+        >
+          <mat-option hidden>{{ constants.SELECT_PLACEHOLDER }}</mat-option>
+          @for (currencyCode of currencyCodes; track currencyCode) {
+            <mat-option [value]="currencyCode">
+              {{ currencyCode }}
+            </mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
+  </div>
+  @if (monetaryForm.invalid && (monetaryForm.dirty || monetaryForm.touched)) {
+    <mat-error>
+      <ng-container>{{
+        validationService.getValidationErrorMessage(
+          monetaryForm,
+          validators.REQUIRED
+        )
+      }}</ng-container>
+    </mat-error>
+  }
+</div>

@@ -1,0 +1,114 @@
+<div [formGroup]="contactForm" class="contact-field">
+  <div class="form-item-label">{{ label }}</div>
+  @for (contact of contacts.controls; track contact; let i = $index) {
+    <ng-container formArrayName="contacts">
+      <div [formGroupName]="i" class="form-item-container">
+        <div class="contact-form">
+          <mat-form-field appearance="fill">
+            <mat-label>{{ constants.NAME_LABEL }}</mat-label>
+            <input
+              matInput
+              type="text"
+              formControlName="name"
+              [required]="required"
+              (blur)="onTouched()"
+            />
+            @if (
+              contact.get('name')?.invalid &&
+              (contact.get('name')?.dirty || contact.get('name')?.touched)
+            ) {
+              <mat-error>
+                {{
+                  validationService.getValidationErrorMessage(
+                    contact.get('name'),
+                    validators.REQUIRED
+                  )
+                }}
+                {{
+                  validationService.getValidationErrorMessage(
+                    contact.get('name'),
+                    validators.MIN_LENGTH
+                  )
+                }}
+              </mat-error>
+            }
+          </mat-form-field>
+          <mat-form-field appearance="fill">
+            <mat-label>{{ constants.EMAIL_LABEL }}</mat-label>
+            <input
+              matInput
+              type="email"
+              formControlName="email"
+              [required]="required"
+              (blur)="onTouched()"
+            />
+            @if (
+              contact.get('email')?.invalid &&
+              (contact.get('email')?.dirty || contact.get('email')?.touched)
+            ) {
+              <mat-error>
+                {{
+                  validationService.getValidationErrorMessage(
+                    contact.get('email'),
+                    validators.REQUIRED
+                  )
+                }}
+                {{
+                  validationService.getValidationErrorMessage(
+                    contact.get('email'),
+                    validators.EMAIL
+                  )
+                }}
+              </mat-error>
+            }
+          </mat-form-field>
+          <mat-form-field appearance="fill">
+            <mat-label>{{ constants.PHONE_LABEL }}</mat-label>
+            <input
+              matInput
+              type="text"
+              formControlName="phone"
+              (blur)="onTouched()"
+            />
+            @if (
+              contact.get('phone')?.invalid &&
+              (contact.get('phone')?.dirty || contact.get('phone')?.touched)
+            ) {
+              <mat-error>
+                {{
+                  validationService.getValidationErrorMessage(
+                    contact.get('phone'),
+                    validators.PHONE
+                  )
+                }}
+              </mat-error>
+            }
+          </mat-form-field>
+        </div>
+        <div>
+          @if (contacts.length === i + 1) {
+            <button
+              mat-stroked-button
+              color="primary"
+              class="form-item-button"
+              (click)="addContact()"
+              [disabled]="contactForm.invalid"
+            >
+              {{ constants.ADD_BUTTON_LABEL }}
+            </button>
+          }
+          @if (contacts.controls.length > 1) {
+            <button
+              mat-stroked-button
+              color="primary"
+              class="form-item-button"
+              (click)="removeContact(i)"
+            >
+              {{ constants.REMOVE_BUTTON_LABEL }}
+            </button>
+          }
+        </div>
+      </div>
+    </ng-container>
+  }
+</div>

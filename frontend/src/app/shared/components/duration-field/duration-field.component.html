@@ -1,0 +1,44 @@
+<div [formGroup]="durationForm" class="duration-form">
+  <div class="form-item-label">{{ label }}</div>
+  <div class="form-item-container number-fields-container">
+    <app-number-field
+      ngDefaultControl
+      formFieldLabel="{{ constants.MONTHS_LABEL }}"
+      [formControl]="months"
+      [integer]="true"
+      [nonNegative]="true"
+    >
+    </app-number-field>
+    <app-number-field
+      ngDefaultControl
+      formFieldLabel="{{ constants.DAYS_LABEL }}"
+      [formControl]="days"
+      [integer]="true"
+      [nonNegative]="true"
+    >
+    </app-number-field>
+    @if (
+      durationForm.invalid &&
+      (months.dirty || months.touched || days.dirty || days.touched)
+    ) {
+      <mat-error>
+        @if (!(months.errors || days.errors)) {
+          {{
+            validationService.getValidationErrorMessage(
+              durationForm,
+              validators.DURATION
+            )
+          }}
+        }
+        {{
+          validationService.getValidationErrorMessage(months, validators.MIN)
+        }}
+        <ng-container>
+          {{
+            validationService.getValidationErrorMessage(days, validators.MIN)
+          }}</ng-container
+        >
+      </mat-error>
+    }
+  </div>
+</div>

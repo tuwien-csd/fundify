@@ -1,0 +1,23 @@
+@use 'sass:map';
+@use './colors' as col;
+@use './typography' as type;
+@use '../../node_modules/@angular/material/index' as mat;
+
+$fundify-light-primary: mat.m2-define-palette(col.$custom-primary-color);
+$fundify-light-accent: mat.m2-define-palette(col.$custom-accent-color);
+$fundify-light-success: mat.m2-define-palette(col.$custom-success-color);
+$fundify-light-warn: mat.m2-define-palette(col.$custom-warn-color);
+$fundify-light-danger: mat.m2-define-palette(col.$custom-warn-color);
+
+$fundify-light-theme: mat.m2-define-light-theme(
+  (
+    color: (
+      primary: $fundify-light-primary,
+      accent: $fundify-light-accent,
+      success: $fundify-light-success,
+      warn: $fundify-light-warn,
+      danger: $fundify-light-danger,
+    ),
+    typography: type.$typography-config,
+  )
+);

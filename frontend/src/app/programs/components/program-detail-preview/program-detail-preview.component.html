@@ -1,0 +1,63 @@
+<mat-card appearance="outlined">
+  <mat-card-header>
+    <mat-card-title
+      >{{
+        program.name?.[0]?.text || (program.name?.[1]?.text ?? 'New Program')
+      }}
+    </mat-card-title>
+    @if (program.status === PublicationStatusEnum.DRAFT) {
+      <mat-chip>
+        {{ program.status }}
+      </mat-chip>
+    }
+  </mat-card-header>
+
+  <mat-card-content>
+    <div class="program-details-grid">
+      @for (detail of programDetails; track detail) {
+        <div class="detail-item">
+          <div class="detail-content">
+            <span class="detail-label">{{ detail.label }}</span>
+            <span class="detail-value">{{ detail.value }}</span>
+          </div>
+        </div>
+      }
+    </div>
+    @if (!programDetails.length) {
+      <div class="no-data">
+        {{ PROGRAM_DETIALS_CONSTANTS.NO_DATA_MESSAGE }}
+      </div>
+    }
+  </mat-card-content>
+
+  <mat-card-actions class="action-section">
+    <button mat-stroked-button class="form-item-button" (click)="onBack()">
+      <mat-icon>arrow_back</mat-icon>
+      {{ BUTTON_LABELS.BACK }}
+    </button>
+    <span class="spacer"></span>
+    @if (
+      program.status === PublicationStatusEnum.DRAFT && permissions.canEdit
+    ) {
+      <button
+        mat-raised-button
+        class="form-item-button"
+        color="primary"
+        (click)="onPublish()"
+        [disabled]="!isValid"
+        [matTooltip]="
+          isValid ? '' : PROGRAM_DETAILS_CONSTANTS.PUBLISH_DISABLED_TOOLTIP
+        "
+      >
+        <mat-icon>publish</mat-icon>
+        {{ BUTTON_LABELS.PUBLISH }}
+      </button>
+    }
+    @if (permissions.canEdit) {
+      <button mat-stroked-button class="form-item-button" (click)="onEdit()">
+        <mat-icon>edit</mat-icon>
+        {{ BUTTON_LABELS.EDIT }}
+      </button>
+    }
+  </mat-card-actions>
+</mat-card>

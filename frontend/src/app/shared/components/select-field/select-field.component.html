@@ -1,0 +1,43 @@
+<div class="form-group">
+  <div class="form-item-label">{{ displayLabel() }}</div>
+  <div class="form-item-container">
+    <mat-form-field
+      class="text-field"
+      appearance="fill"
+      [formGroup]="selectForm"
+    >
+      <mat-label>{{ textLabel() }}</mat-label>
+
+      <mat-select
+        formControlName="value"
+        [multiple]="multiple()"
+        (blur)="onTouched()"
+      >
+        @for (opt of normalizedOptions(); track opt.value) {
+          <mat-option [value]="opt.value">{{ opt.label }}</mat-option>
+        }
+      </mat-select>
+
+      @if (hint()) {
+        <mat-hint>{{ hint() }}</mat-hint>
+      }
+
+      @if (
+        !hideValidation() &&
+        selectForm.invalid &&
+        (selectForm.dirty || selectForm.touched)
+      ) {
+        <mat-error>
+          <ng-container>
+            {{
+              validationService.getValidationErrorMessage(
+                valueControl,
+                validators.REQUIRED
+              )
+            }}
+          </ng-container>
+        </mat-error>
+      }
+    </mat-form-field>
+  </div>
+</div>

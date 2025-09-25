@@ -1,0 +1,30 @@
+<div [formGroup]="singleChoiceForm" class="single-choice">
+  <div class="form-item-label">{{ label }}</div>
+  <div class="form-item-container">
+    <mat-radio-group
+      ngDefaultControl
+      formControlName="value"
+      [color]="'primary'"
+      class="radio-grid"
+    >
+      @for (choice of choices; track choice) {
+        <mat-radio-button [value]="choice" class="form-radio">
+          {{ choice }}
+        </mat-radio-button>
+      }
+    </mat-radio-group>
+    @if (
+      singleChoiceForm.invalid &&
+      (singleChoiceForm.dirty || singleChoiceForm.touched)
+    ) {
+      <mat-error>
+        {{
+          validationService.getValidationErrorMessage(
+            singleChoiceForm,
+            validators.REQUIRED
+          )
+        }}
+      </mat-error>
+    }
+  </div>
+</div>
