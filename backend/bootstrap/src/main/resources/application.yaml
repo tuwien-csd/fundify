@@ -176,7 +176,7 @@ cron:
       enableDevController: true
     auth:
       permissions:
-        enableDebugLogging: true
+        enableDebugLogging: false
         # This property maps userIds to their roles and affiliations
         # A valid entry looks like this:
         # - userid: "ffg"
