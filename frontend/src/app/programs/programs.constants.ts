@@ -11,7 +11,7 @@ export const PROGRAMS_CONSTANTS = {
   ADD_BUTTON_LABEL: 'new',
 };
 
-export const PROGRAM_DETIALS_CONSTANTS = {
+export const PROGRAM_DETAILS_CONSTANTS = {
   TITLE: 'Program Details',
   TABLE_HEADERS: ['label', 'value'],
   NO_DATA_MESSAGE: 'No Data available',
