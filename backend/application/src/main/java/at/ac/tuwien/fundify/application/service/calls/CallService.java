@@ -2,6 +2,7 @@ package at.ac.tuwien.fundify.application.service.calls;
 
 import at.ac.tuwien.fundify.application.port.common.UserService;
 import at.ac.tuwien.fundify.application.port.in.calls.CallUseCase;
+import at.ac.tuwien.fundify.application.port.out.notification.NotificationService;
 import at.ac.tuwien.fundify.application.port.out.persistence.CallRepository;
 import at.ac.tuwien.fundify.application.port.out.persistence.FunderRepository;
 import at.ac.tuwien.fundify.application.service.common.BasePermissionService;
@@ -45,6 +46,8 @@ public class CallService implements CallUseCase {
   private final FunderRepository funderRepository;
   private final UserService userService;
   private final UniversityService universityService;
+  private final NotificationService notificationService;
+
 
   @Override
   public CallId addCall(Call call) throws FundifyException {
@@ -124,6 +127,7 @@ public class CallService implements CallUseCase {
     Call callUpdate = CallUpdateMapper.INSTANCE.updateCallFromCallUpdate(call, callFromDb);
     Call updatedCall = callRepository.update(callUpdate)
         .orElseThrow(() -> new UnexpectedErrorException("Error updating program with ID: " + callFromDb.getId().value()));
+    notificationService.addNotificationToQueue(updatedCall);
     return updatedCall.getId();
   }
 
@@ -165,7 +169,7 @@ public class CallService implements CallUseCase {
     if (status.equals(ESubscriptionStatus.SUBSCRIBED)) {
       if (call.getSubscriptions().stream()
           .noneMatch(s -> s.id().equals(user.id()))) {
-        call.getSubscriptions().add(new FundifyUser(user.id(), null, null,
+        call.getSubscriptions().add(new FundifyUser(user.id(), user.name(), null,
             user.email()));
       }
     } else {
