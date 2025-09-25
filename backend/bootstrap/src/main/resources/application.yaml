@@ -25,6 +25,9 @@ fundify:
         labels:
           - "Kontaktformular"
         project-id: "10164" # CEFUN project
+  notification:
+    email:
+      batch-size: 5
   external-fundings:
     sync-enabled: true
     run-sync-on-startup: true
@@ -135,11 +138,24 @@ quarkus:
         enabled: true
         path: "/q/metrics"
 
+  mailer:
+    host: "mr.tuwien.ac.at"
+    port: 587
+    tls: false
+    starttls: REQUIRED
+    username: "<set this in your .env in the bootstrap module>"
+    password: "<set this in your .env in the bootstrap module>"
+    from: "fundify.notification@tuwien.ac.at"
+
 
 cron:
   expr:
     sync:
       funding: 0 0/5 * ? * *
+
+every:
+  interval:
+    email-poll: 5M
 
 "%dev":
   quarkus:

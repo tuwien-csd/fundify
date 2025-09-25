@@ -29,6 +29,13 @@ services:
     networks:
       - refop-network
 
+  papercut:
+    image: changemakerstudiosus/papercut-smtp:latest
+    container_name: papercut_smtp
+    ports:
+      - "8084:80"
+      - "25:25"
+
   refop-fe:
     container_name: refop-fe
     build:
