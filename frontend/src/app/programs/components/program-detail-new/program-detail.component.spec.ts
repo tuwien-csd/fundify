@@ -1,4 +1,4 @@
-import { ProgramDetailPreviewComponent } from './program-detail-preview.component';
+import { ProgramDetailComponent } from './program-detail-component-new.component';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { LocalStorageService } from '../../../core/services/local-storage.service';
 import { PermissionService } from '../../../core/auth/services/permission.service';
@@ -7,8 +7,8 @@ import { ViewEnum } from '../../../shared/models/enums/view.enum';
 import { ProgramValidationService } from '../../services/program-validation.service';
 
 describe('ProgramDetailPreviewComponent', () => {
-  let component: ProgramDetailPreviewComponent;
-  let fixture: ComponentFixture<ProgramDetailPreviewComponent>;
+  let component: ProgramDetailComponent;
+  let fixture: ComponentFixture<ProgramDetailComponent>;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: This was disabled during the proper setup of eslint. If you touch this code, fix it properly.
   let mockLocalStorageService: any;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: This was disabled during the proper setup of eslint. If you touch this code, fix it properly.
@@ -29,7 +29,7 @@ describe('ProgramDetailPreviewComponent', () => {
     mockValidationService = { validate: jasmine.createSpy('validate') };
 
     await TestBed.configureTestingModule({
-      imports: [ProgramDetailPreviewComponent],
+      imports: [ProgramDetailComponent],
       providers: [
         { provide: LocalStorageService, useValue: mockLocalStorageService },
         { provide: PermissionService, useValue: mockPermissionService },
@@ -39,7 +39,7 @@ describe('ProgramDetailPreviewComponent', () => {
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ProgramDetailPreviewComponent);
+    fixture = TestBed.createComponent(ProgramDetailComponent);
     component = fixture.componentInstance;
     component.program = PROGRAMS[0];
     fixture.detectChanges();

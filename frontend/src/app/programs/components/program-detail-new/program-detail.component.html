@@ -1,13 +1,11 @@
 <mat-card appearance="outlined">
   <mat-card-header>
     <mat-card-title
-      >{{
-        program.name?.[0]?.text || (program.name?.[1]?.text ?? 'New Program')
-      }}
+      >{{ program().name[0].text || program().name[1].text }}
     </mat-card-title>
-    @if (program.status === PublicationStatusEnum.DRAFT) {
+    @if (program().status === PublicationStatusEnum.DRAFT) {
       <mat-chip>
-        {{ program.status }}
+        {{ program().status }}
       </mat-chip>
     }
   </mat-card-header>
@@ -37,7 +35,7 @@
     </button>
     <span class="spacer"></span>
     @if (
-      program.status === PublicationStatusEnum.DRAFT && permissions.canEdit
+      program().status === PublicationStatusEnum.DRAFT && permissions.canEdit
     ) {
       <button
         mat-raised-button

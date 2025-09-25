@@ -12,6 +12,7 @@ export const ROUTER_LINKS = {
   CALL_NEW: 'calls/new',
   PROGRAMS: 'programs',
   PROGRAM_ID: 'programs/:id',
+  PROGRAM_EDIT: 'programs/:id/edit',
   PROGRAM_NEW: 'programs/new',
   CREATE_NEW_PROGRAM: 'fundings/programs/new',
   FUNDERS: 'funders',
