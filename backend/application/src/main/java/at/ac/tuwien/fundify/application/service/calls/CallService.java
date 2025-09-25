@@ -19,10 +19,7 @@ import at.ac.tuwien.fundify.domain.common.exceptions.EntityNotFoundException;
 import at.ac.tuwien.fundify.domain.common.exceptions.FundifyException;
 import at.ac.tuwien.fundify.domain.common.exceptions.InsufficientPermissionsException;
 import at.ac.tuwien.fundify.domain.common.exceptions.UnexpectedErrorException;
-import at.ac.tuwien.fundify.domain.funding.Call;
-import at.ac.tuwien.fundify.domain.funding.CallUpdate;
-import at.ac.tuwien.fundify.domain.funding.Funder;
-import at.ac.tuwien.fundify.domain.funding.FunderReference;
+import at.ac.tuwien.fundify.domain.funding.*;
 import at.ac.tuwien.fundify.domain.funding.vo.enums.EEntryOrigin;
 import jakarta.enterprise.context.ApplicationScoped;
 import java.time.LocalDateTime;
@@ -50,12 +47,14 @@ public class CallService implements CallUseCase {
 
 
   @Override
-  public CallId addCall(Call call) throws FundifyException {
+  public CallId addCall(CallCreate callCreate) throws FundifyException {
     log.infof("Creation of a call initiated by user %s", userService.getCurrentUserIdAndName());
 
-    FunderId funderId = call.getFunder().id();
+    FunderId funderId = callCreate.getFunder().id();
     Funder funder = funderRepository.findById(funderId)
         .orElseThrow(() -> EntityNotFoundException.funderNotFound(funderId.toString()));
+
+    Call call = CallCreateMapper.INSTANCE.createCallFromCallCreate(callCreate, new Call());
 
     if (userService.isUserAnnotator()) {
         String userAffiliation = userService.getCurrentUserAffiliationId();
@@ -209,6 +208,7 @@ public class CallService implements CallUseCase {
     // Funders can only write calls they are affiliated with.
     return basePermissionService.currentUserIsAffiliatedWith(callOwnerAcronym);
   }
+
   @Mapper
   interface CallUpdateMapper {
 
@@ -218,4 +218,10 @@ public class CallService implements CallUseCase {
     Call updateCallFromCallUpdate(CallUpdate callUpdate, @MappingTarget Call call);
   }
 
+  @Mapper
+  interface CallCreateMapper {
+      CallCreateMapper INSTANCE = Mappers.getMapper(CallCreateMapper.class);
+      @Mapping(target = "callOwner", ignore = true)
+      Call createCallFromCallCreate(CallCreate callCreate, @MappingTarget Call call);
+  }
 }

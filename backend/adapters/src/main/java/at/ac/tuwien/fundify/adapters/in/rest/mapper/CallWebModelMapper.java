@@ -1,5 +1,6 @@
 package at.ac.tuwien.fundify.adapters.in.rest.mapper;
 
+import at.ac.tuwien.fundify.adapters.in.rest.dto.CallCreateWebModel;
 import at.ac.tuwien.fundify.adapters.in.rest.dto.CallOwnerWebModel;
 import at.ac.tuwien.fundify.adapters.in.rest.dto.CallUpdateWebModel;
 import at.ac.tuwien.fundify.adapters.in.rest.dto.CallWebModel;
@@ -8,6 +9,7 @@ import at.ac.tuwien.fundify.domain.common.CallOwner;
 import at.ac.tuwien.fundify.domain.common.ESubscriptionStatus;
 import at.ac.tuwien.fundify.domain.dto.CallDTO;
 import at.ac.tuwien.fundify.domain.funding.Call;
+import at.ac.tuwien.fundify.domain.funding.CallCreate;
 import at.ac.tuwien.fundify.domain.funding.CallUpdate;
 import java.util.List;
 import java.util.Optional;
@@ -46,6 +48,11 @@ public interface CallWebModelMapper {
     @Mapping(target = "callOwner", source = "callOwner", qualifiedByName = "mapOwnerToWeb")
     @Mapping(target = "subscriptionStatus", expression = "java(this.isSubscribed(source, userId))")
     CallWebModel fromDomain(Call source, @Context String userId);
+
+    @Mapping(target = "externalIdentifier.identifiers", source = "identifiers")
+    @Mapping(target = "externalIdentifier.risId", source = "risId")
+    @Mapping(target = "callOwner", ignore = true)
+    CallCreate toDomain(CallCreateWebModel source);
 
     List<CallWebModel> fromDomain(List<Call> source, @Context String userId);
 

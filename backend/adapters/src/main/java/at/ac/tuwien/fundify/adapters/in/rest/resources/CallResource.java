@@ -9,6 +9,7 @@ import static at.ac.tuwien.fundify.adapters.in.rest.constants.FundingEntityMetho
 import static at.ac.tuwien.fundify.adapters.in.rest.constants.FundingEntityMethodPath.QUERY_PARAM_STATUS;
 import static at.ac.tuwien.fundify.adapters.in.rest.constants.FundingEntityMethodPath.UPDATE_ENTITY;
 
+import at.ac.tuwien.fundify.adapters.in.rest.dto.CallCreateWebModel;
 import at.ac.tuwien.fundify.adapters.in.rest.dto.CallUpdateWebModel;
 import at.ac.tuwien.fundify.adapters.in.rest.dto.enums.ESubscriptionStatusWebModel;
 import at.ac.tuwien.fundify.adapters.in.rest.dto.CallWebModel;
@@ -62,9 +63,9 @@ public class CallResource {
   @POST
   @Path(ADD_ENTITY)
   @RolesAllowed({UserRole.Names.FUNDER, UserRole.Names.ADMIN, UserRole.Names.ANNOTATOR})
-  public CallWebModel add(CallWebModel callWebModel)
+  public CallWebModel add(CallCreateWebModel callCreateWebModel)
       throws FundifyException {
-      CallId callId = callUseCase.addCall(CallWebModelMapper.INSTANCE.toDomain(callWebModel));
+      CallId callId = callUseCase.addCall(CallWebModelMapper.INSTANCE.toDomain(callCreateWebModel));
       if (callId == null) {
         return null;
       }
