@@ -1,7 +1,7 @@
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ViewEnum } from 'src/app/shared/models/enums/view.enum';
-import { Program } from '../../models/program.interface';
+import { Program, ProgramWebModel } from '../../models/program.interface';
 import { ROUTER_LINKS } from 'src/app/core/router-links.constants';
 import { Observable, of } from 'rxjs';
 import { select, Store } from '@ngrx/store';
@@ -20,6 +20,8 @@ import { ProgramDetailEditComponent } from '../program-detail-edit/program-detai
 import { ProgramDetailPreviewComponent } from '../program-detail-preview/program-detail-preview.component';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { AsyncPipe } from '@angular/common';
+import { ProgramStore } from '../../signal/program-store';
+import { FundersStore } from '../../../funders/signal/funders-store';
 
 @Component({
   selector: 'app-program',
@@ -36,6 +38,8 @@ export class ProgramDetailComponent implements OnInit, OnDestroy {
   private localStorageService = inject(LocalStorageService);
   private router = inject(Router);
   private store = inject<Store<AppState>>(Store);
+  private readonly programStore = inject(ProgramStore);
+  private readonly fundersStore = inject(FundersStore);
 
   authService = inject(AuthService);
 
@@ -64,9 +68,9 @@ export class ProgramDetailComponent implements OnInit, OnDestroy {
   async saveAsDraft(program: Program): Promise<void> {
     program.status = PublicationStatusEnum.DRAFT;
     if (!program.id) {
-      this.store.dispatch(fromPrograms.addProgram({ program }));
+      this.programStore.create(program as unknown as ProgramWebModel); //TODO:fix type
     } else {
-      this.store.dispatch(fromPrograms.upsertProgram({ program }));
+      this.programStore.update(program as unknown as ProgramWebModel); //TODO:fix type
     }
     await this.goBack();
   }
@@ -74,9 +78,9 @@ export class ProgramDetailComponent implements OnInit, OnDestroy {
   async publish(program: Program): Promise<void> {
     program.status = PublicationStatusEnum.PUBLISHED;
     if (!program.id) {
-      this.store.dispatch(fromPrograms.addProgram({ program }));
+      this.programStore.create(program as unknown as ProgramWebModel); //TODO:fix type
     } else {
-      this.store.dispatch(fromPrograms.upsertProgram({ program }));
+      this.programStore.update(program as unknown as ProgramWebModel); //TODO:fix type
     }
     await this.goBack();
   }
@@ -87,9 +91,14 @@ export class ProgramDetailComponent implements OnInit, OnDestroy {
 
   private fetchOrCreateProgram(): Observable<Program | undefined> {
     if (!this.programId) {
+      const userAffiliationId = this.authService.userAffiliationId();
+      const institutionAffiliationId = this.fundersStore.getFunderByAcronym(
+        userAffiliationId ?? ''
+      )?.id;
+      //TODO: This should rather be evaluated when sending the createRequest; not when fetching the program.
       return of({
         funder: {
-          id: this.authService.userAffiliationId(),
+          id: institutionAffiliationId,
         } as FundingEntityRef,
       } as Program);
     } else {

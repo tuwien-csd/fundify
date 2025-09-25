@@ -7,8 +7,10 @@ import {
   withProps,
 } from '@ngrx/signals';
 import {
+  addEntity,
   removeEntity,
   setAllEntities,
+  updateEntity,
   withEntities,
 } from '@ngrx/signals/entities';
 import { BackendServiceV2 } from '../../core/services/backend-service-v2.service';
@@ -40,6 +42,46 @@ export const ProgramStore = signalStore(
         console.error('Error fetching funders:', error);
       }
     },
+    async create(program: ProgramWebModel) {
+      //TODO: Make paths actually RESTful
+      const { data, error } = await backendService.client.POST(
+        '/api/program/add',
+        {
+          body: program,
+        }
+      );
+      if (data) {
+        patchState(store, addEntity(data));
+        notificationService.success(
+          PROGRAM_DETIALS_CONSTANTS.MESSAGES.CREATE.SUCCESS
+        );
+      } else {
+        console.error('Unexpected error while creating program: ', error);
+        notificationService.error(
+          PROGRAM_DETIALS_CONSTANTS.MESSAGES.CREATE.ERROR
+        );
+      }
+    },
+    async update(program: ProgramWebModel) {
+      //TODO: Make paths actually RESTful
+      const { data, error } = await backendService.client.PUT(
+        '/api/program/update',
+        {
+          body: program,
+        }
+      );
+      if (data) {
+        patchState(store, updateEntity({ id: data.id, changes: data }));
+        notificationService.success(
+          PROGRAM_DETIALS_CONSTANTS.MESSAGES.UPDATE.SUCCESS
+        );
+      } else {
+        console.error('Unexpected error while creating program: ', error);
+        notificationService.error(
+          PROGRAM_DETIALS_CONSTANTS.MESSAGES.UPDATE.ERROR
+        );
+      }
+    },
     async delete(programId: string): Promise<void> {
       try {
         const { response } = await backendService.client.DELETE(
@@ -68,6 +110,9 @@ export const ProgramStore = signalStore(
         );
       }
       return;
+    },
+    findById(programId: string) {
+      return store.entities().find((it) => it.id === programId);
     },
   })),
   withHooks({
