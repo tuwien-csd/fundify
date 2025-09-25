@@ -3,12 +3,13 @@
     <mat-card-header>
       <mat-card-title
         >{{
-          program.name?.[0]?.text || (program.name?.[1]?.text ?? 'New Program')
+          program().name?.[0]?.text ||
+            (program().name?.[1]?.text ?? 'New Program')
         }}
       </mat-card-title>
-      @if (program.status === PublicationStatusEnum.DRAFT) {
+      @if (program().status === PublicationStatusEnum.DRAFT) {
         <mat-chip>
-          {{ program.status }}
+          {{ program().status }}
         </mat-chip>
       }
     </mat-card-header>
@@ -156,7 +157,7 @@
           {{ BUTTON_LABELS.PUBLISH }}
         </button>
       }
-      @if (program.status !== PublicationStatusEnum.PUBLISHED) {
+      @if (program().status !== PublicationStatusEnum.PUBLISHED) {
         <button
           mat-stroked-button
           class="form-item-button"

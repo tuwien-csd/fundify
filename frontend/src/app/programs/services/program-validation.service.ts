@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
-import { Program } from '../models/program.interface';
+import { ProgramWebModel } from '../models/program.interface';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ProgramValidationService {
   // checks if all required fields are filled
-  validate(program: Program): boolean {
+  validate(program: ProgramWebModel): boolean {
     return (
       !!program.name?.length &&
       !!program.targetGroups?.length &&

@@ -4,6 +4,7 @@ import { ActionPermissions } from '../../models/ActionPermissions';
 import { PermissionContext } from '../../models/enums/permission-context.enum';
 import { PublicationStatusEnum } from '../../../shared/models/enums/publication-status.enum';
 import { AuthService } from './auth.service';
+import { equalsIgnoreCase } from '../../../utils/string-utils';
 
 const ADMIN_PERMISSIONS: ActionPermissions = { canEdit: true, canDelete: true };
 const DRAFT_OWNER_PERMISSIONS: ActionPermissions = {
@@ -39,7 +40,12 @@ export class PermissionService {
       return ADMIN_PERMISSIONS;
     }
     // if the user is the owner of the call, the user has full permissions
-    if (this.authService.userAffiliationId()?.toLowerCase() === orgunitId?.toLowerCase()) {
+    if (
+      equalsIgnoreCase(
+        this.authService.userAffiliationId(),
+        orgunitId?.toLowerCase()
+      )
+    ) {
       return DRAFT_OWNER_PERMISSIONS;
     }
     // if the user is not the owner of the draft, the entry is readonly
