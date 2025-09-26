@@ -27,6 +27,7 @@ import at.ac.tuwien.fundify.domain.common.exceptions.FundifyException;
 import io.quarkus.security.Authenticated;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.validation.Valid;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
@@ -62,8 +63,10 @@ public class CallResource {
 
   @POST
   @Path(ADD_ENTITY)
+  @Produces(MediaType.APPLICATION_JSON)
+  @Consumes(MediaType.APPLICATION_JSON)
   @RolesAllowed({UserRole.Names.FUNDER, UserRole.Names.ADMIN, UserRole.Names.ANNOTATOR})
-  public CallWebModel add(CallCreateWebModel callCreateWebModel)
+  public CallWebModel add(@Valid CallCreateWebModel callCreateWebModel)
       throws FundifyException {
       CallId callId = callUseCase.addCall(CallWebModelMapper.INSTANCE.toDomain(callCreateWebModel));
       if (callId == null) {
@@ -75,8 +78,10 @@ public class CallResource {
 
   @PUT
   @Path(UPDATE_ENTITY)
+  @Produces(MediaType.APPLICATION_JSON)
+  @Consumes(MediaType.APPLICATION_JSON)
   @RolesAllowed({UserRole.Names.FUNDER, UserRole.Names.ADMIN, UserRole.Names.ANNOTATOR})
-  public CallWebModel update(CallUpdateWebModel callUpdateWebModel) throws FundifyException {
+  public CallWebModel update(@Valid CallUpdateWebModel callUpdateWebModel) throws FundifyException {
     String userId = userService.getCurrentUserId();
     CallId callId = callUseCase.updateCall(CallWebModelMapper.INSTANCE.toDomain(callUpdateWebModel));
       return CallWebModelMapper.INSTANCE.fromDomain(callUseCase.getCall(callId), userId);
