@@ -52,6 +52,7 @@ public interface CallWebModelMapper {
     @Mapping(target = "externalIdentifier.identifiers", source = "identifiers")
     @Mapping(target = "externalIdentifier.risId", source = "risId")
     @Mapping(target = "callOwner", ignore = true)
+    @Mapping(target = "id", ignore = true)
     CallCreate toDomain(CallCreateWebModel source);
 
     List<CallWebModel> fromDomain(List<Call> source, @Context String userId);
