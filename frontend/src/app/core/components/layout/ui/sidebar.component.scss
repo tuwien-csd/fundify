@@ -1,6 +1,6 @@
 @use '../../../../../styles/colors' as col;
 @use '../../../../../styles/variables' as vars;
-@use '../../../../../../node_modules/@angular/material/index' as mat;
+@use '@angular/material' as mat;
 
 .sidebar-container {
   width: 13rem;
