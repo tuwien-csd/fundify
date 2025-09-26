@@ -1,7 +1,7 @@
 @use 'sass:map';
 @use './colors' as col;
 @use './typography' as type;
-@use '../../node_modules/@angular/material/index' as mat;
+@use '@angular/material' as mat;
 
 $fundify-light-primary: mat.m2-define-palette(col.$custom-primary-color);
 $fundify-light-accent: mat.m2-define-palette(col.$custom-accent-color);
