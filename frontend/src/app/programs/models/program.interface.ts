@@ -38,3 +38,7 @@ export interface Program {
 }
 
 export type ProgramWebModel = components['schemas']['ProgramWebModel'];
+export type ProgramCreateWebModel = Omit<
+  components['schemas']['ProgramWebModel'],
+  'id'
+>;
