@@ -4,7 +4,7 @@ import { ActionPermissions } from '../../models/ActionPermissions';
 import { PermissionContext } from '../../models/enums/permission-context.enum';
 import { PublicationStatusEnum } from '../../../shared/models/enums/publication-status.enum';
 import { AuthService } from './auth.service';
-import { equalsIgnoreCase } from '../../../utils/string-utils';
+import { equalsIgnoreCase } from '../../../shared/utils/string-utils';
 
 const ADMIN_PERMISSIONS: ActionPermissions = { canEdit: true, canDelete: true };
 const DRAFT_OWNER_PERMISSIONS: ActionPermissions = {
@@ -22,6 +22,9 @@ const READONLY_PERMISSIONS: ActionPermissions = {
 export class PermissionService {
   authService = inject(AuthService);
 
+  getUserAffiliationId() {
+    return this.authService.userAffiliationId();
+  }
   getPermissions(
     origin: EntryOriginEnum,
     status: PublicationStatusEnum,

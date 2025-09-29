@@ -25,10 +25,7 @@ import { EntryOriginEnum } from '../../../shared/models/enums/entry-origin.enum'
 import { PermissionService } from '../../../core/auth/services/permission.service';
 import { ActionPermissions } from '../../../core/models/ActionPermissions';
 import { ProgramWebModel } from '../../models/program.interface';
-import {
-  LOCAL_STORAGE_KEYS,
-  LocalStorageService,
-} from '../../../core/services/local-storage.service';
+import { LocalStorageService } from '../../../core/services/local-storage.service';
 import { PermissionContext } from '../../../core/models/enums/permission-context.enum';
 import { PublicationStatusEnum } from '../../../shared/models/enums/publication-status.enum';
 import {
@@ -50,6 +47,11 @@ import { SingleChoiceFieldComponent } from '../../../shared/components/single-ch
 import { MatButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { MatTooltip } from '@angular/material/tooltip';
+import { ProgramStore } from '../../signal/program-store';
+import { EditMode } from '../../../shared/utils/edit-mode';
+import { FundersStore } from '../../../funders/signal/funders-store';
+import { Router } from '@angular/router';
+import { ROUTER_LINKS } from '../../../core/router-links.constants';
 
 @Component({
   selector: 'app-program-detail-edit',
@@ -81,12 +83,16 @@ export class ProgramDetailEditComponent implements OnInit {
   private permissionService = inject(PermissionService);
   private fb = inject(FormBuilder);
   private localStorageService = inject(LocalStorageService);
+  private readonly programsStore = inject(ProgramStore);
+  private readonly fundersStore = inject(FundersStore);
+  private readonly router = inject(Router);
 
   protected readonly PROGRAM_DETAILS_CONSTANTS = PROGRAM_DETAILS_CONSTANTS;
   protected readonly BUTTON_LABELS = BUTTON_LABELS;
   protected readonly PublicationStatusEnum = PublicationStatusEnum;
 
-  program = input.required<ProgramWebModel>();
+  mode = input.required<EditMode>();
+  program = input.required<ProgramWebModel | null | undefined>();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: This was disabled during the proper setup of eslint. If you touch this code, fix it properly.
   @Output() saveAsDraft = new EventEmitter<any>();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: This was disabled during the proper setup of eslint. If you touch this code, fix it properly.
@@ -108,7 +114,6 @@ export class ProgramDetailEditComponent implements OnInit {
     FundingCharacteristicEnum;
 
   ngOnInit() {
-    this.loadStagedChanges();
     this.initPermissions();
     if (!this.permissions?.canEdit) {
       //TODO: Properly check permissions
@@ -122,36 +127,62 @@ export class ProgramDetailEditComponent implements OnInit {
   }
 
   onSaveAsDraft() {
-    this.saveAsDraft.emit({
-      ...this.program(),
-      ...this.detailsForm.getRawValue(),
+    const formValue = this.detailsForm.getRawValue();
+    formValue.status = PublicationStatusEnum.DRAFT;
+    this.createOrUpdateProgram(formValue).then((createdProgram) => {
+      if (createdProgram?.id) this.navigateToCreatedProgram(createdProgram.id);
     });
   }
 
   onPublish() {
-    this.publish.emit({ ...this.program(), ...this.detailsForm.getRawValue() });
+    const formValue = this.detailsForm.getRawValue();
+    formValue.status = PublicationStatusEnum.PUBLISHED;
+    this.createOrUpdateProgram(formValue).then((createdProgram) => {
+      if (createdProgram?.id) this.navigateToCreatedProgram(createdProgram.id);
+    });
+  }
+
+  navigateToCreatedProgram(programId: string) {
+    this.router.navigate([
+      `${ROUTER_LINKS.FUNDINGS}/${ROUTER_LINKS.PROGRAMS}`,
+      programId,
+    ]);
   }
 
   onPreview() {
-    this.stageChanges();
     this.preview.emit(ViewEnum.PREVIEW);
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Fix the type when we have typed forms
+  private createOrUpdateProgram(formValue: any) {
+    const currentUserFunder = this.fundersStore.getFunderByAcronym(
+      this.permissionService.getUserAffiliationId()
+    );
+
+    switch (this.mode()) {
+      case EditMode.CREATE:
+        formValue.funder = currentUserFunder;
+        return this.programsStore.create(formValue);
+      case EditMode.EDIT:
+        return this.programsStore.update({ ...this.program(), ...formValue });
+    }
   }
 
   private initForm() {
     this.detailsForm = this.fb.group({
-      name: [this.program().name],
-      acronym: [this.program().acronym],
-      programTracks: [this.program().programTracks],
-      targetGroups: [this.program().targetGroups],
-      careerStages: [this.program().careerStages],
-      description: [this.program().description],
-      characteristics: [this.program().characteristics],
-      fundingScheme: [this.program().fundingScheme],
-      legalType: [this.program().legalType],
-      website: [this.program().website],
-      subjects: [this.program().subjects],
-      duration: [this.program().duration],
-      funder: [this.program().funder],
+      name: [this.program()?.name],
+      acronym: [this.program()?.acronym],
+      programTracks: [this.program()?.programTracks],
+      targetGroups: [this.program()?.targetGroups],
+      careerStages: [this.program()?.careerStages],
+      description: [this.program()?.description],
+      characteristics: [this.program()?.characteristics],
+      fundingScheme: [this.program()?.fundingScheme],
+      legalType: [this.program()?.legalType],
+      website: [this.program()?.website],
+      subjects: [this.program()?.subjects],
+      duration: [this.program()?.duration],
+      funder: [this.program()?.funder],
     });
   }
 
@@ -168,7 +199,7 @@ export class ProgramDetailEditComponent implements OnInit {
   }
 
   private initPermissions(): void {
-    const context = this.program().id
+    const context = this.program()?.id
       ? PermissionContext.EXISTING
       : PermissionContext.NEW;
     this.permissions = this.permissionService.getPermissions(
@@ -177,24 +208,5 @@ export class ProgramDetailEditComponent implements OnInit {
       this.getOwnerId(),
       context
     );
-  }
-
-  private loadStagedChanges(): void {
-    const stagedChanges = this.localStorageService.load(
-      LOCAL_STORAGE_KEYS.STAGED_PROGRAM_CHANGES
-    );
-    //TODO: Check if we need staging
-    // if (stagedChanges) {
-    //   this.program() = { ...this.program(), ...stagedChanges };
-    // }
-  }
-
-  private stageChanges(): void {
-    if (this.detailsForm.dirty) {
-      this.localStorageService.save(
-        LOCAL_STORAGE_KEYS.STAGED_PROGRAM_CHANGES,
-        this.detailsForm.getRawValue()
-      );
-    }
   }
 }
