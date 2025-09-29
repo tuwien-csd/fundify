@@ -68,7 +68,7 @@
                   !this.permissionService.canEdit(
                     program.origin,
                     program.status,
-                    program.funder?.id
+                    program.funder?.acronym
                   )
                 "
               >
@@ -81,7 +81,7 @@
                   !this.permissionService.canDelete(
                     program.origin,
                     program.status,
-                    program.funder?.id
+                    program.funder?.acronym
                   )
                 "
                 (click)="this.onDelete(program.id)"
