@@ -41,13 +41,9 @@ export const ProgramStore = signalStore(
       }
     },
     async create(program: ProgramWebModel) {
-      //TODO: Make paths actually RESTful
-      const { data, error } = await backendService.client.POST(
-        '/api/program/add',
-        {
-          body: program,
-        }
-      );
+      const { data, error } = await backendService.client.POST('/api/program', {
+        body: program,
+      });
       if (data) {
         patchState(store, addEntity(data));
         notificationService.success(
@@ -63,11 +59,15 @@ export const ProgramStore = signalStore(
       }
     },
     async update(program: ProgramWebModel) {
-      //TODO: Make paths actually RESTful
       const { data, error } = await backendService.client.PUT(
-        '/api/program/update',
+        '/api/program/{id}',
         {
           body: program,
+          params: {
+            path: {
+              id: program.id,
+            },
+          },
         }
       );
       if (data) {
@@ -87,7 +87,7 @@ export const ProgramStore = signalStore(
     async delete(programId: string): Promise<void> {
       try {
         const { response } = await backendService.client.DELETE(
-          '/api/program/delete/{id}',
+          '/api/program/{id}',
           {
             params: {
               path: {
