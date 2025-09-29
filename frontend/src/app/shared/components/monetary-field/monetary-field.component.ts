@@ -1,4 +1,11 @@
-import { Component, Input, OnDestroy, OnInit, inject } from '@angular/core';
+import {
+  Component,
+  Input,
+  OnDestroy,
+  OnInit,
+  inject,
+  Injector,
+} from '@angular/core';
 import {
   AbstractControl,
   ControlValueAccessor,
@@ -11,6 +18,8 @@ import {
   Validators,
   FormsModule,
   ReactiveFormsModule,
+  NgControl,
+  TouchedChangeEvent,
 } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { getFormValidationErrors } from '../../utils/validator-util';
@@ -57,6 +66,7 @@ export class MonetaryFieldComponent
 {
   private fb = inject(UntypedFormBuilder);
   validationService = inject(ValidationService);
+  private injector = inject(Injector);
 
   monetaryForm: UntypedFormGroup;
 
@@ -85,9 +95,26 @@ export class MonetaryFieldComponent
   }
 
   ngOnDestroy() {
+    this.touchedChangeSub?.unsubscribe();
     for (const sub of this.onChangeSubs) {
       sub.unsubscribe();
     }
+  }
+
+  private touchedChangeSub?: Subscription;
+
+  ngAfterViewInit() {
+    // Workaround for propagating touched state to all nested child controls:
+    // as markAllAsTouched is not propagated to the child controls
+    // we subscribe to the TouchedChangeEvent and mark all controls as touched.
+    this.touchedChangeSub = this.injector
+      .get(NgControl)
+      .control!.events.subscribe((event) => {
+        if (event instanceof TouchedChangeEvent) {
+          this.monetaryForm.markAllAsTouched();
+          this.monetaryForm.updateValueAndValidity();
+        }
+      });
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type -- TODO: This was disabled during the proper setup of eslint. If you touch this code, fix it properly.

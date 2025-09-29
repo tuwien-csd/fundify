@@ -2,10 +2,12 @@ import {
   Component,
   computed,
   inject,
+  Injector,
   Input,
   OnDestroy,
   OnInit,
   signal,
+  AfterViewInit,
 } from '@angular/core';
 import {
   AbstractControl,
@@ -15,7 +17,9 @@ import {
   FormGroup,
   FormsModule,
   NG_VALUE_ACCESSOR,
+  NgControl,
   ReactiveFormsModule,
+  TouchedChangeEvent,
   UntypedFormBuilder,
   Validator,
   ValidatorFn,
@@ -71,10 +75,11 @@ import { FundersStore } from '../../../funders/signal/funders-store';
   ],
 })
 export class FunderSearchComponent
-  implements OnInit, OnDestroy, Validator, ControlValueAccessor
+  implements OnInit, OnDestroy, Validator, ControlValueAccessor, AfterViewInit
 {
   private fb = inject(UntypedFormBuilder);
   validationService = inject(ValidationService);
+  private injector = inject(Injector);
 
   constants = FUNDING_SEARCH_LABELS;
   validators = VALIDATORS;
@@ -124,9 +129,26 @@ export class FunderSearchComponent
   }
 
   ngOnDestroy() {
+    this.touchedChangeSub?.unsubscribe();
     for (const sub of this.onChangeSubs) {
       sub.unsubscribe();
     }
+  }
+
+  private touchedChangeSub?: Subscription;
+
+  ngAfterViewInit() {
+    // Workaround for propagating touched state to all nested child controls:
+    // as markAllAsTouched is not propagated to the child controls
+    // we subscribe to the TouchedChangeEvent and mark all controls as touched.
+    this.touchedChangeSub = this.injector
+      .get(NgControl)
+      .control!.events.subscribe((event) => {
+        if (event instanceof TouchedChangeEvent) {
+          this.form.markAllAsTouched();
+          this.form.updateValueAndValidity();
+        }
+      });
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type -- TODO: This was disabled during the proper setup of eslint. If you touch this code, fix it properly.

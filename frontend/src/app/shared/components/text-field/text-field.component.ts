@@ -5,6 +5,8 @@ import {
   OnInit,
   ViewEncapsulation,
   inject,
+  Injector,
+  AfterViewInit,
 } from '@angular/core';
 import {
   AbstractControl,
@@ -17,6 +19,8 @@ import {
   Validators,
   FormsModule,
   ReactiveFormsModule,
+  NgControl,
+  TouchedChangeEvent,
 } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { getFormValidationErrors } from '../../utils/validator-util';
@@ -61,10 +65,11 @@ import { MatInput } from '@angular/material/input';
   ],
 })
 export class TextFieldComponent
-  implements OnInit, OnDestroy, Validator, ControlValueAccessor
+  implements OnInit, OnDestroy, Validator, ControlValueAccessor, AfterViewInit
 {
   private fb = inject(UntypedFormBuilder);
   validationService = inject(ValidationService);
+  private injector = inject(Injector);
 
   textForm;
 
@@ -89,9 +94,26 @@ export class TextFieldComponent
   }
 
   ngOnDestroy() {
+    this.touchedChangeSub?.unsubscribe();
     for (const sub of this.onChangeSubs) {
       sub.unsubscribe();
     }
+  }
+
+  private touchedChangeSub?: Subscription;
+
+  ngAfterViewInit() {
+    // Workaround for propagating touched state to all nested child controls:
+    // as markAllAsTouched is not propagated to the child controls
+    // we subscribe to the TouchedChangeEvent and mark all controls as touched.
+    this.touchedChangeSub = this.injector
+      .get(NgControl)
+      .control!.events.subscribe((event) => {
+        if (event instanceof TouchedChangeEvent) {
+          this.textForm.markAllAsTouched();
+          this.textForm.updateValueAndValidity();
+        }
+      });
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type -- TODO: This was disabled during the proper setup of eslint. If you touch this code, fix it properly.
