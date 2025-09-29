@@ -1,9 +1,5 @@
 package at.ac.tuwien.fundify.bootstrap.e2e;
 
-import static at.ac.tuwien.fundify.adapters.in.rest.constants.FundingEntityMethodPath.ADD_ENTITY;
-import static at.ac.tuwien.fundify.adapters.in.rest.constants.FundingEntityMethodPath.DELETE_ENTITY_BY_ID_REPLACE_PARAMTER;
-import static at.ac.tuwien.fundify.adapters.in.rest.constants.FundingEntityMethodPath.ENTITY_BY_ID_REPLACE_PARAMETER;
-import static at.ac.tuwien.fundify.adapters.in.rest.constants.FundingEntityMethodPath.ENTITY_LIST;
 import static at.ac.tuwien.fundify.adapters.in.rest.constants.FundingEntityMethodPath.QUERY_PARAM_STATUS;
 import static at.ac.tuwien.fundify.adapters.in.rest.constants.FundingEntityMethodPath.UPDATE_ENTITY;
 import static at.ac.tuwien.fundify.bootstrap.utils.TestConstants.FFG_FUNDER_AFFILIATION;
@@ -106,7 +102,7 @@ class ProgramTest {
                 .contentType(ContentType.JSON)
                 .body(requestProgram)
                 .when()
-                .post(ADD_ENTITY)
+                .post()
                 .then()
                 .statusCode(200)
                 .extract()
@@ -131,7 +127,7 @@ class ProgramTest {
                 .contentType(ContentType.JSON)
                 .body(requestProgram)
                 .when()
-                .post(ADD_ENTITY)
+                .post()
                 .then()
                 .statusCode(200)
                 .extract()
@@ -157,7 +153,7 @@ class ProgramTest {
                 .contentType(ContentType.JSON)
                 .body(requestProgram)
                 .when()
-                .post(ADD_ENTITY)
+                .post()
                 .then()
                 .statusCode(200)
                 .extract()
@@ -184,7 +180,7 @@ class ProgramTest {
                 .contentType(ContentType.JSON)
                 .body(requestProgram)
                 .when()
-                .post(ADD_ENTITY)
+                .post()
                 .then()
                 .statusCode(200)
                 .extract()
@@ -210,7 +206,7 @@ class ProgramTest {
                 .contentType(ContentType.JSON)
                 .body(requestProgram)
                 .when()
-                .post(ADD_ENTITY)
+                .post()
                 .then()
                 .statusCode(400);
     }
@@ -298,7 +294,7 @@ class ProgramTest {
 
         given()
                 .when()
-                .delete(DELETE_ENTITY_BY_ID_REPLACE_PARAMTER, programId)
+                .delete("{id}", programId)
                 .then()
                 .statusCode(204);
 
@@ -323,7 +319,7 @@ class ProgramTest {
         ProgramWebModel[] programs = given()
                 .when()
                 .queryParam(QUERY_PARAM_STATUS, EPublicationStatusWebModel.PUBLISHED)
-                .get(ENTITY_LIST)
+                .get()
                 .then()
                 .statusCode(200)
                 .extract()
@@ -341,7 +337,7 @@ class ProgramTest {
 
         ProgramWebModel responseProgram = given()
                 .when()
-                .get(ENTITY_BY_ID_REPLACE_PARAMETER, program.id.toHexString())
+                .get("{id}", program.id.toHexString())
                 .then()
                 .statusCode(200)
                 .extract()
@@ -357,7 +353,7 @@ class ProgramTest {
 
         given()
                 .when()
-                .get(ENTITY_BY_ID_REPLACE_PARAMETER, unknownId)
+                .get("{id}", unknownId)
                 .then()
                 .statusCode(404);
     }
@@ -368,7 +364,7 @@ class ProgramTest {
         String invalidId = "invalidId";
         given()
                 .when()
-                .get(ENTITY_BY_ID_REPLACE_PARAMETER, invalidId)
+                .get("{id}", invalidId)
                 .then()
                 .statusCode(404);
     }
@@ -393,7 +389,7 @@ class ProgramTest {
           .contentType(ContentType.JSON)
           .body(requestProgram)
           .when()
-          .post(ADD_ENTITY)
+          .post()
           .then()
           .statusCode(403);
     }
@@ -412,7 +408,7 @@ class ProgramTest {
           .contentType(ContentType.JSON)
           .body(requestProgram)
           .when()
-          .post(ADD_ENTITY)
+          .post()
           .then()
           .statusCode(200);
     }
@@ -463,7 +459,7 @@ class ProgramTest {
     void when_Delete_ProgramAsUnaffiliatedUser_then_ReturnForbidden() {
       given()
           .when()
-          .delete(DELETE_ENTITY_BY_ID_REPLACE_PARAMTER, programId)
+          .delete("{id}", programId)
           .then()
           .statusCode(403);
     }
@@ -473,7 +469,7 @@ class ProgramTest {
     void when_Delete_ProgramManagedThroughSync_then_ReturnForbidden() {
       given()
           .when()
-          .delete(DELETE_ENTITY_BY_ID_REPLACE_PARAMTER, programIdManagedBySync)
+          .delete("{id}", programIdManagedBySync)
           .then()
           .statusCode(403);
     }
