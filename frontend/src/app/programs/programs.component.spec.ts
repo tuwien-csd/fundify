@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ProgramsComponent } from './programs.component';
-import { MockStore, provideMockStore } from '@ngrx/store/testing';
+import { provideMockStore } from '@ngrx/store/testing';
 import { PROGRAMS } from '../shared/mocks/mock-programs';
 import { MatTableDataSource } from '@angular/material/table';
 import { PermissionService } from '../core/auth/services/permission.service';
@@ -12,7 +12,6 @@ import { signal } from '@angular/core';
 describe('ProgramsComponent', () => {
   let component: ProgramsComponent;
   let fixture: ComponentFixture<ProgramsComponent>;
-  let store: MockStore;
   let mockPermissionService: jasmine.SpyObj<PermissionService>;
 
   const initialState = {
@@ -51,8 +50,6 @@ describe('ProgramsComponent', () => {
         },
       ],
     }).compileComponents();
-
-    store = TestBed.inject(MockStore);
 
     fixture = TestBed.createComponent(ProgramsComponent);
     component = fixture.componentInstance;
