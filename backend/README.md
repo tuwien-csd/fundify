@@ -15,8 +15,12 @@
 docker-compose -f compose/docker-compose.development.yaml up -d
 ```
 ### Email Service
-- To test the implementation for the email service locally, you can use the Papercut-SMTP service, which you can also start from [docker-compose.development](./compose/docker-compose.development.yaml). 
+- To test the implementation for the email service locally, you can use the Papercut-SMTP service, which you can also start from [docker-compose.development](./compose/docker-compose.development.yaml).
 - You can access the Papercut web interface at http://localhost:8084 to view the emails that are sent by the application.
+- The [EmailService](./fundify/EmailService.java) uses an internal queue to temporarily store all outgoing mails. To prevent overloading the mailer, these are dispatched in batches at a scheduled interval. Both the batch size and the interval are defined in [application.yaml](./bootstrap/src/main/resources/application.yaml), allowing you to quickly adjust the sending rate for various testing conditions. For that you can modify the following sections:
+    - `fundify.notification.email.batch-size`
+    - `fundify.notification.every.interval.email-poll`
+
 
 ### Running everything in Docker
 - TODO: For this, the main docker-compose.yaml can be used, but the keycloak redirect url needs to be adjusted to point to the nginx-proxy
