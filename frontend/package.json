@@ -12,6 +12,7 @@
     "test:e2e-ui": "npx playwright test --ui",
     "test:e2e-generate": "npx playwright codegen localhost:4200/ --viewport-size='1920,1080' --load-storage='e2e/config/.auth/funder.json'",
     "test:e2e-generate-login": "npx playwright codegen localhost:4200/ --save-storage='e2e/config/.auth/admin.json'",
+    "ci:test": "ng test --watch=false --browsers=ChromeHeadless",
     "lint": "ng lint",
     "prepare": "husky"
   },

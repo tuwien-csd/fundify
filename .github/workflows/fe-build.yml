@@ -21,6 +21,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v5
         with:
+          cache-dependency-path: frontend/package-lock.json
           node-version-file: 'frontend/.nvmrc'
           cache: 'npm'
 
@@ -34,5 +35,5 @@ jobs:
         run: npm run build
 
       - name: Test
-        run: npm run test
+        run: npm run ci:test
 
