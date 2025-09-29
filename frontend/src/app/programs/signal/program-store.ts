@@ -28,9 +28,7 @@ export const ProgramStore = signalStore(
   withMethods(({ backendService, notificationService, ...store }) => ({
     async fetchAll(): Promise<void> {
       try {
-        const response = await backendService.client.GET(
-          '/api/program/detail/list'
-        );
+        const response = await backendService.client.GET('/api/program');
         if (response.data) {
           patchState(store, setAllEntities(response.data));
         } else {
