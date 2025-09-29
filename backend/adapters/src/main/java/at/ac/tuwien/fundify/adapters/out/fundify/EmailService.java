@@ -44,10 +44,6 @@ public class EmailService implements NotificationService {
   @Scheduled(every = "{fundify.notification.every.interval.email-poll}")
   public void processPendingEmails() {
 
-      if (pendingEmails.isEmpty()) {
-        return;
-      }
-
     for (int i = 0; i < batchSize; i++) {
       Mail mail = pendingEmails.poll();
       if (mail == null) {
