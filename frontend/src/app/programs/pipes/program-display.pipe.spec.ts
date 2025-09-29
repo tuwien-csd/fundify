@@ -87,7 +87,11 @@ describe('ProgramDisplayPipe', () => {
   });
 
   it('should return the english name for "funder" field', () => {
-    const program: Program = { id: '1', name: name, funder: funder };
+    const program: Program = {
+      id: '1',
+      name: name,
+      funder: funder,
+    } as unknown as Program;
     const result = pipe.transform(program, 'funder');
     expect(result).toEqual('Funder 1');
   });
