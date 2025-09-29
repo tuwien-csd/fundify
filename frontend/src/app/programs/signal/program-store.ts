@@ -55,11 +55,13 @@ export const ProgramStore = signalStore(
         notificationService.success(
           PROGRAM_DETAILS_CONSTANTS.MESSAGES.CREATE.SUCCESS
         );
+        return data;
       } else {
         console.error('Unexpected error while creating program: ', error);
         notificationService.error(
           PROGRAM_DETAILS_CONSTANTS.MESSAGES.CREATE.ERROR
         );
+        return null;
       }
     },
     async update(program: ProgramWebModel) {
@@ -75,11 +77,13 @@ export const ProgramStore = signalStore(
         notificationService.success(
           PROGRAM_DETAILS_CONSTANTS.MESSAGES.UPDATE.SUCCESS
         );
+        return data;
       } else {
         console.error('Unexpected error while creating program: ', error);
         notificationService.error(
           PROGRAM_DETAILS_CONSTANTS.MESSAGES.UPDATE.ERROR
         );
+        return null;
       }
     },
     async delete(programId: string): Promise<void> {
@@ -109,7 +113,6 @@ export const ProgramStore = signalStore(
           `Unexpected error while trying to delete program with id '${programId}': ${error}`
         );
       }
-      return;
     },
     findById(programId: string) {
       return store.entities().find((it) => it.id === programId);
