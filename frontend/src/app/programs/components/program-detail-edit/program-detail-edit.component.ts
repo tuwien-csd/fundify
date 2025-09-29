@@ -1,11 +1,4 @@
-import {
-  Component,
-  EventEmitter,
-  inject,
-  input,
-  OnInit,
-  Output,
-} from '@angular/core';
+import { Component, inject, input, OnInit } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -18,14 +11,12 @@ import { FundingRegexp } from 'src/app/shared/models/enums/funding-regexp.enum';
 import { FundingSchemeEnum } from 'src/app/shared/models/enums/funding-scheme.enum';
 import { LegalTypeEnum } from 'src/app/shared/models/enums/legal-type.enum';
 import { TargetGroupEnum } from 'src/app/shared/models/enums/target-group.enum';
-import { ViewEnum } from 'src/app/shared/models/enums/view.enum';
 import { PROGRAM_DETAILS_CONSTANTS } from '../../programs.constants';
 import { BUTTON_LABELS } from 'src/app/shared/shared.constants';
 import { EntryOriginEnum } from '../../../shared/models/enums/entry-origin.enum';
 import { PermissionService } from '../../../core/auth/services/permission.service';
 import { ActionPermissions } from '../../../core/models/ActionPermissions';
 import { ProgramWebModel } from '../../models/program.interface';
-import { LocalStorageService } from '../../../core/services/local-storage.service';
 import { PermissionContext } from '../../../core/models/enums/permission-context.enum';
 import { PublicationStatusEnum } from '../../../shared/models/enums/publication-status.enum';
 import {
@@ -50,7 +41,7 @@ import { MatTooltip } from '@angular/material/tooltip';
 import { ProgramStore } from '../../signal/program-store';
 import { EditMode } from '../../../shared/utils/edit-mode';
 import { FundersStore } from '../../../funders/signal/funders-store';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { ROUTER_LINKS } from '../../../core/router-links.constants';
 
 @Component({
@@ -77,12 +68,12 @@ import { ROUTER_LINKS } from '../../../core/router-links.constants';
     MatButton,
     MatIcon,
     MatTooltip,
+    RouterLink,
   ],
 })
 export class ProgramDetailEditComponent implements OnInit {
   private permissionService = inject(PermissionService);
   private fb = inject(FormBuilder);
-  private localStorageService = inject(LocalStorageService);
   private readonly programsStore = inject(ProgramStore);
   private readonly fundersStore = inject(FundersStore);
   private readonly router = inject(Router);
@@ -93,13 +84,6 @@ export class ProgramDetailEditComponent implements OnInit {
 
   mode = input.required<EditMode>();
   program = input.required<ProgramWebModel | null | undefined>();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: This was disabled during the proper setup of eslint. If you touch this code, fix it properly.
-  @Output() saveAsDraft = new EventEmitter<any>();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: This was disabled during the proper setup of eslint. If you touch this code, fix it properly.
-  @Output() publish: EventEmitter<any> = new EventEmitter<any>();
-  @Output() back = new EventEmitter<void>();
-  @Output() validate = new EventEmitter();
-  @Output() preview = new EventEmitter<ViewEnum>();
 
   permissions!: ActionPermissions;
   detailsForm!: FormGroup;
@@ -116,21 +100,16 @@ export class ProgramDetailEditComponent implements OnInit {
   ngOnInit() {
     this.initPermissions();
     if (!this.permissions?.canEdit) {
-      //TODO: Properly check permissions
-      // this.router.navigate([ROUTER_LINKS.NOT_AUTHORIZED]);
+      this.router.navigate([ROUTER_LINKS.NOT_AUTHORIZED]);
     }
     this.initForm();
-  }
-
-  onBack(): void {
-    this.back.emit();
   }
 
   onSaveAsDraft() {
     const formValue = this.detailsForm.getRawValue();
     formValue.status = PublicationStatusEnum.DRAFT;
     this.createOrUpdateProgram(formValue).then((createdProgram) => {
-      if (createdProgram?.id) this.navigateToCreatedProgram(createdProgram.id);
+      if (createdProgram?.id) this.navigateToProgramDetails(createdProgram.id);
     });
   }
 
@@ -138,19 +117,15 @@ export class ProgramDetailEditComponent implements OnInit {
     const formValue = this.detailsForm.getRawValue();
     formValue.status = PublicationStatusEnum.PUBLISHED;
     this.createOrUpdateProgram(formValue).then((createdProgram) => {
-      if (createdProgram?.id) this.navigateToCreatedProgram(createdProgram.id);
+      if (createdProgram?.id) this.navigateToProgramDetails(createdProgram.id);
     });
   }
 
-  navigateToCreatedProgram(programId: string) {
+  navigateToProgramDetails(programId: string) {
     this.router.navigate([
       `${ROUTER_LINKS.FUNDINGS}/${ROUTER_LINKS.PROGRAMS}`,
       programId,
     ]);
-  }
-
-  onPreview() {
-    this.preview.emit(ViewEnum.PREVIEW);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Fix the type when we have typed forms
@@ -191,7 +166,7 @@ export class ProgramDetailEditComponent implements OnInit {
   }
 
   getOwnerId(): string {
-    return this.program()?.funder?.id ?? '';
+    return this.program()?.funder?.acronym ?? '';
   }
 
   getOrigin(): EntryOriginEnum {

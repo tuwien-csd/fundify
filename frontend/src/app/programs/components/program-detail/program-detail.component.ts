@@ -16,10 +16,7 @@ import { PermissionService } from '../../../core/auth/services/permission.servic
 import { ActionPermissions } from '../../../core/models/ActionPermissions';
 import { ProgramWebModel } from '../../models/program.interface';
 import { DateRange } from '../../../shared/models/interfaces/date-range.interface';
-import {
-  LOCAL_STORAGE_KEYS,
-  LocalStorageService,
-} from '../../../core/services/local-storage.service';
+import { LocalStorageService } from '../../../core/services/local-storage.service';
 import { PermissionContext } from '../../../core/models/enums/permission-context.enum';
 import { PublicationStatusEnum } from '../../../shared/models/enums/publication-status.enum';
 import { ProgramValidationService } from '../../services/program-validation.service';
@@ -35,6 +32,7 @@ import { MatButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { MatTooltip } from '@angular/material/tooltip';
 import { ApiModels } from '../../../shared/models/backend-api-models';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-program-detail',
@@ -50,12 +48,15 @@ import { ApiModels } from '../../../shared/models/backend-api-models';
     MatButton,
     MatIcon,
     MatTooltip,
+    RouterLink,
   ],
 })
 export class ProgramDetailComponent implements OnInit {
   private readonly localStorageService = inject(LocalStorageService);
   private readonly permissionService = inject(PermissionService);
   private readonly validationService = inject(ProgramValidationService);
+  private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
 
   protected readonly CONSTANTS = PROGRAM_DETAILS_CONSTANTS;
   protected readonly BUTTON_LABELS = BUTTON_LABELS;
@@ -73,18 +74,13 @@ export class ProgramDetailComponent implements OnInit {
   isValid!: boolean;
 
   ngOnInit(): void {
-    this.loadStagedChanges();
     this.generateProgramDetails();
     this.initPermissions();
     this.isValid = this.validationService.validate(this.program());
   }
 
-  onBack(): void {
-    this.back.emit();
-  }
-
   onEdit(): void {
-    this.edit.emit(ViewEnum.EDIT);
+    this.router.navigate(['./edit'], { relativeTo: this.route });
   }
 
   onPublish(): void {
@@ -104,7 +100,7 @@ export class ProgramDetailComponent implements OnInit {
   }
 
   getOwnerId(): string {
-    return this.program()?.funder?.id ?? '';
+    return this.program()?.funder?.acronym ?? '';
   }
 
   getOrigin(): EntryOriginEnum {
@@ -236,16 +232,6 @@ export class ProgramDetailComponent implements OnInit {
       subjects?.map((subject) => subject.title).join(', ') ??
       PROGRAM_DETAILS_CONSTANTS.PLACEHOLDER
     );
-  }
-
-  private loadStagedChanges(): void {
-    const stagedChanges = this.localStorageService.load(
-      LOCAL_STORAGE_KEYS.STAGED_PROGRAM_CHANGES
-    );
-    // TODO: Check if we need this
-    // if (stagedChanges) {
-    //   this.program() = { ...this.program(), ...stagedChanges };
-    // }
   }
 
   protected readonly PROGRAM_DETAILS_CONSTANTS = PROGRAM_DETAILS_CONSTANTS;
