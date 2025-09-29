@@ -1,9 +1,16 @@
-import { Component, Input, OnDestroy, OnInit, inject } from '@angular/core';
+import {
+  Component,
+  Input,
+  OnDestroy,
+  OnInit,
+  inject,
+  Injector,
+  AfterViewInit,
+} from '@angular/core';
 import {
   AbstractControl,
   ControlValueAccessor,
   UntypedFormBuilder,
-  UntypedFormControl,
   UntypedFormGroup,
   NG_VALIDATORS,
   NG_VALUE_ACCESSOR,
@@ -12,6 +19,8 @@ import {
   Validators,
   FormsModule,
   ReactiveFormsModule,
+  NgControl,
+  TouchedChangeEvent,
 } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { getFormValidationErrors } from '../../utils/validator-util';
@@ -49,10 +58,11 @@ import { MatError } from '@angular/material/form-field';
   ],
 })
 export class SingleChoiceFieldComponent
-  implements OnInit, OnDestroy, Validator, ControlValueAccessor
+  implements OnInit, OnDestroy, Validator, ControlValueAccessor, AfterViewInit
 {
   private fb = inject(UntypedFormBuilder);
   validationService = inject(ValidationService);
+  private injector = inject(Injector);
 
   singleChoiceForm: UntypedFormGroup;
   choices: string[] = [];
@@ -64,23 +74,40 @@ export class SingleChoiceFieldComponent
   validators = VALIDATORS;
 
   constructor() {
-    this.singleChoiceForm = this.fb.group({ value: [null] });
+    this.singleChoiceForm = this.fb.group({ choiceValue: [null] });
   }
 
   ngOnInit(): void {
     this.choices = Object.values(this.type).filter((item) => {
       return isNaN(Number(item));
     });
-    this.singleChoiceForm.controls['value'].setValidators(
+    this.singleChoiceForm.controls['choiceValue'].setValidators(
       this.validatorsForValue()
     );
     this.label = wrapLabelRequiredOrOptional(this.label, this.required);
   }
-
   ngOnDestroy() {
+    this.touchedChangeSub?.unsubscribe();
     for (const sub of this.onChangeSubs) {
       sub.unsubscribe();
     }
+  }
+
+  private touchedChangeSub?: Subscription;
+
+  ngAfterViewInit() {
+    // Workaround for propagating touched state to all nested child controls:
+    // as markAllAsTouched is not propagated to the child controls
+    // we subscribe to the TouchedChangeEvent and mark all controls as touched.
+    this.touchedChangeSub = this.injector
+      .get(NgControl)
+      .control!.events.subscribe((event) => {
+        if (event instanceof TouchedChangeEvent) {
+          this.singleChoiceForm.markAllAsTouched();
+          this.singleChoiceForm.updateValueAndValidity();
+          console.log('single choice marked as touched');
+        }
+      });
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type -- TODO: This was disabled during the proper setup of eslint. If you touch this code, fix it properly.
@@ -90,7 +117,7 @@ export class SingleChoiceFieldComponent
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: This was disabled during the proper setup of eslint. If you touch this code, fix it properly.
   registerOnChange(onChange: any) {
-    const sub = this.value.valueChanges.subscribe(onChange);
+    const sub = this.singleChoiceForm.valueChanges.subscribe(onChange);
     this.onChangeSubs.push(sub);
   }
 
@@ -118,7 +145,7 @@ export class SingleChoiceFieldComponent
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: This was disabled during the proper setup of eslint. If you touch this code, fix it properly.
   writeValue(value: any) {
     if (value) {
-      this.value.setValue(value);
+      this.singleChoiceForm.setValue(value);
     }
   }
 
@@ -127,9 +154,5 @@ export class SingleChoiceFieldComponent
       return [Validators.required];
     }
     return null;
-  }
-
-  get value(): UntypedFormControl {
-    return this.singleChoiceForm.controls['value'] as UntypedFormControl;
   }
 }
