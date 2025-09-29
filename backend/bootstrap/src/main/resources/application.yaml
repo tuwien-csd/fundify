@@ -161,11 +161,11 @@ cron:
       connection-string: mongodb://admin:admin@127.0.0.1:27017?retryWrites=false&retryReads=false&directConnection=true
       credentials:
         auth-source: admin
-  mailer:
-    host: "localhost"
-    port: 25
-    from: "fundify.notification@tuwien.ac.at"
-    mock: false
+    mailer:
+      host: "localhost"
+      port: 25
+      from: "fundify.notification@tuwien.ac.at"
+      mock: false
   cron:
     expr:
       sync:
@@ -278,15 +278,15 @@ cron:
     log:
       console:
         level: INFO
-  mailer:
-    host: "mr.tuwien.ac.at"
-    port: 587
-    tls: false
-    starttls: REQUIRED
-    username: "<set this in your .env in the bootstrap module>"
-    password: "<set this in your .env in the bootstrap module>"
-    from: "fundify.notification@tuwien.ac.at"
-    mock: false
+    mailer:
+      host: "mr.tuwien.ac.at"
+      port: 587
+      tls: false
+      starttls: REQUIRED
+      username: "<set this in your .env in the bootstrap module>"
+      password: "<set this in your .env in the bootstrap module>"
+      from: "fundify.notification@tuwien.ac.at"
+      mock: false
   fundify:
     auth:
       permissions:
