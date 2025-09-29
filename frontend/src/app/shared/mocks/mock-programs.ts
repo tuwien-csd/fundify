@@ -1,4 +1,4 @@
-import { Program } from 'src/app/programs/models/program.interface';
+import { ProgramWebModel } from 'src/app/programs/models/program.interface';
 import { CareerStageEnum } from '../models/enums/career-stage.enum';
 import { EntryOriginEnum } from '../models/enums/entry-origin.enum';
 import { FundingCharacteristicEnum } from '../models/enums/funding-characteristic.enum';
@@ -11,7 +11,7 @@ import { OEFOS } from './mock-oefos';
 import { PublicationStatusEnum } from '../models/enums/publication-status.enum';
 import { TranslationEnum } from '../models/enums/translation-enum';
 
-export const PROGRAMS: Program[] = [
+export const PROGRAMS: ProgramWebModel[] = [
   {
     id: '5001',
     status: PublicationStatusEnum.DRAFT,
@@ -82,9 +82,11 @@ export const PROGRAMS: Program[] = [
     characteristics: [FundingCharacteristicEnum.NATIONAL_PROGRAMME],
     fundingScheme: FundingSchemeEnum.GRANT,
     legalType: LegalTypeEnum.P_27,
-    website: [new URL('https://ffg.ac.at/progs/prog/5001')],
+    website: ['https://ffg.ac.at/progs/prog/5001'],
     subjects: [OEFOS[0], OEFOS[7]],
     entryOrigin: EntryOriginEnum.ENDPOINT,
+    registrationDate: '',
+    lastSync: '',
   },
   {
     id: '5002',
@@ -142,7 +144,9 @@ export const PROGRAMS: Program[] = [
       end: 'Apr 22 2022 00:00:00 GMT',
     },
     targetGroups: [TargetGroupEnum.UNIVERSITY, TargetGroupEnum.COMPANY],
-    website: [new URL('https://ffg.ac.at/progs/prog/5002')],
+    website: ['https://ffg.ac.at/progs/prog/5002'],
+    registrationDate: '',
+    lastSync: '',
   },
   {
     id: '5003',
@@ -200,7 +204,9 @@ export const PROGRAMS: Program[] = [
       end: 'Apr 22 2022 00:00:00 GMT',
     },
     targetGroups: [TargetGroupEnum.UNIVERSITY, TargetGroupEnum.COMPANY],
-    website: [new URL('https://ffg.ac.at/progs/prog/5003')],
+    website: ['https://ffg.ac.at/progs/prog/5003'],
+    registrationDate: '',
+    lastSync: '',
   },
   {
     id: '5004',
@@ -254,6 +260,8 @@ export const PROGRAMS: Program[] = [
     acronym: 'SFB',
     targetGroups: [TargetGroupEnum.UNIVERSITY],
     careerStages: [CareerStageEnum.DOC_STUDENT],
-    website: [new URL('https://fwf.ac.at/progs/prog/1')],
+    website: ['https://fwf.ac.at/progs/prog/1'],
+    registrationDate: '',
+    lastSync: '',
   },
 ];

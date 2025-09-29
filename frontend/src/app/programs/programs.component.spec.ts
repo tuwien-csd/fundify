@@ -1,13 +1,13 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ProgramsComponent } from './programs.component';
-import { provideMockStore, MockStore } from '@ngrx/store/testing';
-import * as fromPrograms from './store';
+import { MockStore, provideMockStore } from '@ngrx/store/testing';
 import { PROGRAMS } from '../shared/mocks/mock-programs';
 import { MatTableDataSource } from '@angular/material/table';
 import { PermissionService } from '../core/auth/services/permission.service';
 import { MatSort } from '@angular/material/sort';
 import { AuthService } from '../core/auth/services/auth.service';
 import { ActivatedRoute } from '@angular/router';
+import { signal } from '@angular/core';
 
 describe('ProgramsComponent', () => {
   let component: ProgramsComponent;
@@ -16,7 +16,6 @@ describe('ProgramsComponent', () => {
   let mockPermissionService: jasmine.SpyObj<PermissionService>;
 
   const initialState = {
-    program: fromPrograms.initialState,
     core: {},
   };
 
@@ -54,13 +53,12 @@ describe('ProgramsComponent', () => {
     }).compileComponents();
 
     store = TestBed.inject(MockStore);
-    store.overrideSelector(fromPrograms.selectAllPrograms, PROGRAMS);
 
     fixture = TestBed.createComponent(ProgramsComponent);
     component = fixture.componentInstance;
-    component.dataSource = new MatTableDataSource(PROGRAMS);
+    component.dataSource = signal(new MatTableDataSource(PROGRAMS));
     component.sort = new MatSort();
-    component.dataSource.sort = component.sort;
+    component.dataSource().sort = component.sort;
     fixture.detectChanges();
   });
 
@@ -68,34 +66,12 @@ describe('ProgramsComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should dispatch loadPrograms action on init', () => {
-    const action = fromPrograms.loadPrograms({ skipIfPresent: false });
-    const dispatchSpy = spyOn(store, 'dispatch');
-    component.ngOnInit();
-    expect(dispatchSpy).toHaveBeenCalledWith(action);
-  });
-
-  it('should set up MatTableDataSource correctly', () => {
-    store.overrideSelector(fromPrograms.selectAllPrograms, PROGRAMS);
-    store.refreshState();
-    fixture.detectChanges();
-    expect(component.dataSource.data).toEqual(PROGRAMS);
-  });
-
   it('should filter the programs when applyFilter is called', () => {
-    component.dataSource = new MatTableDataSource(PROGRAMS);
+    component.dataSource = signal(new MatTableDataSource(PROGRAMS));
     const event = { target: { value: 'test' } } as unknown as Event;
     component.changeFilterValue(event);
-    expect(component.dataSource.filter).toBe(
+    expect(component.dataSource().filter).toBe(
       '{"searchTerm":"test","hideClosedCalls":false}'
-    );
-  });
-
-  it('should dispatch deleteProgram action on onDelete', () => {
-    const dispatchSpy = spyOn(store, 'dispatch');
-    component.onDelete('programId');
-    expect(dispatchSpy).toHaveBeenCalledWith(
-      fromPrograms.deleteProgram({ programId: 'programId' })
     );
   });
 });
