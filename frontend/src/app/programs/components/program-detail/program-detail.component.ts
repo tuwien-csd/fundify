@@ -16,7 +16,6 @@ import { PermissionService } from '../../../core/auth/services/permission.servic
 import { ActionPermissions } from '../../../core/models/ActionPermissions';
 import { ProgramWebModel } from '../../models/program.interface';
 import { DateRange } from '../../../shared/models/interfaces/date-range.interface';
-import { LocalStorageService } from '../../../core/services/local-storage.service';
 import { PermissionContext } from '../../../core/models/enums/permission-context.enum';
 import { PublicationStatusEnum } from '../../../shared/models/enums/publication-status.enum';
 import { ProgramValidationService } from '../../services/program-validation.service';
@@ -33,6 +32,8 @@ import { MatIcon } from '@angular/material/icon';
 import { MatTooltip } from '@angular/material/tooltip';
 import { ApiModels } from '../../../shared/models/backend-api-models';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ProgramStore } from '../../signal/program-store';
+import { ROUTER_LINKS } from '../../../core/router-links.constants';
 
 @Component({
   selector: 'app-program-detail',
@@ -52,11 +53,11 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
   ],
 })
 export class ProgramDetailComponent implements OnInit {
-  private readonly localStorageService = inject(LocalStorageService);
   private readonly permissionService = inject(PermissionService);
   private readonly validationService = inject(ProgramValidationService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
+  private readonly programStore = inject(ProgramStore);
 
   protected readonly CONSTANTS = PROGRAM_DETAILS_CONSTANTS;
   protected readonly BUTTON_LABELS = BUTTON_LABELS;
@@ -84,6 +85,19 @@ export class ProgramDetailComponent implements OnInit {
   }
 
   onPublish(): void {
+    this.programStore
+      .update({
+        ...this.program(),
+        status: PublicationStatusEnum.PUBLISHED,
+      })
+      .then((updatedProgram) => {
+        if (updatedProgram?.id) {
+          this.router.navigate([
+            `${ROUTER_LINKS.FUNDINGS}/${ROUTER_LINKS.PROGRAMS}`,
+            updatedProgram.id,
+          ]);
+        }
+      });
     this.publish.emit(this.program());
   }
 
