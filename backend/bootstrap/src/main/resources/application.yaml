@@ -30,7 +30,7 @@ fundify:
       batch-size: 5
     every:
       interval:
-        email-poll: 1S
+        email-poll: 5M
   external-fundings:
     sync-enabled: true
     run-sync-on-startup: true
