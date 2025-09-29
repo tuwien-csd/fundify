@@ -14,32 +14,36 @@
       @if (detailsForm) {
         <form [formGroup]="detailsForm" class="call-details-grid">
           <div class="nested-grid-container-column">
-          @if (authService.isFunder()) {
+            @if (authService.isFunder()) {
               <div class="detail-item">
-                  <span class="detail-label"> {{ CALL_DETAILS_CONSTANTS.MAIN_FUNDER_LABEL }} </span>
-                  <span class="detail-value">{{ funderRefDisplay() }}</span>
+                <span class="detail-label">
+                  {{ CALL_DETAILS_CONSTANTS.MAIN_FUNDER_LABEL }}
+                </span>
+                <span class="detail-value">{{ funderRefDisplay() }}</span>
               </div>
-          } @else {
+            } @else {
               <div class="detail-item">
-                  <app-funder-search
-                            formControlName="funder"
-                            [placeholder]="CALL_DETAILS_CONSTANTS.JOINT_CALL_PARTNER_PLACEHOLDER"
-                            [label]="CALL_DETAILS_CONSTANTS.MAIN_FUNDER_LABEL"
-                            [multiSelect]="false"
-                            [required]= "true"
-                            [showOnlyExternalFunders]="true"
-                    >
-                    </app-funder-search>
+                <app-funder-search
+                  formControlName="funder"
+                  [placeholder]="
+                    CALL_DETAILS_CONSTANTS.JOINT_CALL_PARTNER_PLACEHOLDER
+                  "
+                  [label]="CALL_DETAILS_CONSTANTS.MAIN_FUNDER_LABEL"
+                  [multiSelect]="false"
+                  [required]="true"
+                  [showOnlyExternalFunders]="true"
+                >
+                </app-funder-search>
               </div>
             }
             <div class="detail-item">
-                <app-single-choice-field
-                         formControlName="fundingType"
-                          [type]="fundingTypes"
-                          [required]="true"
-                          [label]="CALL_DETAILS_CONSTANTS.FUNDING_TYPE_LABEL"
-                >
-                </app-single-choice-field>
+              <app-single-choice-field
+                formControlName="fundingType"
+                [type]="fundingTypes"
+                [required]="true"
+                [label]="CALL_DETAILS_CONSTANTS.FUNDING_TYPE_LABEL"
+              >
+              </app-single-choice-field>
             </div>
           </div>
           <div class="detail-item">
@@ -51,28 +55,28 @@
             >
             </app-translated-text-field>
           </div>
-            <div class="nested-grid-container-column">
-                <div class="detail-item">
-                    <app-text-field
-                            formControlName="acronym"
-                            [placeholder]="CALL_DETAILS_CONSTANTS.ACRONYM_PLACEHOLDER"
-                            [label]="CALL_DETAILS_CONSTANTS.ACRONYM_LABEL"
-                            [textLabel]="CALL_DETAILS_CONSTANTS.ACRONYM_LABEL"
-                            [textPattern]="PATTERN_FOR_ACRONYM"
-                    >
-                    </app-text-field>
-                </div>
-                <div class="detail-item">
-                    <app-multiple-choice-field
-                            formControlName="applicationLanguages"
-                            [type]="applicationLanguages"
-                            [required]="true"
-                            [enableSelectAll]="false"
-                            [label]="CALL_DETAILS_CONSTANTS.APPlICATION_LANGUAGE_LABEL"
-                    >
-                    </app-multiple-choice-field>
-                </div>
+          <div class="nested-grid-container-column">
+            <div class="detail-item">
+              <app-text-field
+                formControlName="acronym"
+                [placeholder]="CALL_DETAILS_CONSTANTS.ACRONYM_PLACEHOLDER"
+                [label]="CALL_DETAILS_CONSTANTS.ACRONYM_LABEL"
+                [textLabel]="CALL_DETAILS_CONSTANTS.ACRONYM_LABEL"
+                [textPattern]="PATTERN_FOR_ACRONYM"
+              >
+              </app-text-field>
             </div>
+            <div class="detail-item">
+              <app-multiple-choice-field
+                formControlName="applicationLanguages"
+                [type]="applicationLanguages"
+                [required]="true"
+                [enableSelectAll]="false"
+                [label]="CALL_DETAILS_CONSTANTS.APPlICATION_LANGUAGE_LABEL"
+              >
+              </app-multiple-choice-field>
+            </div>
+          </div>
           <div class="detail-item">
             <app-translated-text-field
               formControlName="description"
@@ -440,7 +444,6 @@
           class="form-item-button"
           color="primary"
           (click)="onPublish()"
-          [disabled]="!detailsForm.valid"
           [matTooltip]="
             detailsForm.valid
               ? ''
@@ -456,7 +459,6 @@
           mat-stroked-button
           class="form-item-button"
           (click)="onSaveAsDraft()"
-          [disabled]="!detailsForm.get('funder')?.value"
         >
           {{ BUTTON_LABELS.SAVE_AS_DRAFT }}
         </button>
@@ -466,5 +468,12 @@
         {{ BUTTON_LABELS.PREVIEW }}
       </button>
     </mat-card-actions>
+    @if (submissionErrorMsg) {
+      <mat-card-content>
+        <div class="error-message">
+          <strong>{{ submissionErrorMsg }}</strong>
+        </div>
+      </mat-card-content>
+    }
   </mat-card>
 </div>

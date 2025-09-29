@@ -1,12 +1,12 @@
 import {
-    Component,
-    computed,
-    effect,
-    EventEmitter,
-    inject,
-    Input,
-    OnInit,
-    Output,
+  Component,
+  computed,
+  effect,
+  EventEmitter,
+  inject,
+  Input,
+  OnInit,
+  Output,
 } from '@angular/core';
 import {
   FormBuilder,
@@ -30,7 +30,10 @@ import { RegionalScopeEnum } from 'src/app/shared/models/enums/regional-scope.en
 import { TargetGroupEnum } from 'src/app/shared/models/enums/target-group.enum';
 import { ViewEnum } from 'src/app/shared/models/enums/view.enum';
 import { CALL_DETAILS_CONSTANTS } from '../../calls.constants';
-import { BUTTON_LABELS } from 'src/app/shared/shared.constants';
+import {
+  BUTTON_LABELS,
+  FORM_STATUS_MESSAGES,
+} from 'src/app/shared/shared.constants';
 import { ROUTER_LINKS } from 'src/app/core/router-links.constants';
 import { Router } from '@angular/router';
 import { EntryOriginEnum } from '../../../shared/models/enums/entry-origin.enum';
@@ -71,9 +74,9 @@ import { MatTooltip } from '@angular/material/tooltip';
 import { ProgramStore } from '../../../programs/signal/program-store';
 import { FundersStore } from '../../../funders/signal/funders-store';
 import { AuthService } from '../../../core/auth/services/auth.service';
-import {FundingEntityRef} from "../../../shared/models/interfaces/funding-entity-ref.interface";
-import {TranslatedText} from "../../../shared/models/interfaces/translated-text.interface";
-import {FunderSearchComponent} from "../../../shared/components/funder-search/funder-search.component";
+import { FundingEntityRef } from '../../../shared/models/interfaces/funding-entity-ref.interface';
+import { TranslatedText } from '../../../shared/models/interfaces/translated-text.interface';
+import { FunderSearchComponent } from '../../../shared/components/funder-search/funder-search.component';
 
 @Component({
   selector: 'app-call-detail-edit',
@@ -105,7 +108,7 @@ import {FunderSearchComponent} from "../../../shared/components/funder-search/fu
     MatButton,
     MatIcon,
     MatTooltip,
-    FunderSearchComponent
+    FunderSearchComponent,
   ],
 })
 export class CallDetailEditComponent implements OnInit {
@@ -147,23 +150,30 @@ export class CallDetailEditComponent implements OnInit {
   eligibleApplicantsRegions: typeof AustrianStateEnum = AustrianStateEnum;
   modesOfSubmission: typeof ModeOfSubmissionEnum = ModeOfSubmissionEnum;
   decisionProcesses: typeof DecisionProcessEnum = DecisionProcessEnum;
-  fundingCharacteristics: typeof FundingCharacteristicEnum = FundingCharacteristicEnum;
+  fundingCharacteristics: typeof FundingCharacteristicEnum =
+    FundingCharacteristicEnum;
+
+  submissionErrorMsg: string = '';
 
   funderRef = computed(() => {
-      const affiliationId = this.authService.userAffiliationId();
-      const funders = this.fundersStore.entities();
-      if (!affiliationId || !funders?.length) return undefined;
-      return funders.find(
-          (f) => f.acronym?.toUpperCase() === affiliationId.toUpperCase()
-      ) as FundingEntityRef | undefined;
+    const affiliationId = this.authService.userAffiliationId();
+    const funders = this.fundersStore.entities();
+    if (!affiliationId || !funders?.length) return undefined;
+    return funders.find(
+      (f) => f.acronym?.toUpperCase() === affiliationId.toUpperCase()
+    ) as FundingEntityRef | undefined;
   });
   funderRefDisplay = computed(() => this.formatFunder(this.funderRef()));
 
   constructor() {
-      effect(() => {
-          const funderRef = this.funderRef();
-          if (this.authService.isFunder()) this.detailsForm.patchValue({ funder: funderRef }, { emitEvent: false });
-      });
+    effect(() => {
+      const funderRef = this.funderRef();
+      if (this.authService.isFunder())
+        this.detailsForm.patchValue(
+          { funder: funderRef },
+          { emitEvent: false }
+        );
+    });
   }
 
   ngOnInit() {
@@ -181,14 +191,27 @@ export class CallDetailEditComponent implements OnInit {
   }
 
   onSaveAsDraft() {
-    this.saveAsDraft.emit({ ...this.call, ...this.detailsForm.getRawValue() });
+    if (this.detailsForm.valid) {
+      this.saveAsDraft.emit({
+        ...this.call,
+        ...this.detailsForm.getRawValue(),
+      });
+    } else {
+      this.detailsForm.markAllAsTouched();
+      this.submissionErrorMsg = FORM_STATUS_MESSAGES.VALIDATION_ERROR;
+    }
   }
 
   onPublish() {
-    this.publish.emit({
-      ...this.call,
-      ...this.detailsForm.getRawValue(),
-    });
+    if (this.detailsForm.valid) {
+      this.publish.emit({
+        ...this.call,
+        ...this.detailsForm.getRawValue(),
+      });
+    } else {
+      this.detailsForm.markAllAsTouched();
+      this.submissionErrorMsg = FORM_STATUS_MESSAGES.VALIDATION_ERROR;
+    }
   }
 
   onPreview() {
@@ -245,8 +268,9 @@ export class CallDetailEditComponent implements OnInit {
   }
 
   getOwnerId(): string {
-      if (this.authService.isFunder()) return this.authService.userAffiliationId() ?? '';
-      else return this.call.callOwner?.acronym ?? '';
+    if (this.authService.isFunder())
+      return this.authService.userAffiliationId() ?? '';
+    else return this.call.callOwner?.acronym ?? '';
   }
 
   getEntryOrigin(): EntryOriginEnum {
@@ -289,18 +313,19 @@ export class CallDetailEditComponent implements OnInit {
 
   // display current user affiliation for FUNDER users
   private formatFunder(funder: FundingEntityRef | undefined): string {
-      return funder
-          ? `${this.formatTranslatedText(funder.name)} (${funder.id})`
-          : CALL_DETAILS_CONSTANTS.PLACEHOLDER;
+    return funder
+      ? `${this.formatTranslatedText(funder.name)} (${funder.id})`
+      : CALL_DETAILS_CONSTANTS.PLACEHOLDER;
   }
 
   private formatTranslatedText(
-    translatedTexts: TranslatedText[] | undefined ): string {
+    translatedTexts: TranslatedText[] | undefined
+  ): string {
     if (!translatedTexts) return CALL_DETAILS_CONSTANTS.PLACEHOLDER;
 
     return translatedTexts
-            .map((tt) => `${tt.text} (${tt.language})`)
-            .join(', ');
+      .map((tt) => `${tt.text} (${tt.language})`)
+      .join(', ');
   }
 
 }

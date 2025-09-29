@@ -1,4 +1,12 @@
-import { Component, Input, OnDestroy, OnInit, inject } from '@angular/core';
+import {
+  Component,
+  Input,
+  OnDestroy,
+  OnInit,
+  inject,
+  Injector,
+  AfterViewInit,
+} from '@angular/core';
 import {
   AbstractControl,
   ControlValueAccessor,
@@ -12,6 +20,8 @@ import {
   Validators,
   FormsModule,
   ReactiveFormsModule,
+  NgControl,
+  TouchedChangeEvent,
 } from '@angular/forms';
 
 import { Subscription } from 'rxjs';
@@ -66,10 +76,11 @@ import { MatIcon } from '@angular/material/icon';
   ],
 })
 export class TranslatedTextFieldComponent
-  implements OnInit, OnDestroy, Validator, ControlValueAccessor
+  implements OnInit, OnDestroy, Validator, ControlValueAccessor, AfterViewInit
 {
   private fb = inject(UntypedFormBuilder);
   validationService = inject(ValidationService);
+  private injector = inject(Injector);
 
   @Input() placeholder: string = '';
   @Input() required: boolean = false;
@@ -100,9 +111,26 @@ export class TranslatedTextFieldComponent
   }
 
   ngOnDestroy() {
+    this.touchedChangeSub?.unsubscribe();
     for (const sub of this.onChangeSubs) {
       sub.unsubscribe();
     }
+  }
+
+  private touchedChangeSub?: Subscription;
+
+  ngAfterViewInit() {
+    // Workaround for propagating touched state to all nested child controls:
+    // as markAllAsTouched is not propagated to the child controls
+    // we subscribe to the TouchedChangeEvent and mark all controls as touched.
+    this.touchedChangeSub = this.injector
+      .get(NgControl)
+      .control!.events.subscribe((event) => {
+        if (event instanceof TouchedChangeEvent) {
+          this.translatedTextForm.markAllAsTouched();
+          this.translatedTextForm.updateValueAndValidity();
+        }
+      });
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type -- TODO: This was disabled during the proper setup of eslint. If you touch this code, fix it properly.

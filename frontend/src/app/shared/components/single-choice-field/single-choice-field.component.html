@@ -3,7 +3,7 @@
   <div class="form-item-container">
     <mat-radio-group
       ngDefaultControl
-      formControlName="value"
+      formControlName="choiceValue"
       [color]="'primary'"
       class="radio-grid"
     >
@@ -20,7 +20,7 @@
       <mat-error>
         {{
           validationService.getValidationErrorMessage(
-            singleChoiceForm,
+            singleChoiceForm.get('choiceValue'),
             validators.REQUIRED
           )
         }}

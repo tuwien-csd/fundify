@@ -1,4 +1,12 @@
-import { Component, Input, OnDestroy, OnInit, inject } from '@angular/core';
+import {
+  Component,
+  Input,
+  OnDestroy,
+  OnInit,
+  inject,
+  Injector,
+  AfterViewInit,
+} from '@angular/core';
 import { SubjectService } from '../../../core/services/subject.service';
 import {
   AbstractControl,
@@ -13,6 +21,8 @@ import {
   Validator,
   FormsModule,
   ReactiveFormsModule,
+  NgControl,
+  TouchedChangeEvent,
 } from '@angular/forms';
 import {
   MatTableDataSource,
@@ -86,11 +96,12 @@ import { MatCheckbox } from '@angular/material/checkbox';
   ],
 })
 export class SubjectFieldComponent
-  implements OnInit, OnDestroy, Validator, ControlValueAccessor
+  implements OnInit, OnDestroy, Validator, ControlValueAccessor, AfterViewInit
 {
   private subjectService = inject(SubjectService);
   private fb = inject(UntypedFormBuilder);
   validationService = inject(ValidationService);
+  private injector = inject(Injector);
 
   @Input() required = false;
   @Input() label = '';
@@ -128,10 +139,27 @@ export class SubjectFieldComponent
     this.label = wrapLabelRequiredOrOptional(this.label, this.required);
   }
 
-  ngOnDestroy(): void {
+  ngOnDestroy() {
+    this.touchedChangeSub?.unsubscribe();
     for (const sub of this.onChangeSubs) {
       sub.unsubscribe();
     }
+  }
+
+  private touchedChangeSub?: Subscription;
+
+  ngAfterViewInit() {
+    // Workaround for propagating touched state to all nested child controls:
+    // as markAllAsTouched is not propagated to the child controls
+    // we subscribe to the TouchedChangeEvent and mark all controls as touched.
+    this.touchedChangeSub = this.injector
+      .get(NgControl)
+      .control!.events.subscribe((event) => {
+        if (event instanceof TouchedChangeEvent) {
+          this.tableForm.markAllAsTouched();
+          this.tableForm.updateValueAndValidity();
+        }
+      });
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type -- TODO: This was disabled during the proper setup of eslint. If you touch this code, fix it properly.

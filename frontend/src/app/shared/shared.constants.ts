@@ -88,3 +88,8 @@ export const VALIDATORS = {
   PATTERN: 'pattern',
   TRANSLATION: 'translation',
 };
+
+export const FORM_STATUS_MESSAGES = {
+  VALIDATION_ERROR:
+    'The form is not valid. Please check the fields marked in red.',
+};
