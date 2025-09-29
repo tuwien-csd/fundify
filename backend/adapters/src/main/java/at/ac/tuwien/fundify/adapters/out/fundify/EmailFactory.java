@@ -15,21 +15,21 @@ public class EmailFactory {
         """
             <html>
             <body>
-            Hello %s,
-            
-            The Call you are subscribed to, '<b>%s</b>', has been updated.
+                <p>Hello %s,</p>
+                
+                <p>The Call you are subscribed to, '<b>%s</b>', has been updated.</p>
                                     
-            If you no longer wish to receive updates for this Call, follow these steps:
-            
-            <ol>
-              <li>Go to the <b>Dashboard</b> and select the 'Calls' tab.</li>
-              <li>Find the Call in the list.</li>
-              <li>Click the <b>action menu</b> (the three dots) next to the Call.</li>
-              <li>Select the 'Unsubscribe' option.</li>
-            </ol>
-            
-            Kind regards,
-            Your Fundify Team
+                <p>If you no longer wish to receive updates for this Call, follow these steps:</p>
+                
+                <ol>
+                  <li>Go to the <b>Dashboard</b> and select the 'Calls' tab.</li>
+                  <li>Find the Call in the list.</li>
+                  <li>Click the <b>action menu</b> (the three dots) next to the Call.</li>
+                  <li>Select the 'Unsubscribe' option.</li>
+                </ol>
+                
+                <p>Kind regards,<br>
+                Your Fundify Team</p>
             </body>
             </html>""",
         subscriber.name(), call.getName().getFirst().text()

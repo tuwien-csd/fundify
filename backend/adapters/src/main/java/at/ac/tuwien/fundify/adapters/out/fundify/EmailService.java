@@ -30,7 +30,7 @@ public class EmailService implements NotificationService {
 
   @Override
   public void addNotificationToQueue(Call call) {
-    log.info("Adding notification for call to queue: " + call);
+    log.info("Adding notification for call to queue: " + call.getId());
 
     List<Mail> mails = Optional.ofNullable(call.getSubscriptions())
         .stream()
@@ -41,15 +41,19 @@ public class EmailService implements NotificationService {
     pendingEmails.addAll(mails);
   }
 
-  @Scheduled(every = "{every.interval.email-poll}")
+  @Scheduled(every = "{fundify.notification.every.interval.email-poll}")
   public void processPendingEmails() {
 
       if (pendingEmails.isEmpty()) {
         return;
       }
 
-      for (int i = 0; i < batchSize; i++) {
-        mailer.send(pendingEmails.poll());
+    for (int i = 0; i < batchSize; i++) {
+      Mail mail = pendingEmails.poll();
+      if (mail == null) {
+        return;
       }
+      mailer.send(mail);
+    }
   }
 }

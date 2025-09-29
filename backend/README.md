@@ -14,6 +14,10 @@
 ```bash
 docker-compose -f compose/docker-compose.development.yaml up -d
 ```
+### Email Service
+- To test the implementation for the email service locally, you can use the Papercut-SMTP service, which you can also start from [docker-compose.development](./compose/docker-compose.development.yaml). 
+- You can access the Papercut web interface at http://localhost:8084 to view the emails that are sent by the application.
+
 ### Running everything in Docker
 - TODO: For this, the main docker-compose.yaml can be used, but the keycloak redirect url needs to be adjusted to point to the nginx-proxy
 

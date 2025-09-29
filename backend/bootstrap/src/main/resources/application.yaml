@@ -28,6 +28,9 @@ fundify:
   notification:
     email:
       batch-size: 5
+    every:
+      interval:
+        email-poll: 1S
   external-fundings:
     sync-enabled: true
     run-sync-on-startup: true
@@ -139,23 +142,15 @@ quarkus:
         path: "/q/metrics"
 
   mailer:
-    host: "mr.tuwien.ac.at"
-    port: 587
-    tls: false
-    starttls: REQUIRED
-    username: "<set this in your .env in the bootstrap module>"
-    password: "<set this in your .env in the bootstrap module>"
+    host: "localhost"
+    port: 25
     from: "fundify.notification@tuwien.ac.at"
-
+    mock: false
 
 cron:
   expr:
     sync:
       funding: 0 0/5 * ? * *
-
-every:
-  interval:
-    email-poll: 5M
 
 "%dev":
   quarkus:
@@ -166,6 +161,11 @@ every:
       connection-string: mongodb://admin:admin@127.0.0.1:27017?retryWrites=false&retryReads=false&directConnection=true
       credentials:
         auth-source: admin
+  mailer:
+    host: "localhost"
+    port: 25
+    from: "fundify.notification@tuwien.ac.at"
+    mock: false
   cron:
     expr:
       sync:
@@ -214,6 +214,8 @@ every:
         image-name: mongo:5.0.14
       credentials:
         auth-source: admin
+    mailer:
+      mock: true
     oidc:
       enabled: false
     oidc-client:
@@ -276,6 +278,15 @@ every:
     log:
       console:
         level: INFO
+  mailer:
+    host: "mr.tuwien.ac.at"
+    port: 587
+    tls: false
+    starttls: REQUIRED
+    username: "<set this in your .env in the bootstrap module>"
+    password: "<set this in your .env in the bootstrap module>"
+    from: "fundify.notification@tuwien.ac.at"
+    mock: false
   fundify:
     auth:
       permissions:
