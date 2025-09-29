@@ -64,7 +64,7 @@ public class ProgramMongoEntityQuery implements ProgramQuery {
 
     @Override
     public List<Program> findAll() {
-      List<ProgramMongoEntity> programMongoEntities = CallMongoEntity.listAll();
+      List<ProgramMongoEntity> programMongoEntities = ProgramMongoEntity.listAll();
       return ProgramMongoEntityMapper.INSTANCE.toDomain(programMongoEntities, mongoCrossReferenceResolver);
     }
 
