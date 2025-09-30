@@ -18,6 +18,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.jbosslog.JBossLog;
 
@@ -39,7 +40,7 @@ public class VocabularyUseCaseImpl implements VocabularyUseCase {
     Vocabulary vocabulary = vocabularyRepository.getById(id).orElseThrow(() ->
         EntityNotFoundException.vocabularyNotFound(id.value()));
 
-    if(!currentUserMayWrite(vocabulary)) {
+    if (!currentUserMayWrite(vocabulary)) {
       throw new InsufficientPermissionsException(id.value());
     }
 
@@ -55,7 +56,7 @@ public class VocabularyUseCaseImpl implements VocabularyUseCase {
     Vocabulary vocabulary = vocabularyRepository.getById(id).orElseThrow(() ->
         EntityNotFoundException.vocabularyNotFound(id.value()));
 
-    if(!currentUserMayWrite(vocabulary)) {
+    if (!currentUserMayWrite(vocabulary)) {
       throw new InsufficientPermissionsException(id.value());
     }
 
@@ -64,23 +65,68 @@ public class VocabularyUseCaseImpl implements VocabularyUseCase {
   }
 
   @Override
-  public List<VocabularyId> ensureInitialized(UniversityId universityId)
-      throws EntityNotFoundException {
-    // if the vocabulary list is empty, we initialize a vocabulary for each vocabulary type for the university
-    List<VocabularyId> vocabularyIds = new ArrayList<>();
-    if (vocabularyQuery.findByUniversityId(universityId).isEmpty()) {
-      for (EVocabularyType type : EVocabularyType.values()) {
-        vocabularyIds.add(initVocabulary(universityId, type));
-      }
-    }
-    return vocabularyIds;
+  public Vocabulary getById(VocabularyId id) throws EntityNotFoundException {
+    return vocabularyQuery
+        .findById(id)
+        .filter(currentUserCanRead())
+        .orElseThrow(() -> EntityNotFoundException.vocabularyNotFound(id.value()));
   }
 
-  private VocabularyId initVocabulary(UniversityId universityId, EVocabularyType type)
+  @Override
+  public List<Vocabulary> getByUniversityId(UniversityId universityId) {
+    return vocabularyQuery
+        .findByUniversityId(universityId)
+        .stream().filter(currentUserCanRead())
+        .toList();
+  }
+
+  @Override
+  public List<Vocabulary> getAll() {
+    List<Vocabulary> vocabularies = vocabularyQuery
+        .findAll()
+        .stream()
+        .filter(currentUserCanRead())
+        .toList();
+
+    if (!vocabularies.isEmpty()) {
+      return vocabularies;
+    }
+
+    // Vocabularies should always exist for annotators. If the list is empty, it probably has not been initialized yet.
+    var currentUserUniversity = universityQuery.findByAcronym(
+        userService.getCurrentUserAffiliationId()).orElseThrow(
+        () -> EntityNotFoundException.universityNotFound(
+            userService.getCurrentUserAffiliationId()));
+    return initializeVocabulariesForUniversity(currentUserUniversity.getId());
+  }
+
+  private List<Vocabulary> initializeVocabulariesForUniversity(UniversityId universityId)
+      throws EntityNotFoundException {
+    log.infof("Initialization of vocabularies for university %s initiated by user %s",
+        universityId.value(), userService.getCurrentUserIdAndName());
+    List<Vocabulary> vocabularies = new ArrayList<>();
+    if (vocabularyQuery.findByUniversityId(universityId).isEmpty()) {
+      for (EVocabularyType type : EVocabularyType.values()) {
+        vocabularies.add(initVocabulary(universityId, type));
+      }
+    }
+    return vocabularies;
+  }
+
+  private Vocabulary initVocabulary(UniversityId universityId, EVocabularyType type)
       throws EntityNotFoundException {
     UniversityReference university = universityQuery.findReferenceById(universityId)
         .orElseThrow(() -> EntityNotFoundException.universityNotFound(universityId.value()));
     return vocabularyRepository.persistVocabulary(new Vocabulary(null, type, university, Set.of()));
+  }
+
+  /**
+   * Predicate to check if the current user can read the annotated call. Important note: If you use
+   * this on optionals to filter, you might send a NOT_FOUND exception, when the user really just
+   * has no permission to read the item. Depending on your logic, this can be fine.
+   */
+  private Predicate<Vocabulary> currentUserCanRead() {
+    return item -> permissionService.currentUserIsAffiliatedWith(item.university());
   }
 
   private boolean currentUserMayWrite(Vocabulary target) {

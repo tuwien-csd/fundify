@@ -6,7 +6,7 @@ import java.util.Optional;
 
 public interface VocabularyRepository {
 
-    VocabularyId persistVocabulary(Vocabulary vocabulary);
+    Vocabulary persistVocabulary(Vocabulary vocabulary);
 
     VocabularyId updateVocabulary(Vocabulary vocabulary);
 

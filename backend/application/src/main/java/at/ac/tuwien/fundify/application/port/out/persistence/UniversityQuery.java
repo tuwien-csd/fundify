@@ -5,7 +5,6 @@ import at.ac.tuwien.fundify.domain.annotating.UniversityId;
 import at.ac.tuwien.fundify.domain.annotating.UniversityReference;
 import at.ac.tuwien.fundify.domain.common.RisId;
 import at.ac.tuwien.fundify.domain.dto.UniversityIdMapping;
-
 import java.util.List;
 import java.util.Optional;
 
@@ -14,6 +13,8 @@ public interface UniversityQuery {
     Optional<UniversityIdMapping> findByRisId(RisId risId);
 
     Optional<University> findById(UniversityId id);
+
+    Optional<University> findByAcronym(String acronym);
 
     List<University> list();
 
