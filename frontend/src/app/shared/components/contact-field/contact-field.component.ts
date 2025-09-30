@@ -5,6 +5,7 @@ import {
   OnInit,
   inject,
   Injector,
+  AfterViewInit,
 } from '@angular/core';
 import {
   AbstractControl,
@@ -63,7 +64,7 @@ import { MatButton } from '@angular/material/button';
   ],
 })
 export class ContactFieldComponent
-  implements OnInit, OnDestroy, Validator, ControlValueAccessor
+  implements OnInit, OnDestroy, Validator, ControlValueAccessor, AfterViewInit
 {
   private fb = inject(UntypedFormBuilder);
   validationService = inject(ValidationService);
