@@ -751,7 +751,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["CallWebModel"];
+                    "application/json": components["schemas"]["CallCreateWebModel"];
                 };
             };
             responses: {
@@ -2686,10 +2686,56 @@ export interface components {
             links?: components["schemas"]["WebLinkWebModel"][];
             contact?: components["schemas"]["UniversityContactWebModel"];
         };
-        CallOwnerWebModel: {
-            kind?: string;
+        CallCreateWebModel: {
+            fundingType: components["schemas"]["ECallTypeWebModel"];
+            name: components["schemas"]["TranslatedTextWebModel"][];
+            funder: components["schemas"]["FunderRefWebModel"];
+            characteristics: components["schemas"]["EFundingCharacteristicWebModel"][];
+            targetGroups: components["schemas"]["ETargetGroupWebModel"][];
+            subjects: components["schemas"]["StandardizedSubjectWebModel"][];
+            fundingScheme: components["schemas"]["EFundingSchemeWebModel"];
+            legalType: components["schemas"]["ELegalTypeWebModel"];
+            submissionModes: components["schemas"]["EModeOfSubmissionWebModel"][];
+            minProjectVolume: components["schemas"]["MonetaryNumberWebModel"];
+            maxProjectVolume: components["schemas"]["MonetaryNumberWebModel"];
+            fullyFunded: components["schemas"]["EAnswerYNWebModel"];
+            minInkind: number;
+            maxOverhead: number;
+            minProjectDuration: components["schemas"]["TimeSpanWebModel"];
+            maxProjectDuration: components["schemas"]["TimeSpanWebModel"];
+            applicationLanguages: components["schemas"]["ELanguageWebModel"][];
+            identifiers?: components["schemas"]["IdentifierWebModel"][];
             acronym?: string;
-            id?: string;
+            description?: components["schemas"]["TranslatedTextWebModel"][];
+            careerStages?: components["schemas"]["ECareerStageWebModel"][];
+            website?: string[];
+            /** Format: int32 */
+            callVolumeProjects?: number;
+            callStages?: components["schemas"]["CallStageWebModel"][];
+            contacts?: components["schemas"]["FunderContactWebModel"][];
+            callVolumeAmount?: components["schemas"]["MonetaryNumberWebModel"];
+            decisionProcess?: components["schemas"]["EDecisionProcessWebModel"][];
+            decisionProcessDetails?: components["schemas"]["TranslatedTextWebModel"][];
+            dmpRequired?: components["schemas"]["EAnswerYNWebModel"];
+            dmpGuidelines?: string;
+            projectStartDetails?: components["schemas"]["TranslatedTextWebModel"][];
+            targetGroupSpecified?: components["schemas"]["TranslatedTextWebModel"][];
+            eligibleApplicants?: components["schemas"]["TranslatedTextWebModel"][];
+            eligibleApplicantsScope?: components["schemas"]["ERegionalScopeWebModel"];
+            eligibleApplicantsRegions?: components["schemas"]["EAustrianStateWebModel"][];
+            inkindDetails?: components["schemas"]["TranslatedTextWebModel"][];
+            overheadDetails?: components["schemas"]["TranslatedTextWebModel"][];
+            reportingPeriodDetails?: components["schemas"]["TranslatedTextWebModel"][];
+            partOf?: components["schemas"]["ProgramRefWebModel"];
+            thematicOrientations?: components["schemas"]["TranslatedTextWebModel"][][];
+            jointCallPartner?: components["schemas"]["FunderRefWebModel"][];
+            status: components["schemas"]["EPublicationStatusWebModel"];
+            risId?: string;
+        };
+        CallOwnerWebModel: {
+            kind: string;
+            acronym: string;
+            id: string;
         };
         CallPreviewWebModel: {
             id?: string;
@@ -2715,15 +2761,15 @@ export interface components {
         };
         CallUpdateWebModel: {
             id: string;
-            status: components["schemas"]["EPublicationStatusWebModel"];
             fundingType: components["schemas"]["ECallTypeWebModel"];
-            risId: string;
             name: components["schemas"]["TranslatedTextWebModel"][];
+            funder: components["schemas"]["FunderRefWebModel"];
+            characteristics: components["schemas"]["EFundingCharacteristicWebModel"][];
             targetGroups: components["schemas"]["ETargetGroupWebModel"][];
             subjects: components["schemas"]["StandardizedSubjectWebModel"][];
-            characteristics: components["schemas"]["EFundingCharacteristicWebModel"][];
             fundingScheme: components["schemas"]["EFundingSchemeWebModel"];
             legalType: components["schemas"]["ELegalTypeWebModel"];
+            submissionModes: components["schemas"]["EModeOfSubmissionWebModel"][];
             minProjectVolume: components["schemas"]["MonetaryNumberWebModel"];
             maxProjectVolume: components["schemas"]["MonetaryNumberWebModel"];
             fullyFunded: components["schemas"]["EAnswerYNWebModel"];
@@ -2731,34 +2777,34 @@ export interface components {
             maxOverhead: number;
             minProjectDuration: components["schemas"]["TimeSpanWebModel"];
             maxProjectDuration: components["schemas"]["TimeSpanWebModel"];
-            callStages: components["schemas"]["CallStageWebModel"][];
             applicationLanguages: components["schemas"]["ELanguageWebModel"][];
-            submissionModes: components["schemas"]["EModeOfSubmissionWebModel"][];
-            contacts: components["schemas"]["FunderContactWebModel"][];
-            funder: components["schemas"]["FunderRefWebModel"];
-            acronym?: string;
-            targetGroupSpecified?: components["schemas"]["TranslatedTextWebModel"][];
-            thematicOrientations?: components["schemas"]["TranslatedTextWebModel"][][];
             identifiers?: components["schemas"]["IdentifierWebModel"][];
+            acronym?: string;
             description?: components["schemas"]["TranslatedTextWebModel"][];
             careerStages?: components["schemas"]["ECareerStageWebModel"][];
-            eligibleApplicants?: components["schemas"]["TranslatedTextWebModel"][];
-            eligibleApplicantsScope?: components["schemas"]["ERegionalScopeWebModel"];
-            eligibleApplicantsRegions?: components["schemas"]["EAustrianStateWebModel"][];
+            website?: string[];
             /** Format: int32 */
             callVolumeProjects?: number;
+            callStages?: components["schemas"]["CallStageWebModel"][];
+            contacts?: components["schemas"]["FunderContactWebModel"][];
             callVolumeAmount?: components["schemas"]["MonetaryNumberWebModel"];
-            inkindDetails?: components["schemas"]["TranslatedTextWebModel"][];
-            overheadDetails?: components["schemas"]["TranslatedTextWebModel"][];
-            reportingPeriodDetails?: components["schemas"]["TranslatedTextWebModel"][];
             decisionProcess?: components["schemas"]["EDecisionProcessWebModel"][];
             decisionProcessDetails?: components["schemas"]["TranslatedTextWebModel"][];
             dmpRequired?: components["schemas"]["EAnswerYNWebModel"];
             dmpGuidelines?: string;
             projectStartDetails?: components["schemas"]["TranslatedTextWebModel"][];
-            website?: string[];
+            targetGroupSpecified?: components["schemas"]["TranslatedTextWebModel"][];
+            eligibleApplicants?: components["schemas"]["TranslatedTextWebModel"][];
+            eligibleApplicantsScope?: components["schemas"]["ERegionalScopeWebModel"];
+            eligibleApplicantsRegions?: components["schemas"]["EAustrianStateWebModel"][];
+            inkindDetails?: components["schemas"]["TranslatedTextWebModel"][];
+            overheadDetails?: components["schemas"]["TranslatedTextWebModel"][];
+            reportingPeriodDetails?: components["schemas"]["TranslatedTextWebModel"][];
             partOf?: components["schemas"]["ProgramRefWebModel"];
+            thematicOrientations?: components["schemas"]["TranslatedTextWebModel"][][];
             jointCallPartner?: components["schemas"]["FunderRefWebModel"][];
+            status: components["schemas"]["EPublicationStatusWebModel"];
+            risId?: string;
             callOwner?: components["schemas"]["CallOwnerWebModel"];
         };
         CallWebModel: {
@@ -2821,8 +2867,8 @@ export interface components {
             env?: string;
         };
         DateRangeWebModel: {
-            start?: components["schemas"]["LocalDateTime"];
-            end?: components["schemas"]["LocalDateTime"];
+            start: components["schemas"]["LocalDateTime"];
+            end: components["schemas"]["LocalDateTime"];
         };
         /** @enum {string} */
         EAnswerYNWebModel: "Yes" | "No";
@@ -2884,11 +2930,11 @@ export interface components {
             externallyAdministered?: boolean;
         };
         FunderRefWebModel: {
-            id?: string;
+            id: string;
             emailDomain?: string;
             risId?: string;
             type?: components["schemas"]["EFundingTypeWebModel"];
-            name?: components["schemas"]["TranslatedTextWebModel"][];
+            name: components["schemas"]["TranslatedTextWebModel"][];
             acronym?: string;
             identifiers?: components["schemas"]["IdentifierWebModel"][];
         };
@@ -2912,14 +2958,14 @@ export interface components {
             email?: string;
         };
         IdentifierWebModel: {
-            type?: components["schemas"]["EIdentifierTypeWebModel"];
-            value?: string;
+            type: components["schemas"]["EIdentifierTypeWebModel"];
+            value: string;
         };
         /** Format: date-time */
         LocalDateTime: string;
         MonetaryNumberWebModel: {
-            amount?: number;
-            currency?: components["schemas"]["ECurrencyWebModel"];
+            amount: number;
+            currency: components["schemas"]["ECurrencyWebModel"];
         };
         PostAddressWebModel: {
             streetLine: string;
@@ -2937,31 +2983,31 @@ export interface components {
         };
         ProgramWebModel: {
             id: string;
+            fundingScheme: components["schemas"]["EFundingSchemeWebModel"];
+            name: components["schemas"]["TranslatedTextWebModel"][];
+            funder: components["schemas"]["FunderRefWebModel"];
+            characteristics: components["schemas"]["EFundingCharacteristicWebModel"][];
+            targetGroups: components["schemas"]["ETargetGroupWebModel"][];
+            subjects: components["schemas"]["StandardizedSubjectWebModel"][];
+            legalType: components["schemas"]["ELegalTypeWebModel"];
+            identifiers?: components["schemas"]["IdentifierWebModel"][];
+            acronym?: string;
+            description?: components["schemas"]["TranslatedTextWebModel"][];
+            careerStages?: components["schemas"]["ECareerStageWebModel"][];
+            website?: string[];
+            programTracks?: components["schemas"]["TranslatedTextWebModel"][][];
+            duration?: components["schemas"]["DateRangeWebModel"];
             status: components["schemas"]["EPublicationStatusWebModel"];
             entryOrigin: components["schemas"]["EEntryOriginWebModel"];
             registrationDate: components["schemas"]["LocalDateTime"];
             lastSync: components["schemas"]["LocalDateTime"];
             risId: string;
-            name: components["schemas"]["TranslatedTextWebModel"][];
-            targetGroups: components["schemas"]["ETargetGroupWebModel"][];
-            subjects: components["schemas"]["StandardizedSubjectWebModel"][];
-            description: components["schemas"]["TranslatedTextWebModel"][];
-            characteristics: components["schemas"]["EFundingCharacteristicWebModel"][];
-            website: string[];
-            fundingScheme: components["schemas"]["EFundingSchemeWebModel"];
-            legalType: components["schemas"]["ELegalTypeWebModel"];
-            funder: components["schemas"]["FunderRefWebModel"];
-            acronym?: string;
-            identifiers?: components["schemas"]["IdentifierWebModel"][];
-            programTracks?: components["schemas"]["TranslatedTextWebModel"][][];
-            careerStages?: components["schemas"]["ECareerStageWebModel"][];
-            duration?: components["schemas"]["DateRangeWebModel"];
         };
         StandardizedSubjectWebModel: {
             /** Format: int32 */
             level?: number;
-            code?: string;
-            title?: string;
+            code: string;
+            title: string;
         };
         TicketCreateWebModel: {
             name: string;
