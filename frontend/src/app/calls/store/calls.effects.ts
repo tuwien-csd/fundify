@@ -10,11 +10,16 @@ import { Vocabulary } from '../models/vocabulary.interface';
 import { VocabularyTypeEnum } from '../models/vocabulary-type.enum';
 import { UniversityReference } from '../models/university-reference.interface';
 import { PublicationStatusEnum } from '../../shared/models/enums/publication-status.enum';
+import { AuthService } from '../../core/auth/services/auth.service';
+import { UniversitiesStore } from '../../universities/signal/universities-store';
+import { AnnotatedCall } from '../models/annotated-call.interface';
 
 @Injectable()
 export class CallsEffects {
   private actions$ = inject(Actions);
   private callService = inject(CallService);
+  private authService = inject(AuthService);
+  private universitiesStore = inject(UniversitiesStore);
 
   loadCalls$ = createEffect(() => {
     return this.actions$.pipe(
@@ -153,20 +158,34 @@ export class CallsEffects {
   annotateCall$ = createEffect(() => {
     return this.actions$.pipe(
       ofType(CallsActions.annotateCall),
-      switchMap((action) =>
-        this.callService.annotateCall(action.annotatedCall).pipe(
-          map((annotatedCallId) =>
-            CallsActions.annotateCallSuccess({
+      switchMap((action) => {
+        // Setting the university ID here is quite hacky and should be refactored once we move away from ngrx
+        const currentUserUniversity =
+          this.universitiesStore.getUniversityByAcronym(
+            this.authService.userAffiliationId()
+          );
+        const updatedInput: AnnotatedCall = {
+          ...action.annotatedCall,
+          university: {
+            id: currentUserUniversity?.id ?? '',
+            acronym: currentUserUniversity?.acronym ?? '',
+            emailDomain: currentUserUniversity?.emailDomain ?? '',
+          },
+        };
+
+        return this.callService.annotateCall(updatedInput).pipe(
+          map((annotatedCallId) => {
+            return CallsActions.annotateCallSuccess({
               annotatedCall: {
                 ...action.annotatedCall,
                 id: annotatedCallId.value,
                 status: PublicationStatusEnum.DRAFT,
               },
-            })
-          ),
+            });
+          }),
           catchError((error) => of(CallsActions.annotateCallFailure({ error })))
-        )
-      )
+        );
+      })
     );
   });
 
@@ -212,8 +231,20 @@ export class CallsEffects {
   saveAndPublishAnnotatedCall$ = createEffect(() => {
     return this.actions$.pipe(
       ofType(CallsActions.saveAndPublishAnnotatedCall),
-      switchMap((action) =>
-        this.callService.annotateCall(action.annotatedCall).pipe(
+      switchMap((action) => {
+        const currentUserUniversity =
+          this.universitiesStore.getUniversityByAcronym(
+            this.authService.userAffiliationId()
+          );
+        const updatedInput: AnnotatedCall = {
+          ...action.annotatedCall,
+          university: {
+            id: currentUserUniversity?.id ?? '',
+            acronym: currentUserUniversity?.acronym ?? '',
+            emailDomain: currentUserUniversity?.emailDomain ?? '',
+          },
+        };
+        return this.callService.annotateCall(updatedInput).pipe(
           switchMap((annotatedCallId) =>
             this.callService.publishAnnotatedCall(annotatedCallId.value).pipe(
               map((annotatedCallId) =>
@@ -231,8 +262,8 @@ export class CallsEffects {
             )
           ),
           catchError((error) => of(CallsActions.annotateCallFailure({ error })))
-        )
-      )
+        );
+      })
     );
   });
 
