@@ -2,7 +2,12 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { TranslatedTextFieldComponent } from './translated-text-field.component';
 import { RouterTestingModule } from '@angular/router/testing';
-import { UntypedFormGroup, ReactiveFormsModule } from '@angular/forms';
+import {
+  UntypedFormGroup,
+  ReactiveFormsModule,
+  NgControl,
+  FormControl,
+} from '@angular/forms';
 import { LanguageEnum } from '../../models/enums/language.enum';
 
 describe('TranslatedTextFieldComponent', () => {
@@ -16,6 +21,14 @@ describe('TranslatedTextFieldComponent', () => {
           RouterTestingModule,
           ReactiveFormsModule,
           TranslatedTextFieldComponent,
+        ],
+        providers: [
+          {
+            provide: NgControl,
+            useValue: {
+              control: new FormControl(),
+            },
+          },
         ],
       }).compileComponents();
     });
@@ -52,6 +65,14 @@ describe('TranslatedTextFieldComponent', () => {
           RouterTestingModule,
           ReactiveFormsModule,
           TranslatedTextFieldComponent,
+        ],
+        providers: [
+          {
+            provide: NgControl,
+            useValue: {
+              control: new FormControl(),
+            },
+          },
         ],
       }).compileComponents();
     });
@@ -101,6 +122,14 @@ describe('TranslatedTextFieldComponent', () => {
           ReactiveFormsModule,
           TranslatedTextFieldComponent,
         ],
+        providers: [
+          {
+            provide: NgControl,
+            useValue: {
+              control: new FormControl(),
+            },
+          },
+        ],
       }).compileComponents();
     });
 
@@ -135,6 +164,14 @@ describe('TranslatedTextFieldComponent', () => {
           RouterTestingModule,
           ReactiveFormsModule,
           TranslatedTextFieldComponent,
+        ],
+        providers: [
+          {
+            provide: NgControl,
+            useValue: {
+              control: new FormControl(),
+            },
+          },
         ],
       }).compileComponents();
     });

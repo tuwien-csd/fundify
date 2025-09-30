@@ -12,6 +12,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideNativeDateAdapter } from '@angular/material/core';
 import { OAuthServiceMock } from '../../../testing/mocks/OAuthService.mock';
+import { FORM_STATUS_MESSAGES } from '../../../shared/shared.constants';
 
 describe('CallDetailEditComponent', () => {
   let component: CallDetailEditComponent;
@@ -137,16 +138,70 @@ describe('CallDetailEditComponent', () => {
 
   it('should emit save event with form data on onSaveAsDraft', () => {
     spyOn(component.saveAsDraft, 'emit');
+
+    // Make the form valid
+    component.detailsForm.setErrors(null);
+    Object.keys(component.detailsForm.controls).forEach((key) => {
+      component.detailsForm.controls[key].setErrors(null);
+    });
+
     component.onSaveAsDraft();
+
     expect(component.saveAsDraft.emit).toHaveBeenCalledWith(
       jasmine.any(Object)
+    );
+    expect(component.submissionErrorMsg).toBe('');
+  });
+
+  it('should not emit save event and show error when form is invalid on onSaveAsDraft', () => {
+    spyOn(component.saveAsDraft, 'emit');
+
+    // Make form invalid
+    component.detailsForm.setErrors({ invalid: true });
+
+    component.onSaveAsDraft();
+
+    expect(component.saveAsDraft.emit).not.toHaveBeenCalled();
+    expect(component.submissionErrorMsg).toBe(
+      FORM_STATUS_MESSAGES.VALIDATION_ERROR
     );
   });
 
   it('should emit publish event on onPublish', () => {
     spyOn(component.publish, 'emit');
+
+    // Make the form valid by patching its state
+    component.detailsForm.setErrors(null); // Clear form-level errors
+
+    // Mark all controls as valid
+    Object.keys(component.detailsForm.controls).forEach((key) => {
+      component.detailsForm.controls[key].setErrors(null);
+    });
+
     component.onPublish();
+
     expect(component.publish.emit).toHaveBeenCalled();
+    expect(component.submissionErrorMsg).toBe('');
+  });
+
+  it('should not emit publish event and show error when form is invalid on onPublish', () => {
+    spyOn(component.publish, 'emit');
+    component.detailsForm.markAllAsTouched =
+      jasmine.createSpy('markAllAsTouched');
+
+    // Make form invalid
+    Object.defineProperty(component.detailsForm, 'valid', {
+      get: () => false,
+      configurable: true,
+    });
+
+    component.onPublish();
+
+    expect(component.detailsForm.markAllAsTouched).toHaveBeenCalled();
+    expect(component.publish.emit).not.toHaveBeenCalled();
+    expect(component.submissionErrorMsg).toBe(
+      FORM_STATUS_MESSAGES.VALIDATION_ERROR
+    );
   });
 
   it('should emit back event on onBack', () => {
