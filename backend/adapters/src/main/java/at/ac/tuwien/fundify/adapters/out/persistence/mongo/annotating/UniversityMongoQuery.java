@@ -10,7 +10,6 @@ import at.ac.tuwien.fundify.domain.dto.UniversityIdMapping;
 import jakarta.enterprise.context.ApplicationScoped;
 import java.util.List;
 import java.util.Optional;
-import org.bson.types.ObjectId;
 
 @ApplicationScoped
 public class UniversityMongoQuery implements UniversityQuery {
@@ -51,7 +50,7 @@ public class UniversityMongoQuery implements UniversityQuery {
 
     @Override
     public Optional<UniversityReference> findReferenceById(UniversityId id) {
-        UniversityReferenceProjection entity = UniversityMongoEntity.find("_id", new ObjectId(id.value()))
+        UniversityReferenceProjection entity = UniversityMongoEntity.find("_id", ObjectIdUtils.toObjectId(id.value()))
                 .project(UniversityReferenceProjection.class).firstResult();
         if (entity == null) {
             return Optional.empty();
