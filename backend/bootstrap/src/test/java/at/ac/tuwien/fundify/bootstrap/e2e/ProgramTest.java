@@ -7,8 +7,9 @@ import static io.restassured.RestAssured.given;
 
 import at.ac.tuwien.fundify.adapters.in.rest.dto.FunderRefWebModel;
 import at.ac.tuwien.fundify.adapters.in.rest.dto.ProgramWebModel;
-import at.ac.tuwien.fundify.adapters.in.rest.dto.enums.EEntryOriginWebModel;
-import at.ac.tuwien.fundify.adapters.in.rest.dto.enums.EPublicationStatusWebModel;
+import at.ac.tuwien.fundify.adapters.in.rest.dto.StandardizedSubjectWebModel;
+import at.ac.tuwien.fundify.adapters.in.rest.dto.TranslatedTextWebModel;
+import at.ac.tuwien.fundify.adapters.in.rest.dto.enums.*;
 import at.ac.tuwien.fundify.adapters.in.rest.resources.ProgramResource;
 import at.ac.tuwien.fundify.adapters.out.persistence.mongo.funding.FunderMongoEntity;
 import at.ac.tuwien.fundify.adapters.out.persistence.mongo.funding.ProgramMongoEntity;
@@ -484,25 +485,31 @@ class ProgramTest {
     ) {
         return new ProgramWebModel(
                 id,
-                status,
-                EEntryOriginWebModel.REFOP,
+                EFundingSchemeWebModel.GRANT,
+                List.of(new TranslatedTextWebModel("Test Program", ELanguageWebModel.GERMAN, ETranslationWebModel.ORIGINAL)),
+                new FunderRefWebModel(funderId,
+                        null,
+                        null,
+                        null,
+                        List.of(new TranslatedTextWebModel(acronym, ELanguageWebModel.GERMAN, ETranslationWebModel.ORIGINAL)),
+                        acronym,
+                        null),
+                List.of(EFundingCharacteristicWebModel.INFRASTRUCTURE),
+                List.of(ETargetGroupWebModel.UNIVERSITY),
+                List.of(new StandardizedSubjectWebModel(1, "1", "NATURAL SCIENCES")),
+                ELegalTypeWebModel.PROJECT26,
                 null,
-                null,
-                risId,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                new FunderRefWebModel(funderId, null, null, null, null, acronym, null),
                 acronym,
                 null,
                 null,
                 null,
-                null
+                null,
+                null,
+                status,
+                EEntryOriginWebModel.REFOP,
+                null,
+                null,
+                risId
         );
     }
 }

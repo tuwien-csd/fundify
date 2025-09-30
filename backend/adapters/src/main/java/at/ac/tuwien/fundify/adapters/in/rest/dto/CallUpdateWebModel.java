@@ -15,7 +15,7 @@ public record CallUpdateWebModel(
         String id,
         @Schema(required = true) @NotNull
         ECallTypeWebModel fundingType,
-        @Schema(required = true) @NotNull @Size(min = 1) @Valid
+        @Schema(required = true) @NotNull @Size(min = 1)
         List<TranslatedTextWebModel> name,
         @Schema(required = true) @NotNull @Valid
         FunderRefWebModel funder,
@@ -52,7 +52,6 @@ public record CallUpdateWebModel(
         @Valid
         List<IdentifierWebModel> identifiers,
         String acronym,
-        @Valid
         List<TranslatedTextWebModel> description,
         List<ECareerStageWebModel> careerStages,
         List<String> website,
@@ -64,27 +63,18 @@ public record CallUpdateWebModel(
         @Valid
         MonetaryNumberWebModel callVolumeAmount,
         List<EDecisionProcessWebModel> decisionProcess,
-        @Valid
         List<TranslatedTextWebModel> decisionProcessDetails,
         EAnswerYNWebModel dmpRequired,
         String dmpGuidelines,
-        @Valid
         List<TranslatedTextWebModel> projectStartDetails,
-        @Valid
         List<TranslatedTextWebModel> targetGroupSpecified,
-        @Valid
         List<TranslatedTextWebModel> eligibleApplicants,
         ERegionalScopeWebModel eligibleApplicantsScope,
         List<EAustrianStateWebModel> eligibleApplicantsRegions,
-        @Valid
         List<TranslatedTextWebModel> inkindDetails,
-        @Valid
         List<TranslatedTextWebModel> overheadDetails,
-        @Valid
         List<TranslatedTextWebModel> reportingPeriodDetails,
-        @Valid
         ProgramRefWebModel partOf,
-        @Valid
         List<List<TranslatedTextWebModel>> thematicOrientations,
         @Valid
         List<FunderRefWebModel> jointCallPartner,
