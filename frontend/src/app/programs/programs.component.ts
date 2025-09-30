@@ -197,8 +197,8 @@ export class ProgramsComponent implements OnDestroy {
     }
 
     const now = new Date();
-    const startDate = program.duration?.start ?? new Date(0);
-    const endDate = program.duration?.end ?? new Date(2100, 1, 1);
+    const startDate = new Date(program.duration?.start ?? 0);
+    const endDate = new Date(program.duration?.end ?? '2100-02-01T00:00:00');
 
     if (startDate > now) {
       return 'Upcoming';
