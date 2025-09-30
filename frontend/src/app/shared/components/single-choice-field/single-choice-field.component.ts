@@ -74,14 +74,14 @@ export class SingleChoiceFieldComponent
   validators = VALIDATORS;
 
   constructor() {
-    this.singleChoiceForm = this.fb.group({ choiceValue: [null] });
+    this.singleChoiceForm = this.fb.group({ value: [null] });
   }
 
   ngOnInit(): void {
     this.choices = Object.values(this.type).filter((item) => {
       return isNaN(Number(item));
     });
-    this.singleChoiceForm.controls['choiceValue'].setValidators(
+    this.singleChoiceForm.controls['value'].setValidators(
       this.validatorsForValue()
     );
     this.label = wrapLabelRequiredOrOptional(this.label, this.required);
@@ -117,7 +117,9 @@ export class SingleChoiceFieldComponent
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: This was disabled during the proper setup of eslint. If you touch this code, fix it properly.
   registerOnChange(onChange: any) {
-    const sub = this.singleChoiceForm.valueChanges.subscribe(onChange);
+    const sub = this.singleChoiceForm.valueChanges.subscribe((val) => {
+      onChange(val.value);
+    });
     this.onChangeSubs.push(sub);
   }
 
@@ -145,7 +147,7 @@ export class SingleChoiceFieldComponent
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: This was disabled during the proper setup of eslint. If you touch this code, fix it properly.
   writeValue(value: any) {
     if (value) {
-      this.singleChoiceForm.setValue(value);
+      this.singleChoiceForm.setValue({ value });
     }
   }
 
