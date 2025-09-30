@@ -105,7 +105,6 @@ export class SingleChoiceFieldComponent
         if (event instanceof TouchedChangeEvent) {
           this.singleChoiceForm.markAllAsTouched();
           this.singleChoiceForm.updateValueAndValidity();
-          console.log('single choice marked as touched');
         }
       });
   }

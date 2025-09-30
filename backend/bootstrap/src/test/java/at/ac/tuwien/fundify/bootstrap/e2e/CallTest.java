@@ -10,13 +10,8 @@ import static at.ac.tuwien.fundify.adapters.in.rest.constants.FundingEntityMetho
 import static at.ac.tuwien.fundify.bootstrap.utils.TestConstants.*;
 import static io.restassured.RestAssured.given;
 
-import at.ac.tuwien.fundify.adapters.in.rest.dto.CallWebModel;
-import at.ac.tuwien.fundify.adapters.in.rest.dto.FunderRefWebModel;
-import at.ac.tuwien.fundify.adapters.in.rest.dto.TranslatedTextWebModel;
-import at.ac.tuwien.fundify.adapters.in.rest.dto.enums.ELanguageWebModel;
-import at.ac.tuwien.fundify.adapters.in.rest.dto.enums.EPublicationStatusWebModel;
-import at.ac.tuwien.fundify.adapters.in.rest.dto.enums.ESubscriptionStatusWebModel;
-import at.ac.tuwien.fundify.adapters.in.rest.dto.enums.ETranslationWebModel;
+import at.ac.tuwien.fundify.adapters.in.rest.dto.*;
+import at.ac.tuwien.fundify.adapters.in.rest.dto.enums.*;
 import at.ac.tuwien.fundify.adapters.in.rest.resources.CallResource;
 import at.ac.tuwien.fundify.adapters.out.fundify.EmailService;
 import at.ac.tuwien.fundify.adapters.out.persistence.mongo.annotating.UniversityMongoEntity;
@@ -41,6 +36,8 @@ import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.security.TestSecurity;
 import io.restassured.http.ContentType;
 import jakarta.inject.Inject;
+
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -753,31 +750,31 @@ class CallTest {
     return new CallWebModel(
         id,
         status,
-        null,
+        ECallTypeWebModel.CALL,
         null,
         null,
         null,
         null,
         risId,
-        List.of(
-            new TranslatedTextWebModel("FFG", ELanguageWebModel.GERMAN, ETranslationWebModel.ORIGINAL)),
+        List.of(new TranslatedTextWebModel("FFG", ELanguageWebModel.GERMAN, ETranslationWebModel.ORIGINAL)),
+        List.of(ETargetGroupWebModel.UNIVERSITY),
+        List.of(new StandardizedSubjectWebModel(1, "1", "NATURAL SCIENCES")),
+        List.of((EFundingCharacteristicWebModel.SCIENTIFIC_PROGRAMME)),
+        EFundingSchemeWebModel.GRANT,
+        ELegalTypeWebModel.PROJECT26,
+        new MonetaryNumberWebModel(new BigDecimal(10000), ECurrencyWebModel.EUR),
+        new MonetaryNumberWebModel(new BigDecimal(20000), ECurrencyWebModel.EUR),
+        EAnswerYNWebModel.YES,
+        new BigDecimal(5),
+        new BigDecimal(6),
+        new TimeSpanWebModel(0,0,1),
+        new TimeSpanWebModel(0,0,3),
         null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        new FunderRefWebModel(funderId, null, null, null, null, acronym, null),
+        List.of(ELanguageWebModel.ENGLISH),
+        List.of(EModeOfSubmissionWebModel.ONLINE_FULL),
+        List.of(new FunderContactWebModel("name", "email@test.at", "phone")),
+        new FunderRefWebModel(funderId, null, null, null, List.of(
+                new TranslatedTextWebModel(acronym, ELanguageWebModel.GERMAN, ETranslationWebModel.ORIGINAL)), acronym, null),
         null,
         acronym,
         null,
