@@ -5,6 +5,7 @@ import {
   OnInit,
   inject,
   Injector,
+  AfterViewInit,
 } from '@angular/core';
 import {
   AbstractControl,
@@ -52,7 +53,7 @@ import { MatError } from '@angular/material/form-field';
   imports: [FormsModule, ReactiveFormsModule, MatCheckbox, MatError],
 })
 export class MultipleChoiceFieldComponent
-  implements OnInit, OnDestroy, Validator, ControlValueAccessor
+  implements OnInit, OnDestroy, Validator, ControlValueAccessor, AfterViewInit
 {
   private fb = inject(UntypedFormBuilder);
   validationService = inject(ValidationService);

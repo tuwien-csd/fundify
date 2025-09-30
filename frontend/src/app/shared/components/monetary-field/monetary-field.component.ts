@@ -5,6 +5,7 @@ import {
   OnInit,
   inject,
   Injector,
+  AfterViewInit,
 } from '@angular/core';
 import {
   AbstractControl,
@@ -62,7 +63,7 @@ import { MatSelect, MatOption } from '@angular/material/select';
   ],
 })
 export class MonetaryFieldComponent
-  implements OnInit, OnDestroy, Validator, ControlValueAccessor
+  implements OnInit, OnDestroy, Validator, ControlValueAccessor, AfterViewInit
 {
   private fb = inject(UntypedFormBuilder);
   validationService = inject(ValidationService);
