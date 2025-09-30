@@ -32,6 +32,13 @@ services:
     networks:
       - refop-network-dev
 
+  papercut:
+    image: changemakerstudiosus/papercut-smtp:latest
+    container_name: papercut_smtp
+    ports:
+      - "8084:80"
+      - "25:25"
+
 volumes:
   mongo-data-dev:
     driver: local

@@ -1,10 +1,9 @@
-# Fundify
+# FUNDify
 
 ## Getting Started
 
 ### Development setup
 
-#### Development Setup
 
 1. **Set up Husky for Git Hooks**
    ```bash
