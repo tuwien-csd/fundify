@@ -73,14 +73,6 @@ public class VocabularyUseCaseImpl implements VocabularyUseCase {
   }
 
   @Override
-  public List<Vocabulary> getByUniversityId(UniversityId universityId) {
-    return vocabularyQuery
-        .findByUniversityId(universityId)
-        .stream().filter(currentUserCanRead())
-        .toList();
-  }
-
-  @Override
   public List<Vocabulary> getAll() {
     List<Vocabulary> vocabularies = vocabularyQuery
         .findAll()
