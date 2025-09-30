@@ -77,6 +77,7 @@ import { AuthService } from '../../../core/auth/services/auth.service';
 import { FundingEntityRef } from '../../../shared/models/interfaces/funding-entity-ref.interface';
 import { TranslatedText } from '../../../shared/models/interfaces/translated-text.interface';
 import { FunderSearchComponent } from '../../../shared/components/funder-search/funder-search.component';
+import { MatError } from '@angular/material/form-field';
 
 @Component({
   selector: 'app-call-detail-edit',
@@ -109,6 +110,7 @@ import { FunderSearchComponent } from '../../../shared/components/funder-search/
     MatIcon,
     MatTooltip,
     FunderSearchComponent,
+    MatError,
   ],
 })
 export class CallDetailEditComponent implements OnInit {
@@ -191,27 +193,27 @@ export class CallDetailEditComponent implements OnInit {
   }
 
   onSaveAsDraft() {
-    if (this.detailsForm.valid) {
-      this.saveAsDraft.emit({
-        ...this.call,
-        ...this.detailsForm.getRawValue(),
-      });
-    } else {
+    if (this.detailsForm.invalid) {
       this.detailsForm.markAllAsTouched();
       this.submissionErrorMsg = FORM_STATUS_MESSAGES.VALIDATION_ERROR;
+      return;
     }
+    this.saveAsDraft.emit({
+      ...this.call,
+      ...this.detailsForm.getRawValue(),
+    });
   }
 
   onPublish() {
-    if (this.detailsForm.valid) {
-      this.publish.emit({
-        ...this.call,
-        ...this.detailsForm.getRawValue(),
-      });
-    } else {
+    if (this.detailsForm.invalid) {
       this.detailsForm.markAllAsTouched();
       this.submissionErrorMsg = FORM_STATUS_MESSAGES.VALIDATION_ERROR;
+      return;
     }
+    this.publish.emit({
+      ...this.call,
+      ...this.detailsForm.getRawValue(),
+    });
   }
 
   onPreview() {
