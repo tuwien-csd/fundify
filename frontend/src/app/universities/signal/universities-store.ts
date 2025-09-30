@@ -1,5 +1,11 @@
 import { inject } from '@angular/core';
-import { patchState, signalStore, withMethods, withProps } from '@ngrx/signals';
+import {
+  patchState,
+  signalStore,
+  withHooks,
+  withMethods,
+  withProps,
+} from '@ngrx/signals';
 import {
   addEntity,
   removeEntity,
@@ -14,6 +20,7 @@ import {
   UniversityWebModel,
 } from '../models/university.interface';
 import { UNIVERSITY_DETAILS_CONSTANTS } from '../universities.constants';
+import { equalsIgnoreCase } from '../../shared/utils/string-utils';
 
 export const UniversitiesStore = signalStore(
   { providedIn: 'root' },
@@ -142,5 +149,16 @@ export const UniversitiesStore = signalStore(
         console.error('Error deleting university:', error);
       }
     },
-  }))
+    getUniversityByAcronym: (acronym?: string | null) => {
+      return store
+        .entities()
+        .find((it) => equalsIgnoreCase(it.acronym, acronym));
+    },
+  })),
+  withHooks({
+    onInit: (store) => {
+      //Fetch all funders when the store initializes
+      store.fetchAll();
+    },
+  })
 );
