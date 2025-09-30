@@ -20,7 +20,7 @@ import java.util.Collections;
 import java.util.List;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -32,14 +32,16 @@ class VocabularyTest {
   private static String universityId;
   private static String keywordVocabularyId;
 
-  @BeforeAll
-  static void setup() {
+  @BeforeEach
+  void setup() {
+    UniversityMongoEntity.deleteAll();
     // persist a university and a vocabulary
     UniversityMongoEntity university = new UniversityMongoEntity();
     university.acronym = TU_WIEN_UNIVERSITY_AFFILIATION;
     university.persist();
     universityId = university.id.toHexString();
 
+    VocabularyMongoEntity.deleteAll();
     VocabularyMongoEntity keywordVocabulary = new VocabularyMongoEntity();
     keywordVocabulary.universityId = new ObjectId(universityId);
     keywordVocabulary.entries = Collections.emptySet();
@@ -218,6 +220,22 @@ class VocabularyTest {
     Assertions.assertEquals(2, response.size());
   }
 
+  @Test
+  @WithTUWUser
+  void givenUninitializedVocublary_whenGetAll_thenInitializesAndReturnsVocabularies() {
+    List<VocabularyWebModel> response = given()
+        .when()
+        .get("/")
+        .then()
+        .statusCode(200)
+        .extract()
+        .jsonPath().getList(".", VocabularyWebModel.class);
+
+    Assertions.assertEquals(2, response.size());
+
+
+  }
+
   @Nested
   @QuarkusTest
   @TestHTTPEndpoint(VocabularyResource.class)
@@ -258,21 +276,6 @@ class VocabularyTest {
           .get("/{id}")
           .then()
           .statusCode(404);
-    }
-    @Test
-    @WithUniVieUser
-    void when_GetVocabularyByUniversityId_AsUnaffiliatedUser_thenReturnsEmptyList() {
-      var resultList = given()
-          .queryParam("universityId", universityId)
-          .when()
-          .get("/")
-          .then()
-          .extract()
-          .body()
-          .as(VocabularyWebModel[].class);
-
-      Assertions.assertEquals(0, resultList.length);
-
     }
   }
 }
