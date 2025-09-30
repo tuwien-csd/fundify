@@ -270,9 +270,7 @@ export class CallDetailEditComponent implements OnInit {
   }
 
   getOwnerId(): string {
-    if (this.authService.isFunder())
-      return this.authService.userAffiliationId() ?? '';
-    else return this.call.callOwner?.acronym ?? '';
+    return this.call.callOwner?.acronym ?? '';
   }
 
   getEntryOrigin(): EntryOriginEnum {
@@ -329,5 +327,4 @@ export class CallDetailEditComponent implements OnInit {
       .map((tt) => `${tt.text} (${tt.language})`)
       .join(', ');
   }
-
 }

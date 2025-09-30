@@ -21,7 +21,6 @@ import { DatePipe } from '@angular/common';
 import { EntryOriginEnum } from '../../../shared/models/enums/entry-origin.enum';
 import { ActionPermissions } from '../../../core/models/ActionPermissions';
 import { PermissionService } from '../../../core/auth/services/permission.service';
-import { AuthService } from '../../../core/auth/services/auth.service';
 import { Call } from '../../models/call.interface';
 import {
   LOCAL_STORAGE_KEYS,
@@ -62,8 +61,6 @@ export class CallDetailPreviewComponent implements OnInit {
   private localStorageService = inject(LocalStorageService);
   private permissionService = inject(PermissionService);
   private validationService = inject(CallValidationService);
-  private authService = inject(AuthService);
-
 
   protected readonly CALL_DETAILS_CONSTANTS = CALL_DETAILS_CONSTANTS;
   protected readonly BUTTON_LABELS = BUTTON_LABELS;
@@ -112,8 +109,7 @@ export class CallDetailPreviewComponent implements OnInit {
   }
 
   getOwnerId(): string {
-    if (this.authService.isFunder()) return this.authService.userAffiliationId() ?? '';
-    else return this.call.callOwner?.acronym ?? '';
+    return this.call.callOwner?.acronym ?? '';
   }
 
   getEntryOrigin(): EntryOriginEnum {
