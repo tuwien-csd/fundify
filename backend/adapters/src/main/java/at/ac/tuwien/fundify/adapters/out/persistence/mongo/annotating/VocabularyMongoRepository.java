@@ -16,10 +16,10 @@ public class VocabularyMongoRepository implements VocabularyRepository {
     private final MongoCrossReferenceResolver mongoCrossReferenceResolver;
 
     @Override
-    public VocabularyId persistVocabulary(Vocabulary vocabulary) {
+    public Vocabulary persistVocabulary(Vocabulary vocabulary) {
         VocabularyMongoEntity entity = VocabularyMongoEntityMapper.INSTANCE.toEntity(vocabulary);
         entity.persist();
-        return VocabularyMongoEntityMapper.INSTANCE.toDomain(entity, mongoCrossReferenceResolver).id();
+        return VocabularyMongoEntityMapper.INSTANCE.toDomain(entity, mongoCrossReferenceResolver);
     }
 
     @Override
