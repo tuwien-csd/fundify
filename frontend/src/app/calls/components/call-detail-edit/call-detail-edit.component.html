@@ -467,13 +467,10 @@
         <mat-icon>remove_red_eye</mat-icon>
         {{ BUTTON_LABELS.PREVIEW }}
       </button>
+
+      @if (submissionErrorMsg && !detailsForm.valid) {
+        <mat-error class="actions-error"> {{ submissionErrorMsg }} </mat-error>
+      }
     </mat-card-actions>
-    @if (submissionErrorMsg) {
-      <mat-card-content>
-        <div class="error-message">
-          <strong>{{ submissionErrorMsg }}</strong>
-        </div>
-      </mat-card-content>
-    }
   </mat-card>
 </div>
