@@ -12,7 +12,10 @@ import { FundingSchemeEnum } from 'src/app/shared/models/enums/funding-scheme.en
 import { LegalTypeEnum } from 'src/app/shared/models/enums/legal-type.enum';
 import { TargetGroupEnum } from 'src/app/shared/models/enums/target-group.enum';
 import { PROGRAM_DETAILS_CONSTANTS } from '../../programs.constants';
-import { BUTTON_LABELS } from 'src/app/shared/shared.constants';
+import {
+  BUTTON_LABELS,
+  FORM_STATUS_MESSAGES,
+} from 'src/app/shared/shared.constants';
 import { EntryOriginEnum } from '../../../shared/models/enums/entry-origin.enum';
 import { PermissionService } from '../../../core/auth/services/permission.service';
 import { ActionPermissions } from '../../../core/models/ActionPermissions';
@@ -43,6 +46,7 @@ import { EditMode } from '../../../shared/utils/edit-mode';
 import { FundersStore } from '../../../funders/signal/funders-store';
 import { Router, RouterLink } from '@angular/router';
 import { ROUTER_LINKS } from '../../../core/router-links.constants';
+import { MatError } from '@angular/material/form-field';
 
 @Component({
   selector: 'app-program-detail-edit',
@@ -69,6 +73,7 @@ import { ROUTER_LINKS } from '../../../core/router-links.constants';
     MatIcon,
     MatTooltip,
     RouterLink,
+    MatError,
   ],
 })
 export class ProgramDetailEditComponent implements OnInit {
@@ -97,6 +102,8 @@ export class ProgramDetailEditComponent implements OnInit {
   fundingCharacteristics: typeof FundingCharacteristicEnum =
     FundingCharacteristicEnum;
 
+  submissionErrorMsg: string = '';
+
   ngOnInit() {
     this.initPermissions();
     if (!this.permissions?.canEdit) {
@@ -106,6 +113,11 @@ export class ProgramDetailEditComponent implements OnInit {
   }
 
   onSaveAsDraft() {
+    if (this.detailsForm.invalid) {
+      this.detailsForm.markAllAsTouched();
+      this.submissionErrorMsg = FORM_STATUS_MESSAGES.VALIDATION_ERROR;
+      return;
+    }
     const formValue = this.detailsForm.getRawValue();
     formValue.status = PublicationStatusEnum.DRAFT;
     this.createOrUpdateProgram(formValue).then((createdProgram) => {
@@ -114,6 +126,11 @@ export class ProgramDetailEditComponent implements OnInit {
   }
 
   onPublish() {
+    if (this.detailsForm.invalid) {
+      this.detailsForm.markAllAsTouched();
+      this.submissionErrorMsg = FORM_STATUS_MESSAGES.VALIDATION_ERROR;
+      return;
+    }
     const formValue = this.detailsForm.getRawValue();
     formValue.status = PublicationStatusEnum.PUBLISHED;
     this.createOrUpdateProgram(formValue).then((createdProgram) => {

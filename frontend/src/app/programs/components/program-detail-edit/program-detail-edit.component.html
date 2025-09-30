@@ -146,7 +146,6 @@
           color="primary"
           class="form-item-button"
           (click)="onPublish()"
-          [disabled]="!detailsForm.valid"
           [matTooltip]="
             detailsForm.valid
               ? ''
@@ -165,6 +164,9 @@
         >
           {{ BUTTON_LABELS.SAVE_AS_DRAFT }}
         </button>
+      }
+      @if (submissionErrorMsg && !detailsForm.valid) {
+        <mat-error class="actions-error"> {{ submissionErrorMsg }} </mat-error>
       }
     </mat-card-actions>
   </mat-card>
