@@ -209,7 +209,6 @@ class VocabularyTest {
   @WithTUWUser
   void givenValidUniversityId_whenGetVocabularyByUniversityId_thenReturnsVocabulariesAndStatus200() {
     List<VocabularyWebModel> response = given()
-        .queryParam("universityId", universityId)
         .when()
         .get("/")
         .then()
