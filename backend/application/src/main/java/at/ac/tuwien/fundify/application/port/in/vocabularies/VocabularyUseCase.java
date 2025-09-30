@@ -1,6 +1,5 @@
 package at.ac.tuwien.fundify.application.port.in.vocabularies;
 
-import at.ac.tuwien.fundify.domain.annotating.UniversityId;
 import at.ac.tuwien.fundify.domain.common.Vocabulary;
 import at.ac.tuwien.fundify.domain.common.VocabularyId;
 import at.ac.tuwien.fundify.domain.common.exceptions.EntityNotFoundException;
@@ -14,8 +13,6 @@ public interface VocabularyUseCase {
     VocabularyId deleteEntry(VocabularyId id, String entry) throws FundifyException;
 
   Vocabulary getById(VocabularyId id) throws EntityNotFoundException;
-
-  List<Vocabulary> getByUniversityId(UniversityId universityId);
 
   List<Vocabulary> getAll();
 }
