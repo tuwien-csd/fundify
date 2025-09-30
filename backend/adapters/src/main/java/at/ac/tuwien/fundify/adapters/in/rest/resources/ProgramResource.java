@@ -3,6 +3,7 @@ package at.ac.tuwien.fundify.adapters.in.rest.resources;
 import static at.ac.tuwien.fundify.adapters.in.rest.constants.FundingEntityMethodPath.PATH_PARAM_ID;
 
 import at.ac.tuwien.fundify.adapters.in.rest.dto.ProgramWebModel;
+import at.ac.tuwien.fundify.adapters.in.rest.dto.ValidationGroups;
 import at.ac.tuwien.fundify.adapters.in.rest.mapper.ProgramWebModelMapper;
 import at.ac.tuwien.fundify.application.port.in.programs.ProgramAccessor;
 import at.ac.tuwien.fundify.application.port.in.programs.ProgramUseCase;
@@ -12,6 +13,7 @@ import at.ac.tuwien.fundify.domain.common.exceptions.EntityNotFoundException;
 import at.ac.tuwien.fundify.domain.common.exceptions.FundifyException;
 import io.quarkus.security.Authenticated;
 import jakarta.annotation.security.RolesAllowed;
+import jakarta.validation.groups.ConvertGroup;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
@@ -24,6 +26,7 @@ import jakarta.ws.rs.core.MediaType;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.jbosslog.JBossLog;
+import jakarta.validation.Valid;
 
 @Path("/api/program")
 @Produces(MediaType.APPLICATION_JSON)
@@ -37,17 +40,21 @@ public class ProgramResource {
   private final ProgramAccessor programAccessor;
 
   @POST
+  @Produces(MediaType.APPLICATION_JSON)
+  @Consumes(MediaType.APPLICATION_JSON)
   @RolesAllowed({UserRole.Names.FUNDER, UserRole.Names.ADMIN})
-  public ProgramWebModel add(ProgramWebModel programWebModel) throws FundifyException {
+  public ProgramWebModel add(@Valid @ConvertGroup(to = ValidationGroups.Post.class) ProgramWebModel programWebModel) throws FundifyException {
     return ProgramWebModelMapper.INSTANCE.fromDomain(
         programUseCase.addProgram(ProgramWebModelMapper.INSTANCE.toDomain(programWebModel))
     );
   }
 
   @PUT
+  @Produces(MediaType.APPLICATION_JSON)
+  @Consumes(MediaType.APPLICATION_JSON)
   @RolesAllowed({UserRole.Names.FUNDER, UserRole.Names.ADMIN})
   @Path("/{id}")
-  public ProgramWebModel update(@PathParam(PATH_PARAM_ID) String programId, ProgramWebModel programWebModel) throws FundifyException {
+  public ProgramWebModel update(@PathParam(PATH_PARAM_ID) String programId, @Valid @ConvertGroup(to = ValidationGroups.Put.class) ProgramWebModel programWebModel) throws FundifyException {
     return ProgramWebModelMapper.INSTANCE.fromDomain(
         programUseCase.updateProgram(ProgramWebModelMapper.INSTANCE.toDomain(programWebModel))
     );
