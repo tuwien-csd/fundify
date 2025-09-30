@@ -26,6 +26,16 @@ public class UniversityMongoQuery implements UniversityQuery {
     }
 
     @Override
+    public Optional<University> findByAcronym(String acronym) {
+      UniversityMongoEntity entity = UniversityMongoEntity.find("acronym", acronym)
+                .firstResult();
+        if (entity == null) {
+            return Optional.empty();
+        }
+        return  Optional.of(UniversityMongoEntityMapper.INSTANCE.toDomain(entity));
+    }
+
+    @Override
     public Optional<University> findById(UniversityId id) {
         UniversityMongoEntity universityMongoEntity = UniversityMongoEntity.findById(ObjectIdUtils.toObjectId(id.value()));
         if (universityMongoEntity == null) {

@@ -2,7 +2,6 @@ package at.ac.tuwien.fundify.adapters.in.rest.resources;
 
 import at.ac.tuwien.fundify.adapters.in.rest.dto.VocabularyWebModel;
 import at.ac.tuwien.fundify.adapters.in.rest.mapper.VocabularyWebModelMapper;
-import at.ac.tuwien.fundify.application.port.in.vocabularies.VocabularyAccessor;
 import at.ac.tuwien.fundify.application.port.in.vocabularies.VocabularyUseCase;
 import at.ac.tuwien.fundify.domain.annotating.UniversityId;
 import at.ac.tuwien.fundify.domain.common.UserRole;
@@ -30,7 +29,6 @@ import lombok.extern.jbosslog.JBossLog;
 @RequiredArgsConstructor
 public class VocabularyResource {
 
-    private final VocabularyAccessor vocabularyAccessor;
     private final VocabularyUseCase vocabularyUseCase;
 
     @PUT
@@ -55,19 +53,19 @@ public class VocabularyResource {
     @Path("/{id}")
     public VocabularyWebModel getVocabularyById(@PathParam("id") String id)
         throws FundifyException {
-            return VocabularyWebModelMapper.INSTANCE.fromDTO(vocabularyAccessor.getById(new VocabularyId(id)));
+            return VocabularyWebModelMapper.INSTANCE.fromDTO(vocabularyUseCase.getById(new VocabularyId(id)));
     }
 
     @GET
     public List<VocabularyWebModel> getAll() {
-      return VocabularyWebModelMapper.INSTANCE.fromDTO(vocabularyAccessor.getAll());
+      return VocabularyWebModelMapper.INSTANCE.fromDTO(vocabularyUseCase.getAll());
     }
 
     @GET
     public List<VocabularyWebModel> getVocabulariesByUniversityId(@QueryParam("universityId") String universityIdRaw)
         throws FundifyException {
             UniversityId universityId = new UniversityId(universityIdRaw);
-            vocabularyUseCase.ensureInitialized(universityId);
-            return VocabularyWebModelMapper.INSTANCE.fromDTO(vocabularyAccessor.getByUniversityId(universityId));
+//            vocabularyUseCase.ensureInitialized(universityId);
+            return VocabularyWebModelMapper.INSTANCE.fromDTO(vocabularyUseCase.getByUniversityId(universityId));
     }
 }
