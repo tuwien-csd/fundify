@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { TranslatedTextsFieldComponent } from './translated-texts-field.component';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormControl, NgControl, ReactiveFormsModule } from '@angular/forms';
 import { RouterTestingModule } from '@angular/router/testing';
 
 describe('TranslatedTextsFieldComponent', () => {
@@ -14,6 +14,14 @@ describe('TranslatedTextsFieldComponent', () => {
         RouterTestingModule,
         ReactiveFormsModule,
         TranslatedTextsFieldComponent,
+      ],
+      providers: [
+        {
+          provide: NgControl,
+          useValue: {
+            control: new FormControl(),
+          },
+        },
       ],
     }).compileComponents();
   });

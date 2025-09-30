@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { DateRangesInfoFieldComponent } from './date-ranges-info-field.component';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormControl, NgControl, ReactiveFormsModule } from '@angular/forms';
 import { RouterTestingModule } from '@angular/router/testing';
 import { provideNativeDateAdapter } from '@angular/material/core';
 
@@ -16,13 +16,29 @@ describe('DateRangesInfoFieldComponent', () => {
         ReactiveFormsModule,
         DateRangesInfoFieldComponent,
       ],
+      providers: [
+        {
+          provide: NgControl,
+          useValue: {
+            control: new FormControl(),
+          },
+        },
+      ],
     }).compileComponents();
   });
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [DateRangesInfoFieldComponent],
-      providers: [provideNativeDateAdapter()],
+      providers: [
+        provideNativeDateAdapter(),
+        {
+          provide: NgControl,
+          useValue: {
+            control: new FormControl(),
+          },
+        },
+      ],
     }).compileComponents();
   });
 

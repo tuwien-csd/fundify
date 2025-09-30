@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormControl, NgControl, ReactiveFormsModule } from '@angular/forms';
 import { TextFieldComponent } from '../text-field/text-field.component';
 
 describe('TextFieldComponent', () => {
@@ -9,6 +9,14 @@ describe('TextFieldComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [ReactiveFormsModule, TextFieldComponent],
+      providers: [
+        {
+          provide: NgControl,
+          useValue: {
+            control: new FormControl(),
+          },
+        },
+      ],
     }).compileComponents();
   });
 

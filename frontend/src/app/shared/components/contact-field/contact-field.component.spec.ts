@@ -1,6 +1,11 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ContactFieldComponent } from './contact-field.component';
-import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
+import {
+  FormBuilder,
+  FormControl,
+  NgControl,
+  ReactiveFormsModule,
+} from '@angular/forms';
 import { RouterTestingModule } from '@angular/router/testing';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -23,7 +28,15 @@ describe('ContactFieldComponent', () => {
           MatButtonModule,
           ContactFieldComponent,
         ],
-        providers: [FormBuilder],
+        providers: [
+          FormBuilder,
+          {
+            provide: NgControl,
+            useValue: {
+              control: new FormControl(),
+            },
+          },
+        ],
       }).compileComponents();
     });
 
@@ -106,7 +119,15 @@ describe('ContactFieldComponent', () => {
           MatButtonModule,
           ContactFieldComponent,
         ],
-        providers: [FormBuilder],
+        providers: [
+          FormBuilder,
+          {
+            provide: NgControl,
+            useValue: {
+              control: new FormControl(),
+            },
+          },
+        ],
       }).compileComponents();
     });
 
