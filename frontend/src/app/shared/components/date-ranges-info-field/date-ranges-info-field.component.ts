@@ -5,6 +5,7 @@ import {
   OnInit,
   inject,
   Injector,
+  AfterViewInit,
 } from '@angular/core';
 import {
   AbstractControl,
@@ -56,7 +57,7 @@ import { MatButton } from '@angular/material/button';
   ],
 })
 export class DateRangesInfoFieldComponent
-  implements OnInit, OnDestroy, Validator, ControlValueAccessor
+  implements OnInit, OnDestroy, Validator, ControlValueAccessor, AfterViewInit
 {
   private fb = inject(UntypedFormBuilder);
   private injector = inject(Injector);
