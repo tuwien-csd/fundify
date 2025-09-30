@@ -59,7 +59,10 @@ export const PROGRAMS: ProgramWebModel[] = [
         },
       ],
     ],
-    duration: { start: 'Dec 08 2016 07:44:57' },
+    duration: {
+      start: 'Dec 08 2016 07:44:57',
+      end: 'Apr 22 2022 00:00:00 GMT',
+    },
     description: [
       {
         text: 'Thematic Thematic programme is intended to bring the innovation from research into the business',

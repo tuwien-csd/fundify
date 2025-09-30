@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { MultipleChoiceFieldComponent } from './multiple-choice-field.component';
 import { RouterTestingModule } from '@angular/router/testing';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormControl, NgControl, ReactiveFormsModule } from '@angular/forms';
 
 describe('MultipleChoiceFieldComponent', () => {
   let component: MultipleChoiceFieldComponent;
@@ -14,6 +14,14 @@ describe('MultipleChoiceFieldComponent', () => {
         RouterTestingModule,
         ReactiveFormsModule,
         MultipleChoiceFieldComponent,
+      ],
+      providers: [
+        {
+          provide: NgControl,
+          useValue: {
+            control: new FormControl(),
+          },
+        },
       ],
     }).compileComponents();
   });
@@ -45,6 +53,14 @@ describe('MultipleChoiceFieldComponent with @Input type', () => {
         RouterTestingModule,
         ReactiveFormsModule,
         MultipleChoiceFieldComponent,
+      ],
+      providers: [
+        {
+          provide: NgControl,
+          useValue: {
+            control: new FormControl(),
+          },
+        },
       ],
     }).compileComponents();
   });

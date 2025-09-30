@@ -1,5 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import {
+  FormControl,
+  FormsModule,
+  NgControl,
+  ReactiveFormsModule,
+} from '@angular/forms';
 import { NumberFieldComponent } from './number-field.component';
 
 describe('NumberFieldComponent', () => {
@@ -9,6 +14,14 @@ describe('NumberFieldComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [FormsModule, ReactiveFormsModule, NumberFieldComponent],
+      providers: [
+        {
+          provide: NgControl,
+          useValue: {
+            control: new FormControl(),
+          },
+        },
+      ],
     }).compileComponents();
   });
 
