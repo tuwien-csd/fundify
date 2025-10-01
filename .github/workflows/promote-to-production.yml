@@ -29,11 +29,11 @@ jobs:
           VERSION="$(sed -n 's:.*<revision>\(.*\)</revision>.*:\1:p' backend/pom.xml)"
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
-          # If source_tag input provided, use it; otherwise use VERSION-GITHUB_SHA
+          # If source_tag input provided, use it; otherwise use VERSION
           if [ -n "${{ inputs.source_tag }}" ]; then
             SRC_TAG="${{ inputs.source_tag }}"
           else
-            SRC_TAG="${VERSION}-${GITHUB_SHA}"
+            SRC_TAG="${VERSION}"
           fi
           echo "source_tag=$SRC_TAG" >> "$GITHUB_OUTPUT"
 
@@ -98,7 +98,7 @@ jobs:
           if [ -n "${{ inputs.source_tag }}" ]; then
             SRC_TAG="${{ inputs.source_tag }}"
           else
-            SRC_TAG="${VERSION}-${GITHUB_SHA}"
+            SRC_TAG="${VERSION}"
           fi
           echo "source_tag=$SRC_TAG" >> "$GITHUB_OUTPUT"
 
