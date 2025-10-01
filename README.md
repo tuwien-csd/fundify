@@ -1,4 +1,4 @@
-# Fundify
+# FUNDify
 ### Project Overview
 
 FUNDify is an integrated funding management platform developed as a core component of the [RIS Synergy](https://forschungsdaten.at/ris) initiative—a strategic project dedicated to digitizing and strengthening the Austrian research landscape.
