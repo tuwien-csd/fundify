@@ -18,6 +18,9 @@ jobs:
     runs-on: ubuntu-latest
     env:
       IMAGE_NAME: fundify-be
+    outputs:
+      image_tag: ${{ steps.meta.outputs.version }}
+      digest: ${{ steps.pull_retag_and_push.outputs.digest }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
@@ -38,6 +41,7 @@ jobs:
           echo "source_tag=$SRC_TAG" >> "$GITHUB_OUTPUT"
 
       - name: Pull from staging, retag, and push to production
+        id: pull_retag_and_push
         shell: bash
         env:
           REGISTRY: registry.arisnet.ac.at
@@ -61,6 +65,12 @@ jobs:
 
           echo "Pulling ${SRC_IMAGE} from staging..."
           docker pull "${SRC_IMAGE}"
+          
+          # Get the image digest
+          # extracts the "sha256:abcdef...." from the output of "docker inspect"
+          DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' "${SRC_IMAGE}" | cut -d'@' -f2)
+          echo "Image digest: ${DIGEST}"
+          echo "digest=${DIGEST}" >> "$GITHUB_OUTPUT"
 
           echo "Logging into production registry..."
           echo "${PROD_PASS}" | docker login "${REGISTRY}" -u "${PROD_USER}" --password-stdin
@@ -84,6 +94,9 @@ jobs:
     runs-on: ubuntu-latest
     env:
       IMAGE_NAME: fundify-fe
+    outputs:
+      image_tag: ${{ steps.meta.outputs.version }}
+      digest: ${{ steps.pull_retag_and_push.outputs.digest }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
@@ -104,6 +117,7 @@ jobs:
 
       - name: Pull from staging, retag, and push to production
         shell: bash
+        id: pull_retag_and_push
         env:
           REGISTRY: registry.arisnet.ac.at
           STAGING_PROJECT: aris-fundify-staging
@@ -126,6 +140,12 @@ jobs:
 
           echo "Pulling ${SRC_IMAGE} from staging..."
           docker pull "${SRC_IMAGE}"
+          
+          # Get the image digest
+          # extracts the "sha256:abcdef...." from the output of "docker inspect"
+          DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' "${SRC_IMAGE}" | cut -d'@' -f2)
+          echo "Image digest: ${DIGEST}"
+          echo "digest=${DIGEST}" >> "$GITHUB_OUTPUT"
 
           echo "Logging into production registry..."
           echo "${PROD_PASS}" | docker login "${REGISTRY}" -u "${PROD_USER}" --password-stdin
@@ -142,3 +162,53 @@ jobs:
 
           echo "Logging out..."
           docker logout "${REGISTRY}"
+
+  update-helm-values:
+    name: Update Helm Values in GitLab
+    needs: [promote-be, promote-fe]
+    environment: production
+    env:
+      BE_IMAGE_TAG: ${{ needs.promote-be.outputs.image_tag }}
+      BE_DIGEST_TO_DEPLOY: ${{ needs.promote-be.outputs.digest }}
+      FE_IMAGE_TAG: ${{ needs.promote-fe.outputs.image_tag }}
+      FE_DIGEST_TO_DEPLOY: ${{ needs.promote-fe.outputs.digest }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone GitLab GitOps repo
+        # clone into the current directory
+        run: git clone https://${{ secrets.GITLAB_USER_NAME }}:${{ secrets.GITLAB_USER_TOKEN }}@gitlab.tuwien.ac.at/aris-gitops-apps/aris-fundify-prod.git .
+
+      - name: Update prod values.yaml
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          VALUES_FILE="environments/prod/values.yaml"
+          FULL_BE_TAG=${BE_IMAGE_TAG}@${BE_DIGEST_TO_DEPLOY}
+          FULL_FE_TAG=${FE_IMAGE_TAG}@${FE_DIGEST_TO_DEPLOY}
+
+          echo "Updating $VALUES_FILE with backend tag: $FULL_BE_TAG and frontend tag: $FULL_FE_TAG"
+
+          # Update backend.image.tag
+          yq eval ".backend.image.tag = \"$FULL_BE_TAG\"" -i $VALUES_FILE
+
+          # Update frontend.image.tag
+          yq eval ".frontend.image.tag = \"$FULL_FE_TAG\"" -i $VALUES_FILE
+
+      - name: Commit and push changes
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          git config user.name "GitHub Actions Bot"
+          git config user.email "martin.schwarz@andamp.io"
+
+          git add environments/prod/values.yaml
+
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+
+          git commit -m "Update image tags with digests: BE=${BE_IMAGE_TAG}@${BE_DIGEST_TO_DEPLOY}, FE=${FE_IMAGE_TAG}@${FE_DIGEST_TO_DEPLOY}"
+          git push

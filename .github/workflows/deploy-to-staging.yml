@@ -1,4 +1,4 @@
-name: Build and push Docker image
+name: Promote images to production
 
 on:
   push:
@@ -11,6 +11,9 @@ jobs:
     runs-on: ubuntu-latest
     env:
       IMAGE_NAME: fundify-be
+    outputs:
+      image_tag: ${{ steps.get_version.outputs.version }}
+      digest: ${{ steps.docker_build_and_push.outputs.digest }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
@@ -31,6 +34,7 @@ jobs:
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v6
+        id: docker_build_and_push
         with:
           context: ./backend
           push: true
@@ -43,6 +47,9 @@ jobs:
     runs-on: ubuntu-latest
     env:
       IMAGE_NAME: fundify-fe
+    outputs:
+      image_tag: ${{ steps.get_version.outputs.version }}
+      digest: ${{ steps.docker_build_and_push.outputs.digest }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
@@ -63,6 +70,7 @@ jobs:
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v6
+        id: docker_build_and_push
         with:
           context: ./frontend
           push: true
@@ -70,3 +78,53 @@ jobs:
             ${{ vars.ARISNET_DOCKER_REGISTRY }}/${{env.IMAGE_NAME}}:latest
             ${{ vars.ARISNET_DOCKER_REGISTRY }}/${{env.IMAGE_NAME}}:${{ steps.get_version.outputs.version }}
             ${{ vars.ARISNET_DOCKER_REGISTRY }}/${{env.IMAGE_NAME}}:${{ steps.get_version.outputs.version }}-${{github.sha}}
+
+  update-helm-values:
+    name: Update Helm Values in GitLab
+    needs: [ build-and-push-be, build-and-push-fe ]
+    environment: staging
+    env:
+      BE_IMAGE_TAG: ${{ needs.build-and-push-be.outputs.image_tag }}
+      BE_DIGEST_TO_DEPLOY: ${{ needs.build-and-push-be.outputs.digest }}
+      FE_IMAGE_TAG: ${{ needs.build-and-push-fe.outputs.image_tag }}
+      FE_DIGEST_TO_DEPLOY: ${{ needs.build-and-push-fe.outputs.digest }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone GitLab GitOps repo
+        # clone into the current directory
+        run: git clone https://${{ secrets.GITLAB_USER_NAME }}:${{ secrets.GITLAB_USER_TOKEN }}@gitlab.tuwien.ac.at/aris-gitops-apps/aris-fundify-prod.git .
+
+      - name: Update staging values.yaml
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          VALUES_FILE="environments/staging/values.yaml"
+          FULL_BE_TAG=${BE_IMAGE_TAG}@${BE_DIGEST_TO_DEPLOY}
+          FULL_FE_TAG=${FE_IMAGE_TAG}@${FE_DIGEST_TO_DEPLOY}
+
+          echo "Updating $VALUES_FILE with backend tag: $FULL_BE_TAG and frontend tag: $FULL_FE_TAG"
+
+          # Update backend.image.tag
+          yq eval ".backend.image.tag = \"$FULL_BE_TAG\"" -i $VALUES_FILE
+
+          # Update frontend.image.tag
+          yq eval ".frontend.image.tag = \"$FULL_FE_TAG\"" -i $VALUES_FILE
+
+      - name: Commit and push changes
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          git config user.name "GitHub Actions Bot"
+          git config user.email "martin.schwarz@andamp.io"
+
+          git add environments/staging/values.yaml
+
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+
+          git commit -m "Update image tags with digests: BE=${BE_IMAGE_TAG}@${BE_DIGEST_TO_DEPLOY}, FE=${FE_IMAGE_TAG}@${FE_DIGEST_TO_DEPLOY}"
+          git push
