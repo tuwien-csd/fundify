@@ -37,36 +37,33 @@ jobs:
           fi
           echo "source_tag=$SRC_TAG" >> "$GITHUB_OUTPUT"
 
-      - name: Login to STAGING Docker registry
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ vars.STAGING_ARISNET_DOCKER_REGISTRY }}
-          username: ${{ secrets.STAGING_ARISNET_DOCKER_REGISTRY_USERNAME }}
-          password: ${{ secrets.STAGING_ARISNET_DOCKER_REGISTRY_PASSWORD }}
-
-      - name: Login to PRODUCTION Docker registry
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ vars.PROD_ARISNET_DOCKER_REGISTRY }}
-          username: ${{ secrets.PROD_ARISNET_DOCKER_REGISTRY_USERNAME }}
-          password: ${{ secrets.PROD_ARISNET_DOCKER_REGISTRY_PASSWORD }}
-
       - name: Pull from staging, retag, and push to production
         shell: bash
         env:
-          STAGING_REGISTRY: ${{ vars.STAGING_ARISNET_DOCKER_REGISTRY }}
-          PROD_REGISTRY: ${{ vars.PROD_ARISNET_DOCKER_REGISTRY }}
+          REGISTRY: registry.arisnet.ac.at
+          STAGING_PROJECT: aris-fundify-staging
+          PROD_PROJECT: aris-fundify-prod
+          STAGING_USER: ${{ secrets.STAGING_ARISNET_DOCKER_REGISTRY_USERNAME }}
+          STAGING_PASS: ${{ secrets.STAGING_ARISNET_DOCKER_REGISTRY_PASSWORD }}
+          PROD_USER: ${{ secrets.PROD_ARISNET_DOCKER_REGISTRY_USERNAME }}
+          PROD_PASS: ${{ secrets.PROD_ARISNET_DOCKER_REGISTRY_PASSWORD }}
           VERSION: ${{ steps.meta.outputs.version }}
           SRC_TAG: ${{ steps.meta.outputs.source_tag }}
           IMAGE_NAME: ${{ env.IMAGE_NAME }}
         run: |
           set -euo pipefail
 
-          SRC_IMAGE="${STAGING_REGISTRY}/${IMAGE_NAME}:${SRC_TAG}"
-          PROD_IMAGE_BASE="${PROD_REGISTRY}/${IMAGE_NAME}"
+          SRC_IMAGE="${REGISTRY}/${STAGING_PROJECT}/${IMAGE_NAME}:${SRC_TAG}"
+          PROD_IMAGE_BASE="${REGISTRY}/${PROD_PROJECT}/${IMAGE_NAME}"
+
+          echo "Logging into staging registry..."
+          echo "${STAGING_PASS}" | docker login "${REGISTRY}" -u "${STAGING_USER}" --password-stdin
 
           echo "Pulling ${SRC_IMAGE} from staging..."
           docker pull "${SRC_IMAGE}"
+
+          echo "Logging into production registry..."
+          echo "${PROD_PASS}" | docker login "${REGISTRY}" -u "${PROD_USER}" --password-stdin
 
           echo "Retagging for production..."
           docker tag "${SRC_IMAGE}" "${PROD_IMAGE_BASE}:${SRC_TAG}"
@@ -77,6 +74,9 @@ jobs:
           docker push "${PROD_IMAGE_BASE}:${SRC_TAG}"
           docker push "${PROD_IMAGE_BASE}:${VERSION}"
           docker push "${PROD_IMAGE_BASE}:latest"
+
+          echo "Logging out..."
+          docker logout "${REGISTRY}"
 
   promote-fe:
     name: Promote Frontend Image
@@ -102,36 +102,33 @@ jobs:
           fi
           echo "source_tag=$SRC_TAG" >> "$GITHUB_OUTPUT"
 
-      - name: Login to STAGING Docker registry
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ vars.STAGING_ARISNET_DOCKER_REGISTRY }}
-          username: ${{ secrets.STAGING_ARISNET_DOCKER_REGISTRY_USERNAME }}
-          password: ${{ secrets.STAGING_ARISNET_DOCKER_REGISTRY_PASSWORD }}
-
-      - name: Login to PRODUCTION Docker registry
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ vars.PROD_ARISNET_DOCKER_REGISTRY }}
-          username: ${{ secrets.PROD_ARISNET_DOCKER_REGISTRY_USERNAME }}
-          password: ${{ secrets.PROD_ARISNET_DOCKER_REGISTRY_PASSWORD }}
-
       - name: Pull from staging, retag, and push to production
         shell: bash
         env:
-          STAGING_REGISTRY: ${{ vars.STAGING_ARISNET_DOCKER_REGISTRY }}
-          PROD_REGISTRY: ${{ vars.PROD_ARISNET_DOCKER_REGISTRY }}
+          REGISTRY: registry.arisnet.ac.at
+          STAGING_PROJECT: aris-fundify-staging
+          PROD_PROJECT: aris-fundify-prod
+          STAGING_USER: ${{ secrets.STAGING_ARISNET_DOCKER_REGISTRY_USERNAME }}
+          STAGING_PASS: ${{ secrets.STAGING_ARISNET_DOCKER_REGISTRY_PASSWORD }}
+          PROD_USER: ${{ secrets.PROD_ARISNET_DOCKER_REGISTRY_USERNAME }}
+          PROD_PASS: ${{ secrets.PROD_ARISNET_DOCKER_REGISTRY_PASSWORD }}
           VERSION: ${{ steps.meta.outputs.version }}
           SRC_TAG: ${{ steps.meta.outputs.source_tag }}
           IMAGE_NAME: ${{ env.IMAGE_NAME }}
         run: |
           set -euo pipefail
 
-          SRC_IMAGE="${STAGING_REGISTRY}/${IMAGE_NAME}:${SRC_TAG}"
-          PROD_IMAGE_BASE="${PROD_REGISTRY}/${IMAGE_NAME}"
+          SRC_IMAGE="${REGISTRY}/${STAGING_PROJECT}/${IMAGE_NAME}:${SRC_TAG}"
+          PROD_IMAGE_BASE="${REGISTRY}/${PROD_PROJECT}/${IMAGE_NAME}"
+
+          echo "Logging into staging registry..."
+          echo "${STAGING_PASS}" | docker login "${REGISTRY}" -u "${STAGING_USER}" --password-stdin
 
           echo "Pulling ${SRC_IMAGE} from staging..."
           docker pull "${SRC_IMAGE}"
+
+          echo "Logging into production registry..."
+          echo "${PROD_PASS}" | docker login "${REGISTRY}" -u "${PROD_USER}" --password-stdin
 
           echo "Retagging for production..."
           docker tag "${SRC_IMAGE}" "${PROD_IMAGE_BASE}:${SRC_TAG}"
@@ -142,3 +139,6 @@ jobs:
           docker push "${PROD_IMAGE_BASE}:${SRC_TAG}"
           docker push "${PROD_IMAGE_BASE}:${VERSION}"
           docker push "${PROD_IMAGE_BASE}:latest"
+
+          echo "Logging out..."
+          docker logout "${REGISTRY}"
