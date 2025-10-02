@@ -120,7 +120,7 @@ export class FunderDetailEditComponent {
       name: this.nameFormArray(),
       acronym: this.fb.control(this.funder()?.acronym ?? '', {
         nonNullable: true,
-        validators: [Validators.minLength(1), Validators.pattern(/\S/)],
+        validators: [Validators.pattern(/\S/)],
       }),
       crossRefDoi: this.fb.control(this.funder()?.crossRefDoi),
       risId: this.fb.control(this.funder()?.risId),
@@ -128,7 +128,7 @@ export class FunderDetailEditComponent {
       phone: this.fb.control(this.funder()?.phone),
       website: this.fb.control(this.funder()?.website ?? '', {
         nonNullable: true,
-        validators: [Validators.minLength(1), Validators.pattern(/\S/)],
+        validators: [Validators.pattern(/\S/)],
       }),
       submissionSystem: this.fb.control(this.funder()?.submissionSystem),
       externallyAdministered: this.fb.control(

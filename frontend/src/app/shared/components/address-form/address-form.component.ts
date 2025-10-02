@@ -62,16 +62,16 @@ export class AddressFormFactory {
     return this.fb.group<AddressFrom>({
       streetLine: this.fb.control(postAddress?.streetLine ?? '', {
         nonNullable: true,
-        validators: [Validators.minLength(1), Validators.pattern(/\S/)],
+        validators: [Validators.pattern(/\S/)],
       }),
       city: this.fb.control(postAddress?.city ?? '', { nonNullable: true }),
       postalCode: this.fb.control(postAddress?.postalCode ?? '', {
         nonNullable: true,
-        validators: [Validators.minLength(1), Validators.pattern(/\S/)],
+        validators: [Validators.pattern(/\S/)],
       }),
       countryCode: this.fb.control(postAddress?.countryCode ?? '', {
         nonNullable: true,
-        validators: [Validators.minLength(1), Validators.pattern(/\S/)],
+        validators: [Validators.pattern(/\S/)],
       }),
     });
   }
