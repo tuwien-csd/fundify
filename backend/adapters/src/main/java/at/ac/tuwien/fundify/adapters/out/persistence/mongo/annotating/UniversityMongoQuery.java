@@ -26,7 +26,8 @@ public class UniversityMongoQuery implements UniversityQuery {
 
     @Override
     public Optional<University> findByAcronym(String acronym) {
-      UniversityMongoEntity entity = UniversityMongoEntity.find("acronym", acronym)
+      String queryString = "{ 'acronym' : { $regex: ?1, $options: 'i' } }";
+      UniversityMongoEntity entity = UniversityMongoEntity.find(queryString, acronym)
                 .firstResult();
         if (entity == null) {
             return Optional.empty();
