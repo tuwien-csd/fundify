@@ -12,6 +12,7 @@ import {
   FormGroup,
   FormsModule,
   NG_VALUE_ACCESSOR,
+  Validators,
 } from '@angular/forms';
 import { POST_ADDRESS_LABELS, VALIDATORS } from '../../shared.constants';
 import { wrapLabelRequiredOrOptional } from '../../utils/display-util';
@@ -61,13 +62,16 @@ export class AddressFormFactory {
     return this.fb.group<AddressFrom>({
       streetLine: this.fb.control(postAddress?.streetLine ?? '', {
         nonNullable: true,
+        validators: [Validators.minLength(1), Validators.pattern(/\S/)],
       }),
       city: this.fb.control(postAddress?.city ?? '', { nonNullable: true }),
       postalCode: this.fb.control(postAddress?.postalCode ?? '', {
         nonNullable: true,
+        validators: [Validators.minLength(1), Validators.pattern(/\S/)],
       }),
       countryCode: this.fb.control(postAddress?.countryCode ?? '', {
         nonNullable: true,
+        validators: [Validators.minLength(1), Validators.pattern(/\S/)],
       }),
     });
   }

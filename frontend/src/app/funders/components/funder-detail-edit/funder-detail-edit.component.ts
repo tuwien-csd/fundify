@@ -16,6 +16,7 @@ import {
   FormGroup,
   FormsModule,
   ReactiveFormsModule,
+  Validators
 } from '@angular/forms';
 import { ViewEnum } from '../../../shared/models/enums/view.enum';
 import { BUTTON_LABELS } from '../../../shared/shared.constants';
@@ -119,6 +120,7 @@ export class FunderDetailEditComponent {
       name: this.nameFormArray(),
       acronym: this.fb.control(this.funder()?.acronym ?? '', {
         nonNullable: true,
+        validators: [Validators.minLength(1), Validators.pattern(/\S/)],
       }),
       crossRefDoi: this.fb.control(this.funder()?.crossRefDoi),
       risId: this.fb.control(this.funder()?.risId),
@@ -126,10 +128,11 @@ export class FunderDetailEditComponent {
       phone: this.fb.control(this.funder()?.phone),
       website: this.fb.control(this.funder()?.website ?? '', {
         nonNullable: true,
+        validators: [Validators.minLength(1), Validators.pattern(/\S/)],
       }),
       submissionSystem: this.fb.control(this.funder()?.submissionSystem),
       externallyAdministered: this.fb.control(
-        this.funder()?.externallyAdministered
+          this.funder()?.externallyAdministered
       ),
     });
   });
