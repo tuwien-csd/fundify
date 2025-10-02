@@ -45,7 +45,7 @@ import {
 
 type FunderDetailsForm = {
   name: FormArray;
-  acronym: FormControl<string | null | undefined>;
+  acronym: FormControl<string>;
   risId: FormControl<string | null | undefined>;
   crossRefDoi: FormControl<string | null | undefined>;
   postAddress: FormGroup;
@@ -117,7 +117,9 @@ export class FunderDetailEditComponent {
   detailsForm = computed(() => {
     return this.fb.group<FunderDetailsForm>({
       name: this.nameFormArray(),
-      acronym: this.fb.control(this.funder()?.acronym),
+      acronym: this.fb.control(this.funder()?.acronym ?? '', {
+        nonNullable: true,
+      }),
       crossRefDoi: this.fb.control(this.funder()?.crossRefDoi),
       risId: this.fb.control(this.funder()?.risId),
       postAddress: this.addressForm(),
@@ -138,7 +140,7 @@ export class FunderDetailEditComponent {
     return {
       // form is already validated
       name: form.name,
-      acronym: form.acronym ?? undefined,
+      acronym: form.acronym ?? '',
       postAddress: form.postAddress,
       phone: form.phone ?? undefined,
       crossRefDoi: form.crossRefDoi ?? undefined,

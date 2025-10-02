@@ -8,6 +8,7 @@ public record FunderCreateWebModel(
     List<TranslatedTextWebModel> name,
     @Schema(required = true)
     String website,
+    @Schema(required = true)
     String acronym,
     String risId,
     List<IdentifierWebModel> identifiers,
