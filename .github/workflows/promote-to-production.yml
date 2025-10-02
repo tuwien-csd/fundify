@@ -79,18 +79,18 @@ jobs:
           docker tag "${SRC_IMAGE}" "${PROD_IMAGE_BASE}:${FULL_TAG_WITH_SHA}"
           docker tag "${SRC_IMAGE}" "${PROD_IMAGE_BASE}:latest"
           
-          # Get the image digest
-          echo "Getting digest of retagged image..."
-          # extracts the "sha256:abcdef...." from the output of "docker inspect"
-          DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' "${PROD_IMAGE_BASE}:${FULL_TAG_WITH_SHA}" | cut -d'@' -f2)
-          echo "Image digest: ${DIGEST}"
-          echo "digest=${DIGEST}" >> "$GITHUB_OUTPUT"
-
           echo "Pushing to production registry..."
           docker push "${PROD_IMAGE_BASE}:${SRC_TAG}"
           docker push "${PROD_IMAGE_BASE}:${VERSION}"
           docker push "${PROD_IMAGE_BASE}:${FULL_TAG_WITH_SHA}"
-          docker push "${PROD_IMAGE_BASE}:latest"
+          
+          # Note: Since we change the image name from staging to prod, the digest also changes.
+          # Capture digest from last push output
+          PUSH_OUTPUT=$(docker push "${PROD_IMAGE_BASE}:latest")
+          echo "$PUSH_OUTPUT"
+          DIGEST=$(echo "$PUSH_OUTPUT" | grep -oP 'digest: \K[^ ]+' | tail -1)
+          echo "Image digest from push: ${DIGEST}"
+          echo "digest=${DIGEST}" >> "$GITHUB_OUTPUT"
 
           echo "Logging out..."
           docker logout "${REGISTRY}"
@@ -161,19 +161,19 @@ jobs:
           docker tag "${SRC_IMAGE}" "${PROD_IMAGE_BASE}:${FULL_TAG_WITH_SHA}"
           docker tag "${SRC_IMAGE}" "${PROD_IMAGE_BASE}:latest"
           
-          # Get the image digest
-          echo "Getting digest of retagged image..."
-          # extracts the "sha256:abcdef...." from the output of "docker inspect"
-          # Note: Since we change the image name from staging to prod, the digest also changes.
-          DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' "${PROD_IMAGE_BASE}:${FULL_TAG_WITH_SHA}" | cut -d'@' -f2)
-          echo "Image digest: ${DIGEST}"
-          echo "digest=${DIGEST}" >> "$GITHUB_OUTPUT"
-
           echo "Pushing to production registry..."
           docker push "${PROD_IMAGE_BASE}:${SRC_TAG}"
           docker push "${PROD_IMAGE_BASE}:${VERSION}"
           docker push "${PROD_IMAGE_BASE}:${FULL_TAG_WITH_SHA}"
           docker push "${PROD_IMAGE_BASE}:latest"
+          
+          # Note: Since we change the image name from staging to prod, the digest also changes.
+          # Capture digest from last push output
+          PUSH_OUTPUT=$(docker push "${PROD_IMAGE_BASE}:latest")
+          echo "$PUSH_OUTPUT"
+          DIGEST=$(echo "$PUSH_OUTPUT" | grep -oP 'digest: \K[^ ]+' | tail -1)
+          echo "Image digest from push: ${DIGEST}"
+          echo "digest=${DIGEST}" >> "$GITHUB_OUTPUT"
 
           echo "Logging out..."
           docker logout "${REGISTRY}"
