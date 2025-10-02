@@ -1,4 +1,4 @@
-name: deploy-to-production
+name: Promote Docker Images to Production
 
 on:
   workflow_dispatch:
@@ -65,24 +65,30 @@ jobs:
 
           echo "Pulling ${SRC_IMAGE} from staging..."
           docker pull "${SRC_IMAGE}"
-          
-          # Get the image digest
-          # extracts the "sha256:abcdef...." from the output of "docker inspect"
-          DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' "${SRC_IMAGE}" | cut -d'@' -f2)
-          echo "Image digest: ${DIGEST}"
-          echo "digest=${DIGEST}" >> "$GITHUB_OUTPUT"
 
           echo "Logging into production registry..."
           echo "${PROD_PASS}" | docker login "${REGISTRY}" -u "${PROD_USER}" --password-stdin
 
+          FULL_IMAGE_TAG_WITH_SHA="${PROD_IMAGE_BASE}:${VERSION}-${{ github.sha }}"
+          echo "Determined full image tag: ${FULL_IMAGE_TAG_WITH_SHA}"
+          echo "image_tag=${FULL_IMAGE_TAG_WITH_SHA}" >> "$GITHUB_OUTPUT"
+          
           echo "Retagging for production..."
           docker tag "${SRC_IMAGE}" "${PROD_IMAGE_BASE}:${SRC_TAG}"
           docker tag "${SRC_IMAGE}" "${PROD_IMAGE_BASE}:${VERSION}"
+          docker tag "${SRC_IMAGE}" "${PROD_IMAGE_BASE}:${FULL_IMAGE_TAG_WITH_SHA}"
           docker tag "${SRC_IMAGE}" "${PROD_IMAGE_BASE}:latest"
+          
+          # Get the image digest
+          # extracts the "sha256:abcdef...." from the output of "docker inspect"
+          DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' "${FULL_IMAGE_TAG_WITH_SHA}" | cut -d'@' -f2)
+          echo "Image digest: ${DIGEST}"
+          echo "digest=${DIGEST}" >> "$GITHUB_OUTPUT"
 
           echo "Pushing to production registry..."
           docker push "${PROD_IMAGE_BASE}:${SRC_TAG}"
           docker push "${PROD_IMAGE_BASE}:${VERSION}"
+          docker push "${PROD_IMAGE_BASE}:${FULL_IMAGE_TAG_WITH_SHA}"
           docker push "${PROD_IMAGE_BASE}:latest"
 
           echo "Logging out..."
@@ -141,11 +147,9 @@ jobs:
           echo "Pulling ${SRC_IMAGE} from staging..."
           docker pull "${SRC_IMAGE}"
           
-          # Get the image digest
-          # extracts the "sha256:abcdef...." from the output of "docker inspect"
-          DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' "${SRC_IMAGE}" | cut -d'@' -f2)
-          echo "Image digest: ${DIGEST}"
-          echo "digest=${DIGEST}" >> "$GITHUB_OUTPUT"
+          FULL_IMAGE_TAG_WITH_SHA="${PROD_IMAGE_BASE}:${VERSION}-${{ github.sha }}"
+          echo "image_tag=${FULL_IMAGE_TAG_WITH_SHA}" >> "$GITHUB_OUTPUT"
+          echo "Determined full image tag: ${FULL_IMAGE_TAG_WITH_SHA}"
 
           echo "Logging into production registry..."
           echo "${PROD_PASS}" | docker login "${REGISTRY}" -u "${PROD_USER}" --password-stdin
@@ -153,11 +157,20 @@ jobs:
           echo "Retagging for production..."
           docker tag "${SRC_IMAGE}" "${PROD_IMAGE_BASE}:${SRC_TAG}"
           docker tag "${SRC_IMAGE}" "${PROD_IMAGE_BASE}:${VERSION}"
+          docker tag "${SRC_IMAGE}" "${PROD_IMAGE_BASE}:${FULL_IMAGE_TAG_WITH_SHA}"
           docker tag "${SRC_IMAGE}" "${PROD_IMAGE_BASE}:latest"
+          
+          # Get the image digest
+          # extracts the "sha256:abcdef...." from the output of "docker inspect"
+          # Note: Since we change the image name from staging to prod, the digest also changes.
+          DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' "${FULL_IMAGE_TAG_WITH_SHA}" | cut -d'@' -f2)
+          echo "Image digest: ${DIGEST}"
+          echo "digest=${DIGEST}" >> "$GITHUB_OUTPUT"
 
           echo "Pushing to production registry..."
           docker push "${PROD_IMAGE_BASE}:${SRC_TAG}"
           docker push "${PROD_IMAGE_BASE}:${VERSION}"
+          docker push "${PROD_IMAGE_BASE}:${FULL_IMAGE_TAG_WITH_SHA}"
           docker push "${PROD_IMAGE_BASE}:latest"
 
           echo "Logging out..."
