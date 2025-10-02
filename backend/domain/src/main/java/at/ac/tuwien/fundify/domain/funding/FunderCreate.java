@@ -18,6 +18,7 @@ public record FunderCreate(
     // optional fields
     RisId risId,
     String emailDomain,
+    @NonNull
     String acronym,
     List<Identifier> identifiers,
     String submissionSystem,
