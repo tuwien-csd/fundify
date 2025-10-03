@@ -39,39 +39,16 @@ See the [backend README](./backend/README.md) for development setup and further 
 ### Frontend Architecture & Stack
 
 #### Technology Stack
-- **Angular 20**: The frontend is built with Angular 20.1.4, a modern TypeScript-based web framework.
+- **Angular 20**: The frontend is built with Angular 20, a modern TypeScript-based web framework.
 - **Angular Material**: Used for UI components.
 - **NgRx**: Implements state management using NgRx (Store, Effects, Entity, Router-Store, Signals).
 - **TailwindCSS**: Used for styling.
 - **OpenAPI**: Integrates with backend using OpenAPI-generated TypeScript clients.
-- **OAuth2/OIDC**: Authentication via angular-oauth2-oidc library.
-- **RxJS**: For reactive programming.
-
 
 #### Requirements
-- Node.js 22.18
-- Modern web browser
-- Connection to the backend API
-
 See the [frontend README](./frontend/README.md) for development setup.
 
 ### Technical Debt
-
-This section documents known technical debt in the project to increase visibility and prioritization of improvement efforts.
-
-#### Current Technical Debt Items
-
-| Area | Description                                                                        | Priority | Proposed Solution |
-|------|------------------------------------------------------------------------------------|----------|-------------------|
-| Frontend | Lack of responsive design, inconsistent implementation through partial refactoring | High     | Complete documentation and implementation guide |
-| Backend | MongoDB connection lacks proper error handling and retry logic                     | High     | Implement resilience patterns with circuit breaker |
-| Testing | E2E test coverage below 60% for critical user journeys                             | Medium   | Add additional Playwright tests for core workflows |
-
-#### Technical Debt Management Strategy
-
-Our approach to managing technical debt:
-
-1. **Identification**: Regularly review and document technical debt during sprint retrospectives
-2. **Prioritization**: Assess impact on development velocity, system stability, and security
-3. **Allocation**: Dedicate 20% of each sprint to addressing high-priority technical debt
-4. **Prevention**: Code reviews, architecture discussions, and adherence to coding standards
+This project has been developed by various contributors with different experience levels over the course of several years. During the development effort, some technical debt has accrued. Given the limited resources, it is not possible to address all technical debt items at once. The following section documents the current technical debt items.
+- Backend: [backend README](./backend/README.md#technical-debt)
+- Frontend: [frontend README](./frontend/README.md#technical-debt)
