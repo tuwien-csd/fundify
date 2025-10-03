@@ -15,8 +15,8 @@ export const E2E_CREDENTIALS = {
     USERNAME: 'ffg',
     PASSWORD: 'ffg',
   },
-  INSTITUTION: {
-    FILE: 'e2e/config/.auth/institution.json',
+  ANNOTATOR: {
+    FILE: 'e2e/config/.auth/annotator.json',
     USERNAME: 'tuwien',
     PASSWORD: 'tuwien',
   },
