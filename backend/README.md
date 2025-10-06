@@ -71,4 +71,3 @@ docker-compose -f compose/docker-compose.development.yaml up -d
 - Lack of input validation
   - Input validation of incoming POST/PUT requests is mostly missing
   - **Action item: Add input validation for all incoming requests**
-- 
