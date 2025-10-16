@@ -73,6 +73,7 @@ public class RisSynergyNetworkAdapter implements FundingRemoteRepository {
       List<RisFunding> calls = client.getFundings(RisFundingType.CALL);
 
       return calls.stream()
+          .filter(it ->  RisFundingType.CALL == it.getType() ) //Some providers incorrectly return programs as calls
           .map(RisCall.class::cast)
           .map(f -> RisCallMapper.INSTANCE.toDomain(f, memberId))
           .toList();
@@ -99,6 +100,7 @@ public class RisSynergyNetworkAdapter implements FundingRemoteRepository {
       List<RisFunding> calls = client.getFundings(RisFundingType.ONGOING_CALL);
 
       return calls.stream()
+          .filter(it ->  RisFundingType.CALL == it.getType() ) //Some providers incorrectly return programs as calls
           .map(RisCall.class::cast)
           .map(f -> RisCallMapper.INSTANCE.toDomain(f, memberId))
           .toList();
@@ -125,6 +127,7 @@ public class RisSynergyNetworkAdapter implements FundingRemoteRepository {
       List<RisFunding> programs = client.getFundings(RisFundingType.PROGRAMME);
 
       return programs.stream()
+          .filter(it ->  RisFundingType.PROGRAMME == it.getType() ) //Some providers incorrectly return calls as programs
           .map(RisProgramme.class::cast)
           .map(f -> RisProgramMapper.INSTANCE.toDomain(f, memberId))
           .toList();
