@@ -5,7 +5,7 @@ import io.quarkus.arc.properties.IfBuildProperty;
 import io.quarkus.runtime.StartupEvent;
 import io.quarkus.scheduler.Scheduled;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.enterprise.event.Observes;
+import jakarta.enterprise.event.ObservesAsync;
 import lombok.extern.jbosslog.JBossLog;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
@@ -25,7 +25,7 @@ public class DatabaseSyncScheduler {
     }
 
     // Trigger synchronization once at application startup
-    void onStart(@Observes StartupEvent ev) {
+    void onStart(@ObservesAsync StartupEvent ev) {
       if (runSyncOnStartup) {
         log.info("Triggering initial synchronization on startup.");
         synchronizeExternalFundingData();
