@@ -46,7 +46,7 @@ fundify:
           tokenpath: "https://tsso.fwf.ac.at/auth/realms/sso/protocol/openid-connect/token"
       fwf:
         id: "fwf"
-        enabled: true
+        enabled: false
         base-url: "https://risapi.prod.fwf.ac.at"
         credentials:
           id: "<set this in your .env in the bootstrap module>"
@@ -55,7 +55,7 @@ fundify:
       wwtf:
         # No auth needed, API is public
         id: "wwtf"
-        enabled: false
+        enabled: true
         base-url: "https://fundingportal.wwtf.at"
 
 frontend:
@@ -223,6 +223,7 @@ cron:
   fundify:
     external-fundings:
       run-sync-on-startup: false
+      sync-enabled: true
     auth:
       permissions:
         enableDebugLogging: false

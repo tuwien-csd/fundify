@@ -168,6 +168,7 @@ export class TranslatedTextFieldFormFactory {
   ): ValidatorFn | ValidatorFn[] | null {
     const validators = [];
     validators.push(Validators.minLength(minLength));
+    validators.push(Validators.pattern(/\S/));
     if (required) {
       validators.push(Validators.required);
     }

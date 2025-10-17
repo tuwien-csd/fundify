@@ -2284,9 +2284,7 @@ export interface paths {
         /** Get All */
         get: {
             parameters: {
-                query?: {
-                    universityId?: string;
-                };
+                query?: never;
                 header?: never;
                 path?: never;
                 cookie?: never;
@@ -2920,7 +2918,7 @@ export interface components {
         FunderCreateWebModel: {
             name: components["schemas"]["TranslatedTextWebModel"][];
             website: string;
-            acronym?: string;
+            acronym: string;
             risId?: string;
             identifiers?: components["schemas"]["IdentifierWebModel"][];
             submissionSystem?: string;
@@ -2964,8 +2962,8 @@ export interface components {
         /** Format: date-time */
         LocalDateTime: string;
         MonetaryNumberWebModel: {
-            amount: number;
-            currency: components["schemas"]["ECurrencyWebModel"];
+            amount?: number;
+            currency?: components["schemas"]["ECurrencyWebModel"];
         };
         PostAddressWebModel: {
             streetLine: string;

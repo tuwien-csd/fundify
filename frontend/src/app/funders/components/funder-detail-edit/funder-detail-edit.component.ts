@@ -16,6 +16,7 @@ import {
   FormGroup,
   FormsModule,
   ReactiveFormsModule,
+  Validators
 } from '@angular/forms';
 import { ViewEnum } from '../../../shared/models/enums/view.enum';
 import { BUTTON_LABELS } from '../../../shared/shared.constants';
@@ -45,7 +46,7 @@ import {
 
 type FunderDetailsForm = {
   name: FormArray;
-  acronym: FormControl<string | null | undefined>;
+  acronym: FormControl<string>;
   risId: FormControl<string | null | undefined>;
   crossRefDoi: FormControl<string | null | undefined>;
   postAddress: FormGroup;
@@ -117,17 +118,21 @@ export class FunderDetailEditComponent {
   detailsForm = computed(() => {
     return this.fb.group<FunderDetailsForm>({
       name: this.nameFormArray(),
-      acronym: this.fb.control(this.funder()?.acronym),
+      acronym: this.fb.control(this.funder()?.acronym ?? '', {
+        nonNullable: true,
+        validators: [Validators.pattern(/\S/)],
+      }),
       crossRefDoi: this.fb.control(this.funder()?.crossRefDoi),
       risId: this.fb.control(this.funder()?.risId),
       postAddress: this.addressForm(),
       phone: this.fb.control(this.funder()?.phone),
       website: this.fb.control(this.funder()?.website ?? '', {
         nonNullable: true,
+        validators: [Validators.pattern(/\S/)],
       }),
       submissionSystem: this.fb.control(this.funder()?.submissionSystem),
       externallyAdministered: this.fb.control(
-        this.funder()?.externallyAdministered
+          this.funder()?.externallyAdministered
       ),
     });
   });
@@ -138,7 +143,7 @@ export class FunderDetailEditComponent {
     return {
       // form is already validated
       name: form.name,
-      acronym: form.acronym ?? undefined,
+      acronym: form.acronym ?? '',
       postAddress: form.postAddress,
       phone: form.phone ?? undefined,
       crossRefDoi: form.crossRefDoi ?? undefined,
