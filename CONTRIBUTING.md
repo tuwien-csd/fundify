@@ -10,7 +10,6 @@ If you then still feel the need to ask a question and need clarification, we rec
 
 - Contact us through the [contact form](https://fundify.arisnet.ac.at/contact) on our website.
 - Provide as much context as you can about what you’re running into.
-- Provide project and platform versions (nodejs, npm, etc), depending on what seems relevant.
 
 ## I Want To Contribute
 
@@ -27,12 +26,18 @@ A good bug report shouldn’t leave others needing to chase you up for more info
 
 #### How Do I Submit a Good Bug Report?
 
-We use GitHub issues to track bugs and errors. If you run into an issue with the project:
+If you run into an issue with the project, go to FUNDify's [contact page](https://fundify.arisnet.ac.at/contact) to report the bug. Please include the following information in your report:
 
-- Go to FUNDify's [contact page](https://fundify.arisnet.ac.at/contact), select *Error Report* in the **Category** field and complete the form.
-- Explain the behavior you would expect and the actual behavior.
-- Please provide as much context as possible and describe the *reproduction steps* that someone else can follow to recreate the issue on their own. 
-- Provide the information you collected in the previous section.
+- **Category**: Select _Error Report_ as the **Category** in the contact form.
+- **Description**: Give us a clear description of the bug.
+- **Steps to Reproduce**: Provide a detailed step-by-step description of how to reproduce the bug (e.g. text inputs).
+- **Expected Behavior**: Describe what you expected to happen.
+- **Actual Behavior**: Describe what actually happened.
+- **Your Environment**: Provide information about your environment like:
+  - Operating System and Version
+  - Browser and Version
+  - Device
+- **Stack Trace**: Provide a stack trace of the bug if available.
 
 ### Suggesting Enhancements
 
@@ -44,9 +49,10 @@ This section guides you through submitting an enhancement suggestion for Fundify
 - Find out whether your idea fits with the scope and aims of the project. It’s up to you to make a strong case to convince the project’s developers of the advantages of this feature. Keep in mind that we want features that will be useful to the majority of our users and not just a small subset. 
 
 #### How Do I Submit a Good Enhancement Suggestion?
-Enhancement suggestions are tracked as GitHub issues.
 
-- Go to FUNDify's [contact page](https://fundify.arisnet.ac.at/contact), select *Other* in the **Category** field and complete the form.
+If you have any suggestions to enhance FUNDify, go to FUNDify's [contact page](https://fundify.arisnet.ac.at/contact) and make sure to include the following information in your request:
+
+- Select *Other* as the **Category** in the contact form.
 - Provide a **step-by-step description of the suggested enhancement** in as many details as possible.
 - Describe the current behavior and explain which behavior you expected to see instead and why. At this point you can also tell which alternatives do not work for you.
 - **Explain why this enhancement would be useful** to most Fundify users. You may also want to point out the other projects that solved it better and which could serve as inspiration.
