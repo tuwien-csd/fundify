@@ -4,7 +4,7 @@
 
 If you think you have found a vulnerability in this repository, please report it to us through coordinated disclosure.
 
-**Please do not report security vulnerabilities through public issues, discussions, or change requests.**
+**Please do not report security vulnerabilities in public discussions or via any other channel.**
 
 Instead, report it using our [contact page](https://fundify.arisnet.ac.at/contact) on the FUNDify website. Select *Other* as the **Category**, and complete the form.
 
