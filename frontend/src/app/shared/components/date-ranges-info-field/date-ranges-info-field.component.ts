@@ -1,27 +1,27 @@
 import {
+  AfterViewInit,
   Component,
+  inject,
+  Injector,
   Input,
   OnDestroy,
   OnInit,
-  inject,
-  Injector,
-  AfterViewInit,
 } from '@angular/core';
 import {
   AbstractControl,
   ControlValueAccessor,
+  FormsModule,
+  NG_VALIDATORS,
+  NG_VALUE_ACCESSOR,
+  NgControl,
+  ReactiveFormsModule,
+  TouchedChangeEvent,
   UntypedFormArray,
   UntypedFormBuilder,
   UntypedFormGroup,
-  NG_VALIDATORS,
-  NG_VALUE_ACCESSOR,
   Validator,
   ValidatorFn,
   Validators,
-  FormsModule,
-  ReactiveFormsModule,
-  NgControl,
-  TouchedChangeEvent,
 } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { DateInfoRange } from '../../models/interfaces/date-info-range.interface';
@@ -65,6 +65,7 @@ export class DateRangesInfoFieldComponent
   dateRangesInfoForm: UntypedFormGroup;
 
   @Input() required: boolean = false;
+  @Input() descriptionRequired: boolean = false;
   @Input() label: string = '';
   @Input() labelRange: string = '';
   @Input() labelInfo: string = '';
