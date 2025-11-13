@@ -12,17 +12,12 @@ If you then still feel the need to ask a question and need clarification, we rec
 - Provide as much context as you can about what you’re running into.
 
 ## I Want To Contribute
+Work in Progress
 
 ### Reporting Bugs
 #### Before Submitting a Bug Report
 
-A good bug report shouldn’t leave others needing to chase you up for more information. Therefore, we ask you to investigate carefully, collect information and describe the issue in detail in your report. Please complete the following steps in advance to help us fix any potential bug as fast as possible.
-
-- Determine if your bug is really a bug and not an error on your side e.g. using incompatible environment components/versions (Make sure that you have read the documentation).
-- Collect information about the bug:
-  - Stack trace (Traceback)
-  - Possibly your input and the output
-  - Can you reliably reproduce the issue? 
+A good bug report shouldn’t leave others needing to chase you up for more information. Therefore, we ask you to investigate carefully, collect information and describe the issue in detail in your report.
 
 #### How Do I Submit a Good Bug Report?
 
@@ -37,11 +32,11 @@ If you run into an issue with the project, go to FUNDify's [contact page](https:
   - Operating System and Version
   - Browser and Version
   - Device
-- **Stack Trace**: Provide a stack trace of the bug if available.
+- **Console logs**: If possible: Include the console logs of the browser.
 
 ### Suggesting Enhancements
 
-This section guides you through submitting an enhancement suggestion for Fundify, **including completely new features and minor improvements to existing functionality**. Following these guidelines will help maintainers and the community to understand your suggestion and find related suggestions.
+This section guides you through submitting an enhancement suggestion for FUNDify, **including completely new features and minor improvements to existing functionality**. Following these guidelines will help maintainers and the community to understand your suggestion and find related suggestions.
 
 #### Before Submitting an Enhancement
 
@@ -55,4 +50,4 @@ If you have any suggestions to enhance FUNDify, go to FUNDify's [contact page](h
 - Select *Other* as the **Category** in the contact form.
 - Provide a **step-by-step description of the suggested enhancement** in as many details as possible.
 - Describe the current behavior and explain which behavior you expected to see instead and why. At this point you can also tell which alternatives do not work for you.
-- **Explain why this enhancement would be useful** to most Fundify users. You may also want to point out the other projects that solved it better and which could serve as inspiration.
+- **Explain why this enhancement would be useful** to most FUNDify users. You may also want to point out the other projects that solved it better and which could serve as inspiration.
