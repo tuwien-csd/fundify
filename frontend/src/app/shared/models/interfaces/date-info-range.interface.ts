@@ -3,6 +3,6 @@ import { TranslatedText } from './translated-text.interface';
 
 export interface DateInfoRange {
   duration: DateRange;
-  description: TranslatedText[];
+  description?: TranslatedText[];
   number?: number;
 }

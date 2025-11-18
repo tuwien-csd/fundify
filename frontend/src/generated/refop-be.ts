@@ -2755,7 +2755,7 @@ export interface components {
             /** Format: int32 */
             number?: number;
             duration: components["schemas"]["DateRangeWebModel"];
-            description: components["schemas"]["TranslatedTextWebModel"][];
+            description?: components["schemas"]["TranslatedTextWebModel"][];
         };
         CallUpdateWebModel: {
             id: string;
@@ -2865,8 +2865,8 @@ export interface components {
             env?: string;
         };
         DateRangeWebModel: {
-            start: components["schemas"]["LocalDateTime"];
-            end: components["schemas"]["LocalDateTime"];
+            start?: components["schemas"]["LocalDateTime"];
+            end?: components["schemas"]["LocalDateTime"];
         };
         /** @enum {string} */
         EAnswerYNWebModel: "Yes" | "No";

@@ -190,8 +190,8 @@ export class CallsComponent {
     }
 
     const now = new Date();
-    const startDate = this.getCallStartDate(call.callStages ?? []);
-    const endDate = this.getCallEndDate(call.callStages ?? []);
+    const startDate = this.getCallStartDate(call?.callStages ?? []);
+    const endDate = this.getCallEndDate(call?.callStages ?? []);
 
     if (startDate > now) {
       return 'Upcoming';
