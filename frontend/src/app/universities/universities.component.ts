@@ -1,11 +1,4 @@
-import {
-  AfterViewInit,
-  Component,
-  computed,
-  inject,
-  OnInit,
-  ViewChild,
-} from '@angular/core';
+import { Component, computed, inject, OnInit, ViewChild } from '@angular/core';
 import { PermissionService } from '../core/auth/services/permission.service';
 import { AuthService } from '../core/auth/services/auth.service';
 import { TabInfo, TopNavbarComponent } from '../shared/ui/top-navbar.component';
@@ -76,7 +69,7 @@ import { MatFormField } from '@angular/material/form-field';
   templateUrl: './universities.component.html',
   styleUrl: './universities.component.scss',
 })
-export class UniversitiesComponent implements OnInit, AfterViewInit {
+export class UniversitiesComponent implements OnInit {
   permissionService = inject(PermissionService);
   authService = inject(AuthService);
   universitiesStore = inject(UniversitiesStore);
@@ -97,29 +90,27 @@ export class UniversitiesComponent implements OnInit, AfterViewInit {
       label: 'Universities',
     },
   ];
+  displayedColumns: string[] = this.UNIVERSITIES_CONSTANTS.TABLE_COLUMNS.map(
+    (column) => column.field
+  );
+
+  displayedColumnsWithMenu: string[] = [...this.displayedColumns, 'menu'];
+  @ViewChild(MatSort, { static: true }) sort!: MatSort;
+
+  @ViewChild(MatPaginator, { static: true }) paginator!: MatPaginator;
+
   dataSource = computed(() => {
     const dataSource = new MatTableDataSource<UniversityWebModel>(
       this.universitiesStore.entities()
     );
     dataSource.filterPredicate = this.createFilterPredicate();
+    dataSource.sort = this.sort;
+    dataSource.paginator = this.paginator;
     return dataSource;
   });
 
-  displayedColumns: string[] = this.UNIVERSITIES_CONSTANTS.TABLE_COLUMNS.map(
-    (column) => column.field
-  );
-  displayedColumnsWithMenu: string[] = [...this.displayedColumns, 'menu'];
-
-  @ViewChild(MatSort, { static: true }) sort!: MatSort;
-  @ViewChild(MatPaginator, { static: true }) paginator!: MatPaginator;
-
   ngOnInit(): void {
     this.universitiesStore.fetchAll();
-  }
-
-  ngAfterViewInit(): void {
-    this.dataSource().sort = this.sort;
-    this.dataSource().paginator = this.paginator;
   }
 
   applyFilter(event: Event): void {
