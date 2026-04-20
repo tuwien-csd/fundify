@@ -1,20 +1,7 @@
 package at.ac.tuwien.fundify.adapters.in.rest.dto;
 
-import at.ac.tuwien.fundify.adapters.in.rest.dto.enums.EAnswerYNWebModel;
-import at.ac.tuwien.fundify.adapters.in.rest.dto.enums.EAustrianStateWebModel;
-import at.ac.tuwien.fundify.adapters.in.rest.dto.enums.ECallTypeWebModel;
-import at.ac.tuwien.fundify.adapters.in.rest.dto.enums.ECareerStageWebModel;
-import at.ac.tuwien.fundify.adapters.in.rest.dto.enums.EDecisionProcessWebModel;
-import at.ac.tuwien.fundify.adapters.in.rest.dto.enums.EEntryOriginWebModel;
-import at.ac.tuwien.fundify.adapters.in.rest.dto.enums.EFundingCharacteristicWebModel;
-import at.ac.tuwien.fundify.adapters.in.rest.dto.enums.EFundingSchemeWebModel;
-import at.ac.tuwien.fundify.adapters.in.rest.dto.enums.ELanguageWebModel;
-import at.ac.tuwien.fundify.adapters.in.rest.dto.enums.ELegalTypeWebModel;
-import at.ac.tuwien.fundify.adapters.in.rest.dto.enums.EModeOfSubmissionWebModel;
-import at.ac.tuwien.fundify.adapters.in.rest.dto.enums.EPublicationStatusWebModel;
-import at.ac.tuwien.fundify.adapters.in.rest.dto.enums.ERegionalScopeWebModel;
-import at.ac.tuwien.fundify.adapters.in.rest.dto.enums.ESubscriptionStatusWebModel;
-import at.ac.tuwien.fundify.adapters.in.rest.dto.enums.ETargetGroupWebModel;
+import at.ac.tuwien.fundify.adapters.in.rest.dto.enums.*;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -87,6 +74,8 @@ public record CallWebModel (
         List<TranslatedTextWebModel> eligibleApplicants,
         ERegionalScopeWebModel eligibleApplicantsScope,
         List<EAustrianStateWebModel> eligibleApplicantsRegions,
+        List<ECountryWebModel> eligibleTargetRegions,
+        List<ECountryWebModel> eligibleSourceRegions,
         Integer callVolumeProjects,
         MonetaryNumberWebModel callVolumeAmount,
         List<TranslatedTextWebModel> inkindDetails,

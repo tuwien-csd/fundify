@@ -71,6 +71,8 @@ public record CallUpdateWebModel(
         List<TranslatedTextWebModel> eligibleApplicants,
         ERegionalScopeWebModel eligibleApplicantsScope,
         List<EAustrianStateWebModel> eligibleApplicantsRegions,
+        List<ECountryWebModel> eligibleTargetRegions,
+        List<ECountryWebModel> eligibleSourceRegions,
         List<TranslatedTextWebModel> inkindDetails,
         List<TranslatedTextWebModel> overheadDetails,
         List<TranslatedTextWebModel> reportingPeriodDetails,

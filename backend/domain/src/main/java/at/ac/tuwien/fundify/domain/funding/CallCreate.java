@@ -51,6 +51,8 @@ public class CallCreate implements Entity<CallId>, Publishable {
     private List<TranslatedText> eligibleApplicants;
     private ERegionalScope eligibleApplicantsScope;
     private List<EAustrianState> eligibleApplicantsRegions;
+    private List<ECountry> eligibleTargetRegions;
+    private List<ECountry> eligibleSourceRegions;
     private Integer callVolumeProjects;
     private MonetaryNumber callVolumeAmount;
     private List<TranslatedText> inkindDetails;
