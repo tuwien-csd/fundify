@@ -24,10 +24,8 @@ import at.ac.tuwien.fundify.domain.funding.vo.enums.EFundingScheme;
 import at.ac.tuwien.fundify.domain.funding.vo.enums.ELegalType;
 import at.ac.tuwien.fundify.domain.funding.vo.enums.EModeOfSubmission;
 import at.ac.tuwien.fundify.domain.funding.vo.enums.ERegionalScope;
-import at.ac.tuwien.fundify.domain.common.*;
 import at.ac.tuwien.fundify.domain.funding.FunderReference;
 import at.ac.tuwien.fundify.domain.funding.ProgramReference;
-import at.ac.tuwien.fundify.domain.funding.vo.*;
 import at.ac.tuwien.fundify.domain.funding.vo.enums.*;
 import lombok.Data;
 
@@ -73,6 +71,8 @@ public class CallDTO {
     private List<TranslatedText> eligibleApplicants;
     private ERegionalScope eligibleApplicantsScope;
     private List<EAustrianState> eligibleApplicantsRegions;
+    private List<ECountry> eligibleTargetRegions;
+    private List<ECountry> eligibleSourceRegions;
     private Integer callVolumeProjects;
     private MonetaryNumber callVolumeAmount;
     private List<TranslatedText> inkindDetails;
