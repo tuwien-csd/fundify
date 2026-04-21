@@ -199,6 +199,24 @@
             </app-multiple-choice-field>
           </div>
           <div class="detail-item">
+            <app-search-select
+              formControlName="eligibleTargetRegions"
+              [type]="countries"
+              [multiSelect]="true"
+              [label]="CALL_DETAILS_CONSTANTS.ELIGIBLE_TARGET_REGIONS_LABEL"
+            >
+            </app-search-select>
+          </div>
+          <div class="detail-item">
+            <app-search-select
+              formControlName="eligibleSourceRegions"
+              [type]="countries"
+              [multiSelect]="true"
+              [label]="CALL_DETAILS_CONSTANTS.ELIGIBLE_SOURCE_REGIONS_LABEL"
+            >
+            </app-search-select>
+          </div>
+          <div class="detail-item">
             <app-single-choice-field
               formControlName="fundingScheme"
               [type]="fundingSchemes"
