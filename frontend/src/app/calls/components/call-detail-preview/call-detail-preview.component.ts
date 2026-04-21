@@ -233,18 +233,30 @@ export class CallDetailPreviewComponent implements OnInit {
           this.call.eligibleApplicantsScope ??
           CALL_DETAILS_CONSTANTS.PLACEHOLDER,
       },
-      {
-        label: this.CALL_DETAILS_CONSTANTS.ELIGIBLE_APPLICANTS_REGION_LABEL,
-        value:
-          this.call.eligibleApplicantsRegions?.join(', ') ??
-          CALL_DETAILS_CONSTANTS.PLACEHOLDER,
-      },
-      {
-        label: this.CALL_DETAILS_CONSTANTS.MODE_OF_SUBMISSION_LABEL,
-        value:
-          this.call.submissionModes?.join(', ') ??
-          CALL_DETAILS_CONSTANTS.PLACEHOLDER,
-      },
+       {
+         label: this.CALL_DETAILS_CONSTANTS.ELIGIBLE_APPLICANTS_REGION_LABEL,
+         value:
+           this.call.eligibleApplicantsRegions?.join(', ') ??
+           CALL_DETAILS_CONSTANTS.PLACEHOLDER,
+       },
+       {
+         label: this.CALL_DETAILS_CONSTANTS.ELIGIBLE_TARGET_REGIONS_LABEL,
+         value:
+           this.call.eligibleTargetRegions?.join(', ') ??
+           CALL_DETAILS_CONSTANTS.PLACEHOLDER,
+       },
+       {
+         label: this.CALL_DETAILS_CONSTANTS.ELIGIBLE_SOURCE_REGIONS_LABEL,
+         value:
+           this.call.eligibleSourceRegions?.join(', ') ??
+           CALL_DETAILS_CONSTANTS.PLACEHOLDER,
+       },
+       {
+         label: this.CALL_DETAILS_CONSTANTS.MODE_OF_SUBMISSION_LABEL,
+         value:
+           this.call.submissionModes?.join(', ') ??
+           CALL_DETAILS_CONSTANTS.PLACEHOLDER,
+       },
       {
         label: this.CALL_DETAILS_CONSTANTS.CHARACTERISTICS_LABEL,
         value:
