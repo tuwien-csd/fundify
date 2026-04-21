@@ -6,7 +6,6 @@ import at.ac.tuwien.fundify.adapters.out.persistence.mongo.common.MongoCrossRefe
 import at.ac.tuwien.fundify.adapters.out.persistence.mongo.common.MongoEntityIdMapper;
 import at.ac.tuwien.fundify.adapters.out.persistence.mongo.common.ObjectIdUtils;
 import at.ac.tuwien.fundify.domain.common.CallOwner;
-import at.ac.tuwien.fundify.domain.common.FunderId;
 import at.ac.tuwien.fundify.domain.dto.CallDTO;
 import at.ac.tuwien.fundify.domain.funding.Call;
 import at.ac.tuwien.fundify.domain.funding.CallUpdate;
@@ -37,34 +36,17 @@ public interface CallMongoEntityMapper {
     @Mapping(target = "externalIdentifier.identifiers", source = "identifiers")
     @Mapping(target = "funder", source = "funderId")
     @Mapping(target = "partOf", source = "partOfId")
-    @Mapping(target = "jointCallPartner", source = "otherJointCallpartner")
     @Mapping(target = "callOwner", source = "." , qualifiedByName = "resolveCallOwner")
     Call toDomain(CallMongoEntity callMongoEntity, @Context MongoCrossReferenceResolver resolver);
     List<Call> toDomain(List<CallMongoEntity> callMongoEntity, @Context MongoCrossReferenceResolver resolver);
 
     @AfterMapping
     default void postProcess(
-            CallMongoEntity callMongoEntity,
-            @MappingTarget Call call
+      CallMongoEntity callMongoEntity,
+      @MappingTarget Call call,
+      @Context MongoCrossReferenceResolver resolver
     ) {
-        if (callMongoEntity.registeredJointCallPartnerIds == null || callMongoEntity.registeredJointCallPartnerIds.isEmpty()) {
-            return;
-        }
-        List<FunderReference> jointCallPartner = call.getJointCallPartner();
-        callMongoEntity.registeredJointCallPartnerIds.forEach(
-                registeredJointCallPartnerId -> {
-                    FunderReference funderReference = new FunderReference(
-                            new FunderId(registeredJointCallPartnerId.toHexString()),
-                            null,
-                            null,
-                            null,
-                            null,
-                            null,
-                            null
-                    );
-                    jointCallPartner.add(funderReference);
-                });
-        call.setJointCallPartner(jointCallPartner);
+        call.setJointCallPartner(resolveJointCallPartners(callMongoEntity, resolver));
     }
 
 
