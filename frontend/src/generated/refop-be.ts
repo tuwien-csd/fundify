@@ -2721,6 +2721,8 @@ export interface components {
             eligibleApplicants?: components["schemas"]["TranslatedTextWebModel"][];
             eligibleApplicantsScope?: components["schemas"]["ERegionalScopeWebModel"];
             eligibleApplicantsRegions?: components["schemas"]["EAustrianStateWebModel"][];
+            eligibleTargetRegions?: components["schemas"]["ECountryWebModel"][];
+            eligibleSourceRegions?: components["schemas"]["ECountryWebModel"][];
             inkindDetails?: components["schemas"]["TranslatedTextWebModel"][];
             overheadDetails?: components["schemas"]["TranslatedTextWebModel"][];
             reportingPeriodDetails?: components["schemas"]["TranslatedTextWebModel"][];
@@ -2795,6 +2797,8 @@ export interface components {
             eligibleApplicants?: components["schemas"]["TranslatedTextWebModel"][];
             eligibleApplicantsScope?: components["schemas"]["ERegionalScopeWebModel"];
             eligibleApplicantsRegions?: components["schemas"]["EAustrianStateWebModel"][];
+            eligibleTargetRegions?: components["schemas"]["ECountryWebModel"][];
+            eligibleSourceRegions?: components["schemas"]["ECountryWebModel"][];
             inkindDetails?: components["schemas"]["TranslatedTextWebModel"][];
             overheadDetails?: components["schemas"]["TranslatedTextWebModel"][];
             reportingPeriodDetails?: components["schemas"]["TranslatedTextWebModel"][];
@@ -2842,6 +2846,8 @@ export interface components {
             eligibleApplicants?: components["schemas"]["TranslatedTextWebModel"][];
             eligibleApplicantsScope?: components["schemas"]["ERegionalScopeWebModel"];
             eligibleApplicantsRegions?: components["schemas"]["EAustrianStateWebModel"][];
+            eligibleTargetRegions?: components["schemas"]["ECountryWebModel"][];
+            eligibleSourceRegions?: components["schemas"]["ECountryWebModel"][];
             /** Format: int32 */
             callVolumeProjects?: number;
             callVolumeAmount?: components["schemas"]["MonetaryNumberWebModel"];
@@ -2876,6 +2882,8 @@ export interface components {
         ECallTypeWebModel: "Call" | "Ongoing Call";
         /** @enum {string} */
         ECareerStageWebModel: "Experts" | "Students" | "Doctoral students" | "Early stage researchers" | "Mid-career researchers" | "Established researchers";
+        /** @enum {string} */
+        ECountryWebModel: "Afghanistan" | "Egypt" | "Albania" | "Algeria" | "Andorra" | "Angola" | "Antigua and Barbuda" | "Equatorial Guinea" | "Argentina" | "Armenia" | "Azerbaijan" | "Ethiopia" | "Australia" | "Bahamas" | "Bahrain" | "Bangladesh" | "Barbados" | "Belarus" | "Belgium" | "Belize" | "Benin" | "Bhutan" | "Bolivia" | "Bosnia und Herzegovina" | "Botswana" | "Brazil" | "Brunei Darussalam" | "Bulgaria" | "Burkina Faso" | "Burundi" | "Cabo Verde" | "Chile" | "China" | "Costa Rica" | "Côte d'Ivoire" | "Denmark" | "Germany" | "Dominica" | "Dominican Republic" | "Djibouti" | "Ecuador" | "El Salvador" | "Eritrea" | "Estonia" | "Eswatini" | "Fiji" | "Finland" | "France" | "Gabon" | "Gambia" | "Georgia" | "Ghana" | "Grenada" | "Greece" | "Guatemala" | "Guinea" | "Guinea-Bissau" | "Guyana" | "Haiti" | "Honduras" | "India" | "Indonesia" | "Iraq" | "Iran" | "Ireland" | "Iceland" | "Israel" | "Italy" | "Jamaica" | "Japan" | "Yemen" | "Jordan" | "Cambodia" | "Cameroon" | "Canada" | "Kazakhstan" | "Qatar" | "Kenya" | "Kyrgyzstan" | "Kiribati" | "Colombia" | "Comoros" | "Congo" | "Congo - Democratic Republic of the" | "Korea - Democratic People's Republic of" | "Korea - Republic of" | "Kosovo" | "Croatia" | "Cuba" | "Kuwait" | "Lao People's Democratic Republic" | "Lesotho" | "Latvia" | "Lebanon" | "Liberia" | "Libya" | "Liechtenstein" | "Lithuania" | "Luxembourg" | "Madagascar" | "Malawi" | "Malaysia" | "Maldives" | "Mali" | "Malta" | "Morocco" | "Marshall Islands" | "Mauritania" | "Mauritius" | "Mexico" | "Micronesia - Federated States of" | "Moldova - Republic of" | "Monaco" | "Mongolia" | "Montenegro" | "Mozambique" | "Myanmar" | "Namibia" | "Nauru" | "Nepal" | "New Zealand" | "Nicaragua" | "Netherlands" | "Niger" | "Nigeria" | "North Macedonia" | "Norway" | "Oman" | "Austria" | "Pakistan" | "Palau" | "Panama" | "Papua New Guinea" | "Paraguay" | "Peru" | "Philippines" | "Poland" | "Portugal" | "Rwanda" | "Romania" | "Russian Federation" | "Solomon Islands" | "Zambia" | "Samoa" | "San Marino" | "Sao Tome and Principe" | "Saudi Arabia" | "Sweden" | "Switzerland" | "Senegal" | "Serbia" | "Seychelles" | "Sierra Leone" | "Zimbabwe" | "Singapore" | "Slovakia" | "Slovenia" | "Somalia" | "Spain" | "Sri Lanka" | "Saint Kitts and Nevis" | "Saint Lucia" | "Saint Vincent and the Grenadines" | "South Africa" | "Sudan" | "South Sudan" | "Suriname" | "Syrian Arab Republic" | "Tajikistan" | "Tanzania - United Republic of" | "Thailand" | "Timor-Leste" | "Togo" | "Tonga" | "Trinidad and Tobago" | "Chad" | "Czechia" | "Tunisia" | "Türkiye" | "Turkmenistan" | "Tuvalu" | "Uganda" | "Ukraine" | "Hungary" | "Uruguay" | "Uzbekistan" | "Vanuatu" | "Vatican City" | "Venezuela" | "United Arab Emirates" | "United States" | "United Kingdom" | "Vietnam" | "Central African Republic" | "Cyprus";
         /** @enum {string} */
         ECurrencyWebModel: "EUR" | "USD" | "CHF";
         /** @enum {string} */

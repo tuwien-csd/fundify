@@ -58,6 +58,8 @@ export const CALL_DETAILS_CONSTANTS = {
   ELIGIBLE_APPLICANTS_PLACEHOLDER: 'Details about Eligible Applicants',
   ELIGIBLE_APPLICANTS_SCOPE_LABEL: 'Eligible Applicants Scope',
   ELIGIBLE_APPLICANTS_REGION_LABEL: 'Eligible Applicants Region',
+  ELIGIBLE_TARGET_REGIONS_LABEL: 'Eligible Target Regions',
+  ELIGIBLE_SOURCE_REGIONS_LABEL: 'Eligible Source Regions',
   MIN_PROJECT_VOLUME_LABEL: 'Min Project Volume',
   MAX_PROJECT_VOLUME_LABEL: 'Max Project Volume',
   CALL_VOLUME_PROJCETS_LABEL: 'Call Volume Projects (Max.)',
