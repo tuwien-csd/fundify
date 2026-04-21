@@ -1,0 +1,47 @@
+@use '@angular/material' as mat;
+@use '../../../../styles/colors' as col;
+
+.search-select-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  .form-item-label {
+    font-weight: 500;
+    font-size: 0.875rem;
+  }
+
+  .form-item-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .search-field {
+    display: flex;
+    flex-grow: 1;
+    flex-direction: column;
+    margin: 0.5rem 0.5rem 0;
+  }
+
+  .chip-list {
+    display: flex;
+    flex-wrap: wrap;
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
+  }
+}
+
+
+@media (max-width: 600px) {
+  .search-select-container {
+    .chip-list {
+      flex-direction: column;
+      align-items: stretch;
+
+      mat-chip {
+        width: 100%;
+      }
+    }
+  }
+}
