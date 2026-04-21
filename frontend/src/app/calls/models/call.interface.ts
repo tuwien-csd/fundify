@@ -3,6 +3,7 @@ import { AnswerYnEnum } from '../../shared/models/enums/answer-yn.enum';
 import { AustrianStateEnum } from 'src/app/shared/models/enums/austrian-state.enum';
 import { CallTypeEnum } from 'src/app/shared/models/enums/call-type.enum';
 import { CareerStageEnum } from 'src/app/shared/models/enums/career-stage.enum';
+import { CountryEnum } from 'src/app/shared/models/enums/country.enum';
 import { DecisionProcessEnum } from 'src/app/shared/models/enums/decision-process.enum';
 import { EntryOriginEnum } from 'src/app/shared/models/enums/entry-origin.enum';
 import { FundingCharacteristicEnum } from 'src/app/shared/models/enums/funding-characteristic.enum';
@@ -62,6 +63,8 @@ export interface Call {
   eligibleApplicants?: TranslatedText[];
   eligibleApplicantsScope?: RegionalScopeEnum;
   eligibleApplicantsRegions?: AustrianStateEnum[];
+  eligibleTargetRegions?: CountryEnum[];
+  eligibleSourceRegions?: CountryEnum[];
   callVolumeProjects?: number;
   callVolumeAmount?: MonetaryNumber;
   inkindDetails?: TranslatedText[];
