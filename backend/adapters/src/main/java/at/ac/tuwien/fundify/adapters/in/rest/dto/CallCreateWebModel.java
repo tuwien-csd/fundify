@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public record CallCreateWebModel(
-        // mandatory fields according to RIS Synergy funding API 1.1 specification
+        // mandatory fields according to RIS Synergy funding API 1.2 specification
         @Schema(required = true) @NotNull
         ECallTypeWebModel fundingType,
         @Schema(required = true) @NotNull @Size(min = 1) @Valid
@@ -30,16 +30,8 @@ public record CallCreateWebModel(
         ELegalTypeWebModel legalType,
         @Schema(required = true) @NotNull @Size(min = 1)
         List<EModeOfSubmissionWebModel> submissionModes,
-        @Schema(required = true) @NotNull @Valid
-        MonetaryNumberWebModel minProjectVolume,
-        @Schema(required = true) @NotNull @Valid
-        MonetaryNumberWebModel maxProjectVolume,
         @Schema(required = true) @NotNull
         EAnswerYNWebModel fullyFunded,
-        @Schema(required = true) @NotNull @DecimalMin("0")
-        BigDecimal minInkind,
-        @Schema(required = true) @NotNull @DecimalMin("0")
-        BigDecimal maxOverhead,
         @Schema(required = true) @NotNull @Valid
         TimeSpanWebModel minProjectDuration,
         @Schema(required = true) @NotNull @Valid
@@ -47,7 +39,11 @@ public record CallCreateWebModel(
         @Schema(required = true) @NotNull @Size(min = 1)
         List<ELanguageWebModel> applicationLanguages,
 
-        // optional fields according to RIS Synergy funding API 1.1 specification
+        // optional fields according to RIS Synergy funding API 1.2 specification
+        BigDecimal minInkind,
+        BigDecimal maxOverhead,
+        MonetaryNumberWebModel minProjectVolume,
+        MonetaryNumberWebModel maxProjectVolume,
         @Valid
         List<IdentifierWebModel> identifiers,
         String acronym,
@@ -55,7 +51,6 @@ public record CallCreateWebModel(
         List<ECareerStageWebModel> careerStages,
         List<String> website,
         Integer callVolumeProjects,
-        @Valid
         List<CallStageWebModel> callStages,
         @Valid
         List<FunderContactWebModel> contacts,

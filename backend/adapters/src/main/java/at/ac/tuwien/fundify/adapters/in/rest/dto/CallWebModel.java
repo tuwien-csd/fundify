@@ -5,6 +5,7 @@ import at.ac.tuwien.fundify.adapters.in.rest.dto.enums.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 
 public record CallWebModel (
@@ -39,21 +40,11 @@ public record CallWebModel (
         @Schema(required = true)
         ELegalTypeWebModel legalType,
         @Schema(required = true)
-        MonetaryNumberWebModel minProjectVolume,
-        @Schema(required = true)
-        MonetaryNumberWebModel maxProjectVolume,
-        @Schema(required = true)
         EAnswerYNWebModel fullyFunded,
-        @Schema(required = true)
-        BigDecimal minInkind,
-        @Schema(required = true)
-        BigDecimal maxOverhead,
         @Schema(required = true)
         TimeSpanWebModel minProjectDuration,
         @Schema(required = true)
         TimeSpanWebModel maxProjectDuration,
-        @Schema(required = true)
-        List<CallStageWebModel> callStages,
         @Schema(required = true)
         List<ELanguageWebModel> applicationLanguages,
         @Schema(required = true)
@@ -65,6 +56,11 @@ public record CallWebModel (
         @Schema(required = true)
         ESubscriptionStatusWebModel subscriptionStatus,
         // optional fields
+        List<CallStageWebModel> callStages,
+        BigDecimal minInkind,
+        BigDecimal maxOverhead,
+        MonetaryNumberWebModel minProjectVolume,
+        MonetaryNumberWebModel maxProjectVolume,
         String acronym,
         List<IdentifierWebModel> identifiers,
         List<TranslatedTextWebModel> targetGroupSpecified,
