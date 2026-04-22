@@ -11,19 +11,43 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List For University */
+        /**
+         * List annotated RIS Calls for a University
+         * @description Returns a list of annotated RIS Calls for a specific university
+         */
         get: {
             parameters: {
                 query?: {
+                    /** @description Retrieve national or international calls
+                     *     Vocabulary: [Eligible Applicants Scope - Vocabulary](https://documentation.forschungsdaten.at/?page_id=343)
+                     *      */
                     applicantsScope?: components["schemas"]["RisEligibleApplicantsScope"];
+                    /** @description Retrieve calls from a specific funder: Funder ID */
                     funderId?: string;
+                    /** @description Retrieve fundings filtered by specific type
+                     *     Vocabulary: [Eligible Applicants Scope - Vocabulary](https://documentation.forschungsdaten.at/?page_id=303)
+                     *      */
                     fundingType?: components["schemas"]["RisFundingType"];
+                    /** @description Retrieve region-specific calls
+                     *     Vocabulary: [Eligible Applicants Region - Vocabulary](https://documentation.forschungsdaten.at/?page_id=346)
+                     *      */
                     region?: components["schemas"]["RisEligibleApplicantsRegion"];
+                    /** @description Deadline of the (first) Call-Stage is in the future (Field: Call stage start 1)
+                     *     Ongoing Call: Deadline = fictional date in the future
+                     *     Start date is in the past or present + End date is in the future or is not set
+                     *     true: returns only running calls
+                     *     false: returns only calls that do not meet the requirements for running calls.
+                     *     not specified: returns all calls
+                     *      */
                     runningCalls?: boolean;
+                    /** @description Retrieve calls filtered by specific target groups (organization types)
+                     *     Vocabulary: [Target group - Vocabulary](https://documentation.forschungsdaten.at/?page_id=322)
+                     *      */
                     targetGroup?: components["schemas"]["RisTargetGroup"];
                 };
                 header?: never;
                 path: {
+                    /** @description University RIS ID */
                     universityRisId: string;
                 };
                 cookie?: never;
@@ -91,13 +115,18 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get Annotated Call */
+        /**
+         * Get annotated call for a university and call
+         * @description Returns a specific annotated call for a university and call combination
+         */
         get: {
             parameters: {
                 query?: never;
                 header?: never;
                 path: {
+                    /** @description Call RIS ID */
                     callRisId: string;
+                    /** @description University RIS ID */
                     universityRisId: string;
                 };
                 cookie?: never;
@@ -165,15 +194,38 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List */
+        /**
+         * GET Endpoint for Fundings
+         * @description Get Endpoint for retrieving all Fundings
+         */
         get: {
             parameters: {
                 query?: {
+                    /** @description Retrieve national or international calls
+                     *     Vocabulary: [Eligible Applicants Scope - Vocabulary](https://documentation.forschungsdaten.at/?page_id=343)
+                     *      */
                     applicantsScope?: components["schemas"]["RisEligibleApplicantsScope"];
+                    /** @description Retrieve calls from a specific funder: Funder ID */
                     funderId?: string;
+                    /** @description Retrieve fundings filtered by specific type
+                     *     Vocabulary: [Eligible Applicants Scope - Vocabulary](https://documentation.forschungsdaten.at/?page_id=303)
+                     *      */
                     fundingType?: components["schemas"]["RisFundingType"];
+                    /** @description Retrieve region-specific calls
+                     *     Vocabulary: [Eligible Applicants Region - Vocabulary](https://documentation.forschungsdaten.at/?page_id=346)
+                     *      */
                     region?: components["schemas"]["RisEligibleApplicantsRegion"];
+                    /** @description Deadline of the (first) Call-Stage is in the future (Field: Call stage start 1)
+                     *     Ongoing Call: Deadline = fictional date in the future
+                     *     Start date is in the past or present + End date is in the future or is not set
+                     *     true: returns only running calls
+                     *     false: returns only calls that do not meet the requirements for running calls.
+                     *     not specified: returns all calls
+                     *      */
                     runningCalls?: boolean;
+                    /** @description Retrieve calls filtered by specific target groups (organization types)
+                     *     Vocabulary: [Target group - Vocabulary](https://documentation.forschungsdaten.at/?page_id=322)
+                     *      */
                     targetGroup?: components["schemas"]["RisTargetGroup"];
                 };
                 header?: never;
@@ -229,7 +281,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get */
+        /**
+         * GET Endpoint for Funding
+         * @description Get Endpoint for retrieving Funding via ID
+         */
         get: {
             parameters: {
                 query?: never;
@@ -2467,7 +2522,7 @@ export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
         /** @enum {string} */
-        FunderTypeEnum: "EXECUTIVE_ORGANISATION" | "JOINT_CALL_PARTNER";
+        RisOrganisationFundingRoleEnum: "EXECUTIVE_ORGANISATION" | "JOINT_CALL_PARTNER";
         /**
          * Format: date-time
          * @example 2022-03-10T12:15:50-04:00
@@ -2542,7 +2597,7 @@ export interface components {
             callStageDescription?: components["schemas"]["RisText"][];
         };
         /** @enum {string} */
-        RisCareerStage: "EXPERTS" | "STUDENTS" | "DOCTORAL_STUDENTS" | "EARLY_STAGE_RESEARCHERS" | "MID_CAREER_RESEARCHERS" | "ESTABLISHED_RESEARCHERS";
+        RisCareerStage: "EXPERTS" | "STUDENTS" | "DOCTORAL_STUDENTS" | "EARLY_STAGE_RESEARCHERS" | "MID_CAREER_RESEARCHERS" | "ESTABLISHED_RESEARCHERS" | "UNDERGRADUATE_STUDENTS" | "GRADUATE_STUDENTS" | "POSTGRADUATE_STUDENTS" | "POSTDOCTORAL_RESEARCHERS" | "SCIENTISTS" | "SCIENTIFIC_INSTITUTION";
         RisContact: {
             name?: string;
             email?: string;
@@ -2555,7 +2610,7 @@ export interface components {
         /** @enum {string} */
         RisEligibleApplicantsScope: "NATIONAL" | "REGIONAL";
         RisFunder: {
-            funderType?: components["schemas"]["FunderTypeEnum"];
+            funderType?: components["schemas"]["RisOrganisationFundingRoleEnum"];
             funder?: components["schemas"]["RisOrgUnit"];
         };
         RisFunding: {
@@ -2577,7 +2632,7 @@ export interface components {
         /** @enum {string} */
         RisFundingCharacteristic: "INTERNATIONAL_PROGRAMME" | "BILATERAL_PROGRAMME" | "NATIONAL_PROGRAMME" | "INDIVIDUAL_PROJECT" | "CONSORTIUM" | "SCIENTIFIC_PROGRAMME" | "COOPERATIVE_PROGRAMME" | "PERSONAL_GRANT" | "PROJECT_FUNDING" | "INFRASTRUCTURE" | "NETWORKING" | "MOBILITY_PROGRAMME";
         /** @enum {string} */
-        RisFundingType: "PROGRAMME" | "CALL" | "ONGOING_CALL" | "RESEARCH_CONTRACT" | "AWARD" | "GRANT" | "SCHOLARSHIP";
+        RisFundingType: "PROGRAMME" | "CALL" | "ONGOING_CALL" | "RESEARCH_CONTRACT" | "AWARD" | "GRANT" | "SCHOLARSHIP" | "SEMESTER_GRANT" | "SUMMER_GRANT" | "PRACTICAL_TRAINING" | "SUBSIDY" | "RESEARCH_ALLOWANCE";
         RisIdentifier: {
             type?: components["schemas"]["RisIdentifierTypeEnum"];
             value?: string;
@@ -2585,7 +2640,7 @@ export interface components {
         /** @enum {string} */
         RisIdentifierTypeEnum: "CROSSREF_GRANTID" | "PROJECT_NUMBER" | "APPLICATION_NUMBER" | "ORCID" | "ROR" | "RINGGOLD" | "RIS_SYNERGY";
         /** @enum {string} */
-        RisLegalType: "PROJECT26" | "PROJECT27";
+        RisLegalType: "PROJECT26" | "PROJECT27" | "INDIV";
         /** @enum {string} */
         RisLevelEnum: "LEVEL_1" | "LEVEL_2" | "Level_3";
         RisOrgUnit: {
@@ -2619,7 +2674,7 @@ export interface components {
         /** @enum {string} */
         RisSubmissionMode: "ONLINE_FULL" | "ONLINE_PARTLY" | "OFFLINE";
         /** @enum {string} */
-        RisTargetGroup: "UNIVERSITY" | "UNIVERSITY_OF_APPLIED_SCIENCES" | "PRIVATE_UNIVERSITY" | "RESEARCH_INSTITUTE" | "COMPANY" | "PRIVATE_NON_PROFIT" | "INDEPENDENT_RESEARCHER" | "GOVERNMENT";
+        RisTargetGroup: "UNIVERSITY" | "UNIVERSITY_OF_APPLIED_SCIENCES" | "PRIVATE_UNIVERSITY" | "RESEARCH_INSTITUTE" | "COMPANY" | "PRIVATE_NON_PROFIT" | "INDEPENDENT_RESEARCHER" | "GOVERNMENT" | "UNIVERSITY_COLLEGE_OF_TEACHER_EDUCATION";
         RisText: {
             lang?: string;
             trans?: components["schemas"]["TransEnum"];
@@ -2649,7 +2704,7 @@ export interface components {
             description?: string;
         };
         /** @enum {string} */
-        TransEnum: "O" | "H" | "M";
+        RisTranslationEnum: "O" | "H" | "M";
         AnnotateRequest: {
             callId?: string;
             universityId?: string;
@@ -2881,7 +2936,7 @@ export interface components {
         /** @enum {string} */
         ECallTypeWebModel: "Call" | "Ongoing Call";
         /** @enum {string} */
-        ECareerStageWebModel: "Experts" | "Students" | "Doctoral students" | "Early stage researchers" | "Mid-career researchers" | "Established researchers";
+        ECareerStageWebModel: "Experts" | "Students" | "Doctoral students" | "Early stage researchers" | "Mid-career researchers" | "Established researchers" | "Undergraduate students" | "Graduate students" | "Postgraduate students" | "Postdoctoral researchers" | "Scientists" | "Scientific institution";
         /** @enum {string} */
         ECountryWebModel: "Afghanistan" | "Egypt" | "Albania" | "Algeria" | "Andorra" | "Angola" | "Antigua and Barbuda" | "Equatorial Guinea" | "Argentina" | "Armenia" | "Azerbaijan" | "Ethiopia" | "Australia" | "Bahamas" | "Bahrain" | "Bangladesh" | "Barbados" | "Belarus" | "Belgium" | "Belize" | "Benin" | "Bhutan" | "Bolivia" | "Bosnia and Herzegovina" | "Botswana" | "Brazil" | "Brunei Darussalam" | "Bulgaria" | "Burkina Faso" | "Burundi" | "Cabo Verde" | "Chile" | "China" | "Costa Rica" | "Côte d'Ivoire" | "Denmark" | "Germany" | "Dominica" | "Dominican Republic" | "Djibouti" | "Ecuador" | "El Salvador" | "Eritrea" | "Estonia" | "Eswatini" | "Fiji" | "Finland" | "France" | "Gabon" | "Gambia" | "Georgia" | "Ghana" | "Grenada" | "Greece" | "Guatemala" | "Guinea" | "Guinea-Bissau" | "Guyana" | "Haiti" | "Honduras" | "India" | "Indonesia" | "Iraq" | "Iran" | "Ireland" | "Iceland" | "Israel" | "Italy" | "Jamaica" | "Japan" | "Yemen" | "Jordan" | "Cambodia" | "Cameroon" | "Canada" | "Kazakhstan" | "Qatar" | "Kenya" | "Kyrgyzstan" | "Kiribati" | "Colombia" | "Comoros" | "Republic of the Congo" | "Democratic Republic of the Congo" | "Democratic People's Republic of Korea" | "Republic of Korea" | "Kosovo" | "Croatia" | "Cuba" | "Kuwait" | "Lao People's Democratic Republic" | "Lesotho" | "Latvia" | "Lebanon" | "Liberia" | "Libya" | "Liechtenstein" | "Lithuania" | "Luxembourg" | "Madagascar" | "Malawi" | "Malaysia" | "Maldives" | "Mali" | "Malta" | "Morocco" | "Marshall Islands" | "Mauritania" | "Mauritius" | "Mexico" | "Federated States of Micronesia" | "Republic of Moldova" | "Monaco" | "Mongolia" | "Montenegro" | "Mozambique" | "Myanmar" | "Namibia" | "Nauru" | "Nepal" | "New Zealand" | "Nicaragua" | "Netherlands" | "Niger" | "Nigeria" | "North Macedonia" | "Norway" | "Oman" | "Austria" | "Pakistan" | "Palau" | "Panama" | "Papua New Guinea" | "Paraguay" | "Peru" | "Philippines" | "Poland" | "Portugal" | "Rwanda" | "Romania" | "Russian Federation" | "Solomon Islands" | "Zambia" | "Samoa" | "San Marino" | "Sao Tome and Principe" | "Saudi Arabia" | "Sweden" | "Switzerland" | "Senegal" | "Serbia" | "Seychelles" | "Sierra Leone" | "Zimbabwe" | "Singapore" | "Slovakia" | "Slovenia" | "Somalia" | "Spain" | "Sri Lanka" | "Saint Kitts and Nevis" | "Saint Lucia" | "Saint Vincent and the Grenadines" | "South Africa" | "Sudan" | "South Sudan" | "Suriname" | "Syrian Arab Republic" | "Tajikistan" | "United Republic of Tanzania" | "Thailand" | "Timor-Leste" | "Togo" | "Tonga" | "Trinidad and Tobago" | "Chad" | "Czechia" | "Tunisia" | "Türkiye" | "Turkmenistan" | "Tuvalu" | "Uganda" | "Ukraine" | "Hungary" | "Uruguay" | "Uzbekistan" | "Vanuatu" | "Vatican City" | "Venezuela" | "United Arab Emirates" | "United States" | "United Kingdom" | "Vietnam" | "Central African Republic" | "Cyprus";
         /** @enum {string} */
@@ -2893,7 +2948,7 @@ export interface components {
         /** @enum {string} */
         EFundingCharacteristicWebModel: "International Programme" | "Bilateral Programme" | "National Programme" | "Individual Project" | "Consortium" | "Scientific Programme" | "Cooperative Programme" | "Personal Grant" | "Project Funding" | "Infrastructure" | "Networking" | "Mobility Programme";
         /** @enum {string} */
-        EFundingSchemeWebModel: "Award" | "Grant" | "Research Contract" | "Scholarship";
+        EFundingSchemeWebModel: "Award" | "Grant" | "Research Contract" | "Scholarship" | "Semester Grant" | "Summer Grant" | "Practical Training" | "Subsidy" | "Research Allowance";
         /** @enum {string} */
         EFundingTypeWebModel: "FUNDER" | "PROGRAM" | "CALL";
         /** @enum {string} */
@@ -2901,7 +2956,7 @@ export interface components {
         /** @enum {string} */
         ELanguageWebModel: "En" | "De";
         /** @enum {string} */
-        ELegalTypeWebModel: "§26 Project" | "§27 Project";
+        ELegalTypeWebModel: "§26 Project" | "§27 Project" | "Individual";
         /** @enum {string} */
         EModeOfSubmissionWebModel: "online (full)" | "online (partly)" | "offline";
         /** @enum {string} */
@@ -2913,7 +2968,7 @@ export interface components {
         /** @enum {string} */
         ESubscriptionStatusWebModel: "SUBSCRIBED" | "UNSUBSCRIBED";
         /** @enum {string} */
-        ETargetGroupWebModel: "University" | "University of Applied Sciences" | "Private University" | "Research Institute" | "Company" | "Private Non-Profit" | "Independent Researcher" | "Government";
+        ETargetGroupWebModel: "University" | "University of Applied Sciences" | "Private University" | "Research Institute" | "Company" | "Private Non-Profit" | "Independent Researcher" | "Government" | "University College of Teacher Education";
         /** @enum {string} */
         ETranslationWebModel: "o" | "t";
         /** @enum {string} */
@@ -3031,6 +3086,8 @@ export interface components {
             /** Format: int32 */
             years?: number;
         };
+        /** @enum {string} */
+        TransEnum: "O" | "H" | "M";
         TranslatedTextWebModel: {
             text: string;
             language: components["schemas"]["ELanguageWebModel"];
