@@ -2,7 +2,6 @@ package at.ac.tuwien.fundify.adapters.in.rest.dto;
 
 import at.ac.tuwien.fundify.adapters.in.rest.dto.enums.*;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;

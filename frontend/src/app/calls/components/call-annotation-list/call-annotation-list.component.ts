@@ -1,6 +1,5 @@
 import {
   AfterViewInit,
-  ChangeDetectorRef,
   Component,
   computed,
   inject,
@@ -129,7 +128,6 @@ export class CallAnnotationListComponent
   private store = inject(Store);
   private fundersStore = inject(FundersStore);
   private fb = inject(FormBuilder);
-  private cdr = inject(ChangeDetectorRef);
 
   protected readonly BUTTON_LABELS = BUTTON_LABELS;
   protected readonly ROUTER_LINKS = ROUTER_LINKS;
