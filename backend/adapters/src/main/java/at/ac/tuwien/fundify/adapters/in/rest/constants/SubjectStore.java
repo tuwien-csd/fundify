@@ -66,6 +66,7 @@ public class SubjectStore {
         map.put("603", new StandardizedSubjectWebModel(2, "603", "Philosophy, Ethics, Religion"));
         map.put("604", new StandardizedSubjectWebModel(2, "604", "Arts"));
         map.put("605", new StandardizedSubjectWebModel(2, "605", "Other Humanities"));
+        map.put("7", new StandardizedSubjectWebModel(1, "7", "ARTS"));
         subjectsMap = map;
     }
 
