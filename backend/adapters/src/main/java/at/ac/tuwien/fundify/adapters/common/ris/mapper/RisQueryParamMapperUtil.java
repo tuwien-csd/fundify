@@ -37,6 +37,7 @@ public class RisQueryParamMapperUtil {
             case UNIVERSITY -> ETargetGroup.UNIVERSITY;
             case INDEPENDENT_RESEARCHER -> ETargetGroup.INDEPENDENT_RESEARCHER;
             case GOVERNMENT -> ETargetGroup.GOVERNMENT;
+            case UNIVERSITY_COLLEGE_OF_TEACHER_EDUCATION -> ETargetGroup.UNIVERSITY_COLLEGE_OF_TEACHER_EDUCATION;
         };
     }
 

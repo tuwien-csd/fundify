@@ -14,7 +14,8 @@ public enum ETargetGroupWebModel {
     COMPANY("Company"),
     PRIVATE_NON_PROFIT("Private Non-Profit"),
     INDEPENDENT_RESEARCHER("Independent Researcher"),
-    GOVERNMENT("Government");
+    GOVERNMENT("Government"),
+    UNIVERSITY_COLLEGE_OF_TEACHER_EDUCATION("University College of Teacher Education");
 
     private final String value;
 
