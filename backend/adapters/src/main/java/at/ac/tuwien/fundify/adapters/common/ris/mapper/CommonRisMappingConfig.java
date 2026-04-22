@@ -59,11 +59,16 @@ public interface CommonRisMappingConfig {
             case GRANT -> EFundingScheme.GRANT;
             case RESEARCH_CONTRACT -> EFundingScheme.RESEARCH_CONTRACT;
             case SCHOLARSHIP -> EFundingScheme.SCHOLARSHIP;
+            case SEMESTER_GRANT -> EFundingScheme.SEMESTER_GRANT;
+            case SUMMER_GRANT -> EFundingScheme.SUMMER_GRANT;
+            case PRACTICAL_TRAINING -> EFundingScheme.PRACTICAL_TRAINING;
+            case SUBSIDY -> EFundingScheme.SUBSIDY;
+            case RESEARCH_ALLOWANCE -> EFundingScheme.RESEARCH_ALLOWANCE;
             default -> throw new IllegalArgumentException("Unknown funding scheme: " + fundingType);
         };
     }
 
-    default  RisFundingType eFundingSchemeToFundingType(EFundingScheme fundingScheme) {
+    default RisFundingType eFundingSchemeToFundingType(EFundingScheme fundingScheme) {
         if (fundingScheme == null) {
             return null;
         }
@@ -72,6 +77,11 @@ public interface CommonRisMappingConfig {
             case GRANT -> RisFundingType.GRANT;
             case RESEARCH_CONTRACT -> RisFundingType.RESEARCH_CONTRACT;
             case SCHOLARSHIP -> RisFundingType.SCHOLARSHIP;
+            case SEMESTER_GRANT -> RisFundingType.SEMESTER_GRANT;
+            case SUMMER_GRANT -> RisFundingType.SUMMER_GRANT;
+            case PRACTICAL_TRAINING -> RisFundingType.PRACTICAL_TRAINING;
+            case SUBSIDY -> RisFundingType.SUBSIDY;
+            case RESEARCH_ALLOWANCE -> RisFundingType.RESEARCH_ALLOWANCE;
         };
     }
 
