@@ -1,9 +1,6 @@
 package at.ac.tuwien.fundify.adapters.common.ris.mapper;
 
-import at.ac.tuwien.fundify.adapters.common.ris.model.v1.RisCall;
-import at.ac.tuwien.fundify.adapters.common.ris.model.v1.RisFunder;
-import at.ac.tuwien.fundify.adapters.common.ris.model.v1.RisFundingType;
-import at.ac.tuwien.fundify.adapters.common.ris.model.v1.RisVolume;
+import at.ac.tuwien.fundify.adapters.common.ris.model.v1.*;
 import at.ac.tuwien.fundify.domain.dto.CallDTO;
 import at.ac.tuwien.fundify.domain.funding.Call;
 import at.ac.tuwien.fundify.domain.funding.FunderReference;
@@ -52,7 +49,7 @@ public interface RisCallMapper {
             return null;
         }
         return funders.stream()
-                .filter(f -> f.getFunderType() == RisFunder.FunderTypeEnum.EXECUTIVE_ORGANISATION)
+                .filter(f -> f.getFunderType() == RisOrganisationFundingRoleEnum.EXECUTIVE_ORGANISATION)
                 .findFirst()
                 .map(f -> RisFunderRefMapper.INSTANCE.toDomain(f, memberId))
                 .orElse(null);
@@ -64,7 +61,7 @@ public interface RisCallMapper {
             return Collections.emptyList();
         }
         return funders.stream()
-                .filter(f -> f.getFunderType() == RisFunder.FunderTypeEnum.JOINT_CALL_PARTNER)
+                .filter(f -> f.getFunderType() == RisOrganisationFundingRoleEnum.JOINT_CALL_PARTNER)
                 .map(RisFunderRefMapper.INSTANCE::toDomain)
                 .toList();
     }
@@ -105,12 +102,12 @@ public interface RisCallMapper {
         if (mainFunder != null) {
             funders.add(RisFunderRefMapper.INSTANCE
                     .fromDomain(mainFunder)
-                    .funderType(RisFunder.FunderTypeEnum.EXECUTIVE_ORGANISATION));
+                    .funderType(RisOrganisationFundingRoleEnum.EXECUTIVE_ORGANISATION));
         }
         if (jointCallPartner != null) {
             jointCallPartner.forEach(f -> funders.add(RisFunderRefMapper.INSTANCE
                     .fromDomain(f)
-                    .funderType(RisFunder.FunderTypeEnum.JOINT_CALL_PARTNER)));
+                    .funderType(RisOrganisationFundingRoleEnum.JOINT_CALL_PARTNER)));
         }
         return funders;
     }
