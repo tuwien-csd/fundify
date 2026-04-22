@@ -11,34 +11,57 @@ paths:
     get:
       tags:
         - public
+      summary: List annotated RIS Calls for a University
+      description: Returns a list of annotated RIS Calls for a specific university
       parameters:
         - name: universityRisId
           in: path
+          description: University RIS ID
           required: true
           schema:
             type: string
         - name: applicantsScope
           in: query
+          description: |
+            Retrieve national or international calls
+            Vocabulary: [Eligible Applicants Scope - Vocabulary](https://documentation.forschungsdaten.at/?page_id=343)
           schema:
             $ref: '#/components/schemas/RisEligibleApplicantsScope'
         - name: funderId
           in: query
+          description: 'Retrieve calls from a specific funder: Funder ID'
           schema:
             type: string
         - name: fundingType
           in: query
+          description: |
+            Retrieve fundings filtered by specific type
+            Vocabulary: [Eligible Applicants Scope - Vocabulary](https://documentation.forschungsdaten.at/?page_id=303)
           schema:
             $ref: '#/components/schemas/RisFundingType'
         - name: region
           in: query
+          description: |
+            Retrieve region-specific calls
+            Vocabulary: [Eligible Applicants Region - Vocabulary](https://documentation.forschungsdaten.at/?page_id=346)
           schema:
             $ref: '#/components/schemas/RisEligibleApplicantsRegion'
         - name: runningCalls
           in: query
+          description: |
+            Deadline of the (first) Call-Stage is in the future (Field: Call stage start 1)
+            Ongoing Call: Deadline = fictional date in the future
+            Start date is in the past or present + End date is in the future or is not set
+            true: returns only running calls
+            false: returns only calls that do not meet the requirements for running calls.
+            not specified: returns all calls
           schema:
             type: boolean
         - name: targetGroup
           in: query
+          description: |
+            Retrieve calls filtered by specific target groups (organization types)
+            Vocabulary: [Target group - Vocabulary](https://documentation.forschungsdaten.at/?page_id=322)
           schema:
             $ref: '#/components/schemas/RisTargetGroup'
       responses:
@@ -60,14 +83,18 @@ paths:
     get:
       tags:
         - public
+      summary: Get annotated call for a university and call
+      description: Returns a specific annotated call for a university and call combination
       parameters:
         - name: callRisId
           in: path
+          description: Call RIS ID
           required: true
           schema:
             type: string
         - name: universityRisId
           in: path
+          description: University RIS ID
           required: true
           schema:
             type: string
@@ -88,29 +115,51 @@ paths:
     get:
       tags:
         - public
+      summary: GET Endpoint for Fundings
+      description: Get Endpoint for retrieving all Fundings
       parameters:
         - name: applicantsScope
           in: query
+          description: |
+            Retrieve national or international calls
+            Vocabulary: [Eligible Applicants Scope - Vocabulary](https://documentation.forschungsdaten.at/?page_id=343)
           schema:
             $ref: '#/components/schemas/RisEligibleApplicantsScope'
         - name: funderId
           in: query
+          description: 'Retrieve calls from a specific funder: Funder ID'
           schema:
             type: string
         - name: fundingType
           in: query
+          description: |
+            Retrieve fundings filtered by specific type
+            Vocabulary: [Eligible Applicants Scope - Vocabulary](https://documentation.forschungsdaten.at/?page_id=303)
           schema:
             $ref: '#/components/schemas/RisFundingType'
         - name: region
           in: query
+          description: |
+            Retrieve region-specific calls
+            Vocabulary: [Eligible Applicants Region - Vocabulary](https://documentation.forschungsdaten.at/?page_id=346)
           schema:
             $ref: '#/components/schemas/RisEligibleApplicantsRegion'
         - name: runningCalls
           in: query
+          description: |
+            Deadline of the (first) Call-Stage is in the future (Field: Call stage start 1)
+            Ongoing Call: Deadline = fictional date in the future
+            Start date is in the past or present + End date is in the future or is not set
+            true: returns only running calls
+            false: returns only calls that do not meet the requirements for running calls.
+            not specified: returns all calls
           schema:
             type: boolean
         - name: targetGroup
           in: query
+          description: |
+            Retrieve calls filtered by specific target groups (organization types)
+            Vocabulary: [Target group - Vocabulary](https://documentation.forschungsdaten.at/?page_id=322)
           schema:
             $ref: '#/components/schemas/RisTargetGroup'
       responses:
@@ -128,6 +177,8 @@ paths:
     get:
       tags:
         - public
+      summary: GET Endpoint for Funding
+      description: Get Endpoint for retrieving Funding via ID
       parameters:
         - name: fundingRisId
           in: path
@@ -149,7 +200,7 @@ paths:
           description: Internal server error
 components:
   schemas:
-    FunderTypeEnum:
+    RisOrganisationFundingRoleEnum:
       enum:
         - EXECUTIVE_ORGANISATION
         - JOINT_CALL_PARTNER
@@ -358,6 +409,12 @@ components:
         - EARLY_STAGE_RESEARCHERS
         - MID_CAREER_RESEARCHERS
         - ESTABLISHED_RESEARCHERS
+        - UNDERGRADUATE_STUDENTS
+        - GRADUATE_STUDENTS
+        - POSTGRADUATE_STUDENTS
+        - POSTDOCTORAL_RESEARCHERS
+        - SCIENTISTS
+        - SCIENTIFIC_INSTITUTION
       type: string
     RisContact:
       type: object
@@ -395,7 +452,7 @@ components:
       type: object
       properties:
         funderType:
-          $ref: '#/components/schemas/FunderTypeEnum'
+          $ref: '#/components/schemas/RisOrganisationFundingRoleEnum'
         funder:
           $ref: '#/components/schemas/RisOrgUnit'
     RisFunding:
@@ -471,6 +528,11 @@ components:
         - AWARD
         - GRANT
         - SCHOLARSHIP
+        - SEMESTER_GRANT
+        - SUMMER_GRANT
+        - PRACTICAL_TRAINING
+        - SUBSIDY
+        - RESEARCH_ALLOWANCE
       type: string
     RisIdentifier:
       type: object
@@ -493,6 +555,7 @@ components:
       enum:
         - PROJECT26
         - PROJECT27
+        - INDIV
       type: string
     RisLevelEnum:
       enum:
@@ -584,6 +647,7 @@ components:
         - PRIVATE_NON_PROFIT
         - INDEPENDENT_RESEARCHER
         - GOVERNMENT
+        - UNIVERSITY_COLLEGE_OF_TEACHER_EDUCATION
       type: string
     RisText:
       type: object
@@ -591,7 +655,7 @@ components:
         lang:
           type: string
         trans:
-          $ref: '#/components/schemas/TransEnum'
+          $ref: '#/components/schemas/RisTranslationEnum'
         text:
           type: string
     RisTimeSpan:
@@ -633,7 +697,7 @@ components:
           type: string
         description:
           type: string
-    TransEnum:
+    RisTranslationEnum:
       enum:
         - O
         - H
