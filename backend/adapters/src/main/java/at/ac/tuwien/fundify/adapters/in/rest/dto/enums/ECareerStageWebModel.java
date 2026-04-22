@@ -12,7 +12,13 @@ public enum ECareerStageWebModel {
     DOCTORAL_STUDENTS("Doctoral students"),
     EARLY_STAGE_RESEARCHERS("Early stage researchers"),
     MID_CAREER_RESEARCHERS("Mid-career researchers"),
-    ESTABLISHED_RESEARCHERS("Established researchers");
+    ESTABLISHED_RESEARCHERS("Established researchers"),
+    UNDERGRADUATE_STUDENTS("Undergraduate students"),
+    GRADUATE_STUDENTS("Graduate students"),
+    POSTGRADUATE_STUDENTS("Postgraduate students"),
+    POSTDOCTORAL_RESEARCHERS("Postdoctoral researchers"),
+    SCIENTISTS("Scientists"),
+    SCIENTIFIC_INSTITUTION("Scientific institution");
 
     private final String value;
 
