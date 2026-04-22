@@ -7,4 +7,5 @@ export enum TargetGroupEnum {
   PRIVATE_NON_PROFIT = 'Private Non-Profit',
   INDEPENDENT_RESEARCHER = 'Independent Researcher',
   GOVERNMENT = 'Government',
+  UNIVERSITY_COLLEGE_OF_TEACHER_EDUCATION = 'University College of Teacher Education',
 }
