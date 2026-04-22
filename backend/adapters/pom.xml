@@ -15,6 +15,7 @@
     <org.mapstruct.version>1.5.5.Final</org.mapstruct.version>
     <swagger.codegen.maven.plugin.version>3.0.50</swagger.codegen.maven.plugin.version>
     <openapi.codegen.maven.plugin.version>7.15.0</openapi.codegen.maven.plugin.version>
+    <funding.spec.version>v1_2</funding.spec.version>
   </properties>
 
   <dependencies>
@@ -184,8 +185,7 @@
               <goal>generate</goal>
             </goals>
             <configuration>
-              <inputSpec>${project.basedir}/src/main/resources/openapi/funding-spec-v1.json
-              </inputSpec>
+              <inputSpec>${project.basedir}/src/main/resources/openapi/funding-spec-${funding.spec.version}.json</inputSpec>
               <language>java</language>
               <generateModels>true</generateModels>
               <modelPackage>at.ac.tuwien.fundify.adapters.common.ris.model.v1</modelPackage>
