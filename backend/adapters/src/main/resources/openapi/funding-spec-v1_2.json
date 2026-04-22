@@ -196,12 +196,8 @@
           "fundingScheme",
           "id",
           "legalType",
-          "maxOverHeads",
           "maxProjectDuration",
-          "maxProjectVolume",
-          "minInkind",
           "minProjectDuration",
-          "minProjectVolume",
           "name",
           "subjects",
           "submissionModes",
@@ -366,10 +362,6 @@
         ]
       },
       "CallStage": {
-        "required": [
-          "callStageEnd",
-          "callStageStart"
-        ],
         "type": "object",
         "properties": {
           "number": {
