@@ -7,8 +7,8 @@ export enum FundingCharacteristicEnum {
   SCIENTIFIC_PROGRAMME = 'Scientific Programme',
   COOPERATIVE_PROGRAMME = 'Cooperative Programme',
   PERSONAL_GRANT = 'Personal Grant',
-  PROJECT_FUNDING = ' Project Funding',
-  INFRASTRUCTURE = ' Infrastructure',
+  PROJECT_FUNDING = 'Project Funding',
+  INFRASTRUCTURE = 'Infrastructure',
   NETWORKING = 'Networking',
   MOBILITY_PROGRAMME = 'Mobility Programme',
 }
