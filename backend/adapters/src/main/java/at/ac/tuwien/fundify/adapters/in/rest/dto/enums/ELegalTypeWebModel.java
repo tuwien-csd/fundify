@@ -8,7 +8,8 @@ import lombok.AllArgsConstructor;
 public enum ELegalTypeWebModel {
 
     PROJECT26("§26 Project"),
-    PROJECT27("§27 Project");
+    PROJECT27("§27 Project"),
+    INDIV("Individual");
 
     private final String value;
 
