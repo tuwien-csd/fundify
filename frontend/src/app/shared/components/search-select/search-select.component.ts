@@ -10,7 +10,6 @@ import {
   AfterViewInit,
 } from '@angular/core';
 import {
-  AbstractControl,
   ControlValueAccessor,
   FormArray,
   FormControl,
@@ -85,20 +84,22 @@ export class SearchSelectComponent
   private validationService = inject(ValidationService);
   private injector = inject(Injector);
   private choices: string[] = [];
+  private touchedChangeSub?: Subscription;
+  private onChangeSubs: Subscription[] = [];
 
   protected readonly VALIDATORS = VALIDATORS;
   protected readonly FUNDING_SEARCH_LABELS = FUNDING_SEARCH_LABELS;
-  protected searchValue = signal('');
-  protected displayedLabel = computed(() =>
-    wrapLabelRequiredOrOptional(this.label(), this.required())
-  );
-  form: FormGroup = this.fb.group({
+  protected form: FormGroup = this.fb.group({
     search: [''],
     selections: this.fb.array([], {
       validators: this.validatorsForSelection(),
     }),
   });
 
+  protected searchValue = signal('');
+  protected displayedLabel = computed(() =>
+    wrapLabelRequiredOrOptional(this.label(), this.required())
+  );
   protected filteredItems = computed(() => {
     // Filter by search value
     const filtered = this.choices.filter((item) => {
@@ -138,8 +139,6 @@ export class SearchSelectComponent
     }
   }
 
-  private touchedChangeSub?: Subscription;
-
   ngAfterViewInit() {
     this.touchedChangeSub = this.injector
       .get(NgControl)
@@ -151,25 +150,11 @@ export class SearchSelectComponent
       });
   }
 
-  onTouched: () => void = () => {};
-
-  onChangeSubs: Subscription[] = [];
-
   registerOnChange(onChange: (value: string | string[]) => void) {
     const sub = this.selectionsFormArray.valueChanges
       .pipe(map((value: string[]) => (this.multiSelect() ? value : value[0])))
       .subscribe(onChange);
     this.onChangeSubs.push(sub);
-  }
-
-  private applySearchDisabledState(selectionLen: number): void {
-    const shouldDisable = !this.multiSelect() && selectionLen > 0;
-    const control = this.search;
-    if (shouldDisable && control.enabled) {
-      control.disable({ emitEvent: false });
-    } else if (!shouldDisable && control.disabled) {
-      control.enable({ emitEvent: false });
-    }
   }
 
   registerOnTouched(onTouched: () => void) {
@@ -197,20 +182,14 @@ export class SearchSelectComponent
     }
   }
 
-  validate(control: AbstractControl) {
+  validate() {
     if (this.form.valid) {
       return null;
     }
     return getFormValidationErrors(this.form);
   }
 
-  private validatorsForSelection(): ValidatorFn[] {
-    const validatorList = [];
-    if (this.required()) {
-      validatorList.push(Validators.required);
-    }
-    return validatorList;
-  }
+  onTouched: () => void = () => {};
 
   displayFn(item: string): string {
     return item ?? '';
@@ -238,6 +217,13 @@ export class SearchSelectComponent
     this.search.setValue('', { emitEvent: true });
   }
 
+  getValidationErrors(form: FormGroup, validatorName: string) {
+    return this.validationService.getValidationErrorMessage(
+      form,
+      validatorName
+    );
+  }
+
   get search(): FormControl {
     return this.form.get('search') as FormControl;
   }
@@ -246,10 +232,21 @@ export class SearchSelectComponent
     return this.form.get('selections') as FormArray;
   }
 
-  protected getValidationErrors(form: FormGroup, validatorName: string) {
-    return this.validationService.getValidationErrorMessage(
-      form,
-      validatorName
-    );
+  private validatorsForSelection(): ValidatorFn[] {
+    const validatorList = [];
+    if (this.required()) {
+      validatorList.push(Validators.required);
+    }
+    return validatorList;
+  }
+
+  private applySearchDisabledState(selectionLen: number): void {
+    const shouldDisable = !this.multiSelect() && selectionLen > 0;
+    const control = this.search;
+    if (shouldDisable && control.enabled) {
+      control.disable({ emitEvent: false });
+    } else if (!shouldDisable && control.disabled) {
+      control.enable({ emitEvent: false });
+    }
   }
 }
