@@ -320,9 +320,9 @@ export class CallAnnotationListComponent
         callScope: call.eligibleApplicantsScope,
         callRegions: call.eligibleApplicantsRegions ?? [],
         callStatus: call.status,
-        callStartDate: call.callStages?.[0].duration.start,
+        callStartDate: call.callStages?.[0].duration?.start,
         callEndDate:
-          call.callStages?.[call.callStages.length - 1]?.duration.end,
+          call.callStages?.[call.callStages.length - 1]?.duration?.end,
         callFunderId: call.funder?.id,
         annotatedCallId: annotatedCall?.id ?? '',
         registrationDate: call.registrationDate,
