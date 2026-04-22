@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public record CallUpdateWebModel(
-        // mandatory fields according to RIS Synergy funding API 1.1 specification
+        // mandatory fields according to RIS Synergy funding API 1.2 specification
         @Schema(required = true) @NotNull
         String id,
         @Schema(required = true) @NotNull
@@ -31,16 +31,8 @@ public record CallUpdateWebModel(
         ELegalTypeWebModel legalType,
         @Schema(required = true) @NotNull @Size(min = 1)
         List<EModeOfSubmissionWebModel> submissionModes,
-        @Schema(required = true) @NotNull @Valid
-        MonetaryNumberWebModel minProjectVolume,
-        @Schema(required = true) @NotNull @Valid
-        MonetaryNumberWebModel maxProjectVolume,
         @Schema(required = true) @NotNull
         EAnswerYNWebModel fullyFunded,
-        @Schema(required = true) @NotNull @DecimalMin("0")
-        BigDecimal minInkind,
-        @Schema(required = true) @NotNull @DecimalMin("0")
-        BigDecimal maxOverhead,
         @Schema(required = true) @NotNull @Valid
         TimeSpanWebModel minProjectDuration,
         @Schema(required = true) @NotNull @Valid
@@ -48,7 +40,11 @@ public record CallUpdateWebModel(
         @Schema(required = true) @NotNull @Size(min = 1)
         List<ELanguageWebModel> applicationLanguages,
 
-        // optional fields according to RIS Synergy funding API 1.1 specification
+        // optional fields according to RIS Synergy funding API 1.2 specification
+        BigDecimal minInkind,
+        BigDecimal maxOverhead,
+        MonetaryNumberWebModel minProjectVolume,
+        MonetaryNumberWebModel maxProjectVolume,
         @Valid
         List<IdentifierWebModel> identifiers,
         String acronym,
@@ -56,7 +52,6 @@ public record CallUpdateWebModel(
         List<ECareerStageWebModel> careerStages,
         List<String> website,
         Integer callVolumeProjects,
-        @Valid
         List<CallStageWebModel> callStages,
         @Valid
         List<FunderContactWebModel> contacts,
