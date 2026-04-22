@@ -81,6 +81,12 @@ describe('CallDetailEditComponent', () => {
           ),
           jointCallPartner: new FormControl(CALLS[0].jointCallPartner),
           dmpRequired: new FormControl(CALLS[0].dmpRequired),
+          eligibleTargetRegions: new FormControl(
+            CALLS[0].eligibleTargetRegions
+          ),
+          eligibleSourceRegions: new FormControl(
+            CALLS[0].eligibleSourceRegions
+          ),
         })
       ),
     };
