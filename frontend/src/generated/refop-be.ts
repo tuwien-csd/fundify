@@ -2749,14 +2749,14 @@ export interface components {
             fundingScheme: components["schemas"]["EFundingSchemeWebModel"];
             legalType: components["schemas"]["ELegalTypeWebModel"];
             submissionModes: components["schemas"]["EModeOfSubmissionWebModel"][];
-            minProjectVolume: components["schemas"]["MonetaryNumberWebModel"];
-            maxProjectVolume: components["schemas"]["MonetaryNumberWebModel"];
             fullyFunded: components["schemas"]["EAnswerYNWebModel"];
-            minInkind: number;
-            maxOverhead: number;
             minProjectDuration: components["schemas"]["TimeSpanWebModel"];
             maxProjectDuration: components["schemas"]["TimeSpanWebModel"];
             applicationLanguages: components["schemas"]["ELanguageWebModel"][];
+            minInkind?: number;
+            maxOverhead?: number;
+            minProjectVolume?: components["schemas"]["MonetaryNumberWebModel"];
+            maxProjectVolume?: components["schemas"]["MonetaryNumberWebModel"];
             identifiers?: components["schemas"]["IdentifierWebModel"][];
             acronym?: string;
             description?: components["schemas"]["TranslatedTextWebModel"][];
@@ -2811,7 +2811,7 @@ export interface components {
         CallStageWebModel: {
             /** Format: int32 */
             number?: number;
-            duration: components["schemas"]["DateRangeWebModel"];
+            duration?: components["schemas"]["DateRangeWebModel"];
             description?: components["schemas"]["TranslatedTextWebModel"][];
         };
         CallUpdateWebModel: {
@@ -2825,14 +2825,14 @@ export interface components {
             fundingScheme: components["schemas"]["EFundingSchemeWebModel"];
             legalType: components["schemas"]["ELegalTypeWebModel"];
             submissionModes: components["schemas"]["EModeOfSubmissionWebModel"][];
-            minProjectVolume: components["schemas"]["MonetaryNumberWebModel"];
-            maxProjectVolume: components["schemas"]["MonetaryNumberWebModel"];
             fullyFunded: components["schemas"]["EAnswerYNWebModel"];
-            minInkind: number;
-            maxOverhead: number;
             minProjectDuration: components["schemas"]["TimeSpanWebModel"];
             maxProjectDuration: components["schemas"]["TimeSpanWebModel"];
             applicationLanguages: components["schemas"]["ELanguageWebModel"][];
+            minInkind?: number;
+            maxOverhead?: number;
+            minProjectVolume?: components["schemas"]["MonetaryNumberWebModel"];
+            maxProjectVolume?: components["schemas"]["MonetaryNumberWebModel"];
             identifiers?: components["schemas"]["IdentifierWebModel"][];
             acronym?: string;
             description?: components["schemas"]["TranslatedTextWebModel"][];
@@ -2879,19 +2879,19 @@ export interface components {
             characteristics: components["schemas"]["EFundingCharacteristicWebModel"][];
             fundingScheme: components["schemas"]["EFundingSchemeWebModel"];
             legalType: components["schemas"]["ELegalTypeWebModel"];
-            minProjectVolume: components["schemas"]["MonetaryNumberWebModel"];
-            maxProjectVolume: components["schemas"]["MonetaryNumberWebModel"];
             fullyFunded: components["schemas"]["EAnswerYNWebModel"];
-            minInkind: number;
-            maxOverhead: number;
             minProjectDuration: components["schemas"]["TimeSpanWebModel"];
             maxProjectDuration: components["schemas"]["TimeSpanWebModel"];
-            callStages: components["schemas"]["CallStageWebModel"][];
             applicationLanguages: components["schemas"]["ELanguageWebModel"][];
             submissionModes: components["schemas"]["EModeOfSubmissionWebModel"][];
             contacts: components["schemas"]["FunderContactWebModel"][];
             funder: components["schemas"]["FunderRefWebModel"];
             subscriptionStatus: components["schemas"]["ESubscriptionStatusWebModel"];
+            callStages?: components["schemas"]["CallStageWebModel"][];
+            minInkind?: number;
+            maxOverhead?: number;
+            minProjectVolume?: components["schemas"]["MonetaryNumberWebModel"];
+            maxProjectVolume?: components["schemas"]["MonetaryNumberWebModel"];
             acronym?: string;
             identifiers?: components["schemas"]["IdentifierWebModel"][];
             targetGroupSpecified?: components["schemas"]["TranslatedTextWebModel"][];
