@@ -351,7 +351,9 @@ export class CallAnnotationListComponent
     data: CallAnnotationListViewElement,
     hideClosedCalls: boolean
   ) {
-    return !hideClosedCalls || new Date(data.callEndDate) > new Date();
+    if (!hideClosedCalls) return true;
+    const callStatus = this.deriveCallStatus(data);
+    return callStatus !== 'Closed';
   }
 
   private matchesSearchText(
@@ -367,20 +369,18 @@ export class CallAnnotationListComponent
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: This was disabled during the proper setup of eslint. If you touch this code, fix it properly.
     filters: any[]
   ): boolean {
-    const now = new Date();
-    return filters.every((f) => this.evaluateFilterCondition(data, f, now));
+    return filters.every((f) => this.evaluateFilterCondition(data, f));
   }
 
   private evaluateFilterCondition(
     data: CallAnnotationListViewElement,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: This was disabled during the proper setup of eslint. If you touch this code, fix it properly.
-    filter: any,
-    now: Date
+    filter: any
   ): boolean {
     if (!filter.values || filter.values.length === 0) return true;
     switch (filter.property) {
       case 'callStatus':
-        return this.evaluateCallStatusFilter(data, filter.values, now);
+        return this.evaluateCallStatusFilter(data, filter.values);
       case 'callFunderId':
         return filter.values.includes(this.funderMap().get(data.callFunderId));
       case 'callRegions':
@@ -399,34 +399,27 @@ export class CallAnnotationListComponent
 
   private evaluateCallStatusFilter(
     data: CallAnnotationListViewElement,
-    statuses: string[],
-    now: Date
+    statuses: string[]
   ): boolean {
-    return statuses.some((status) => {
-      switch (status) {
-        case 'Upcoming':
-          return new Date(data.callStartDate) > now;
-        case 'Running':
-          return (
-            new Date(data.callStartDate) <= now &&
-            new Date(data.callEndDate) >= now
-          );
-        case 'Closed':
-          return new Date(data.callEndDate) < now;
-        default:
-          return false;
-      }
-    });
+    const publicationStatus = this.deriveCallStatus(data);
+    return statuses.some((filterStatus) => filterStatus === publicationStatus);
   }
 
   private deriveCallStatus(
     data: CallAnnotationListViewElement
   ): PublicationStatus {
     const now = new Date();
-    const startDate = new Date(data.callStartDate);
-    const endDate = new Date(data.callEndDate);
-    if (startDate > now) return 'Upcoming';
-    return endDate < now ? 'Running' : 'Closed';
+    const startDate = data.callStartDate
+      ? new Date(data.callStartDate)
+      : new Date(0);
+    const endDate = data.callEndDate
+      ? new Date(data.callEndDate)
+      : new Date(2100, 1, 1);
+
+    if (startDate > now) {
+      return 'Upcoming';
+    }
+    return endDate < now ? 'Closed' : 'Running';
   }
 
   private combineCallFields(
