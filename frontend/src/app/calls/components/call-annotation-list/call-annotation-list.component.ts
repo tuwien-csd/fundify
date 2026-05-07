@@ -309,7 +309,7 @@ export class CallAnnotationListComponent
     calls: Call[],
     annotatedCalls: AnnotatedCall[]
   ): CallAnnotationListViewElement[] {
-    return calls.map((call) => {
+    return calls.filter((call) => call.status !== PublicationStatusEnum.DRAFT).map((call) => {
       const annotatedCall = annotatedCalls.find(
         (aCall) => aCall.callPreview?.id === call.id
       );
