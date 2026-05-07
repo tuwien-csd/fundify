@@ -6,6 +6,7 @@ export const IdentifierTypeEnum = {
   ROR: 'ROR',
   RINGGOLD: 'Ringgold',
   RIS_SYNERGY: 'Ris Synergy',
+  EU_ID: 'EU-ID',
 } as const;
 
 export type IdentifierTypeEnum =

@@ -8,5 +8,7 @@ public enum EIdentifierType {
     ORCID,
     ROR,
     RINGGOLD,
-    RIS_SYNERGY
+    RIS_SYNERGY,
+    CROSSREF_FUNDERID,
+    EU_ID
 }

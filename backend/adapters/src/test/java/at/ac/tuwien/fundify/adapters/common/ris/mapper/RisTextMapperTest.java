@@ -1,6 +1,7 @@
 package at.ac.tuwien.fundify.adapters.common.ris.mapper;
 
 import at.ac.tuwien.fundify.adapters.common.ris.model.v1.RisText;
+import at.ac.tuwien.fundify.adapters.common.ris.model.v1.RisTranslationEnum;
 import at.ac.tuwien.fundify.domain.common.ELanguage;
 import at.ac.tuwien.fundify.domain.common.ETranslation;
 import at.ac.tuwien.fundify.domain.common.TranslatedText;
@@ -21,7 +22,7 @@ class RisTextMapperTest {
         assertNotNull(result);
         assertEquals(translatedText.text(), result.getText());
         assertEquals("en", result.getLang());
-        assertEquals(RisText.TransEnum.H, result.getTrans());
+        assertEquals(RisTranslationEnum.H, result.getTrans());
     }
 
     @Test
@@ -33,7 +34,7 @@ class RisTextMapperTest {
         assertNotNull(result);
         assertEquals(translatedText.text(), result.getText());
         assertEquals("en", result.getLang());
-        assertEquals(RisText.TransEnum.H, result.getTrans());
+        assertEquals(RisTranslationEnum.H, result.getTrans());
 
     }
 
@@ -46,7 +47,7 @@ class RisTextMapperTest {
         assertNotNull(result);
         assertEquals(translatedText.text(), result.getText());
         assertEquals("en", result.getLang());
-        assertEquals(RisText.TransEnum.H, result.getTrans());
+        assertEquals(RisTranslationEnum.H, result.getTrans());
 
     }
 
@@ -59,7 +60,7 @@ class RisTextMapperTest {
         assertNotNull(result);
         assertEquals("", result.getText());
         assertEquals("en", result.getLang());
-        assertEquals(RisText.TransEnum.H, result.getTrans());
+        assertEquals(RisTranslationEnum.H, result.getTrans());
 
     }
 

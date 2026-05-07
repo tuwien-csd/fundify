@@ -72,6 +72,23 @@ public class CallMongoRepository implements CallRepository {
     }
 
     @Override
+    public Optional<Call> findByEuId(String euId) {
+        Document query = new Document(
+                "identifiers",
+                new Document(
+                        "$elemMatch",
+                        new Document("type", EIdentifierType.EU_ID).append("value", euId)
+                )
+        );
+
+        CallMongoEntity call = CallMongoEntity.find(query).firstResult();
+        if (call == null) {
+            return Optional.empty();
+        }
+        return Optional.of(CallMongoEntityMapper.INSTANCE.toDomain(call, mongoCrossReferenceResolver));
+    }
+
+    @Override
     public Optional<CallIdMapping> findIdMappingByRisId(RisId risId) {
         Document query = new Document(
                 "identifiers",

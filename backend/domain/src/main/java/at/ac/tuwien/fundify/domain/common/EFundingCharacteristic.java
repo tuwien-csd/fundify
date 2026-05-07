@@ -13,5 +13,6 @@ public enum EFundingCharacteristic {
     PROJECT_FUNDING,
     INFRASTRUCTURE,
     NETWORKING,
-    MOBILITY_PROGRAMME
+    MOBILITY_PROGRAMME,
+    EU_FUNDING
 }

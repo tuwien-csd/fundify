@@ -57,6 +57,11 @@ fundify:
         id: "wwtf"
         enabled: true
         base-url: "https://fundingportal.wwtf.at"
+      eutender:
+        # No auth needed, API is public
+        id: "eutender"
+        enabled: true
+        base-url: "https://api.tech.ec.europa.eu/search-api/prod/rest/search?apiKey=SEDIA&text=***"
 
 frontend:
   auth:
@@ -119,6 +124,10 @@ quarkus:
       read-timeout: 10000
     wwtf:
       url: ${fundify.external-fundings.data-providers.wwtf.base-url}
+      connect-timeout: 5000
+      read-timeout: 10000
+    eutender:
+      url: ${fundify.external-fundings.data-providers.eutender.base-url}
       connect-timeout: 5000
       read-timeout: 10000
 
