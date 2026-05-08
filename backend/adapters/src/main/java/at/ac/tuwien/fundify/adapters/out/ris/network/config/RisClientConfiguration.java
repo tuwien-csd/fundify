@@ -23,9 +23,13 @@ public class RisClientConfiguration {
   private static final String DATA_PROVIDER_ENABLED_KEY_PATTERN =
       "fundify.external-fundings.data-providers.%s.enabled";
 
+  private static final String DATA_PROVIDER_CONTACT_EMAIL_KEY_PATTERN =
+      "fundify.external-fundings.data-providers.%s.contact-email";
+
   private static final  boolean DEFAULT_ACTION_IF_NO_KEY_FOUND = false;
 
   private final Map<String, GenericRisFundingRestClient> registeredRestClients = new HashMap<>();
+  private final Map<String, String> contactEmails = new HashMap<>();
 
   RisClientConfiguration(
       @RestClient WwtfRestClient wwtfRestClient,
@@ -44,6 +48,9 @@ public class RisClientConfiguration {
     String memberId = client.getMemberId();
     if (clientIsEnabled(memberId)) {
       registeredRestClients.put(memberId, client);
+      appConfig.getOptionalValue(String.format(DATA_PROVIDER_CONTACT_EMAIL_KEY_PATTERN, memberId), String.class)
+          .filter(email -> !email.isBlank())
+          .ifPresent(email -> contactEmails.put(memberId, email));
     }
   }
 
@@ -68,5 +75,9 @@ public class RisClientConfiguration {
 
   public Map<String, GenericRisFundingRestClient> getRegisteredRestClients() {
     return Collections.unmodifiableMap(registeredRestClients);
+  }
+
+  public Map<String, String> getContactEmails() {
+    return Collections.unmodifiableMap(contactEmails);
   }
 }

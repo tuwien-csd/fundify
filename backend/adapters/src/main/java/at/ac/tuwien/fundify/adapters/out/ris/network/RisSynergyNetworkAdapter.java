@@ -8,6 +8,7 @@ import at.ac.tuwien.fundify.adapters.common.ris.model.v1.RisFundingType;
 import at.ac.tuwien.fundify.adapters.common.ris.model.v1.RisProgramme;
 import at.ac.tuwien.fundify.adapters.out.ris.network.client.GenericRisFundingRestClient;
 import at.ac.tuwien.fundify.adapters.out.ris.network.config.RisClientConfiguration;
+import at.ac.tuwien.fundify.application.port.out.notification.SyncErrorNotificationService;
 import at.ac.tuwien.fundify.application.port.out.ris.network.FundingRemoteRepository;
 import at.ac.tuwien.fundify.application.port.out.ticketing.TicketingService;
 import at.ac.tuwien.fundify.domain.funding.Call;
@@ -33,11 +34,16 @@ public class RisSynergyNetworkAdapter implements FundingRemoteRepository {
   private static final String SYNC_ERROR_STANDARD_DESCRIPTION = "Could not process data provided by the RIS funding data provider.";
   private final static String SYNC_ERROR_KEY_TEMPLATE = "[SYNC_ERROR_%s] Invalid RIS Format";
   private final TicketingService ticketingService;
+  private final SyncErrorNotificationService syncErrorNotificationService;
+  private final Map<String, String> contactEmails;
 
   @Inject
-  RisSynergyNetworkAdapter(RisClientConfiguration config, TicketingService ticketingService) {
+  RisSynergyNetworkAdapter(RisClientConfiguration config, TicketingService ticketingService,
+      SyncErrorNotificationService syncErrorNotificationService) {
     this.registeredRestClients = config.getRegisteredRestClients();
     this.ticketingService = ticketingService;
+    this.syncErrorNotificationService = syncErrorNotificationService;
+    this.contactEmails = config.getContactEmails();
   }
 
 
@@ -154,11 +160,21 @@ public class RisSynergyNetworkAdapter implements FundingRemoteRepository {
   }
 
   private void createOrAppendSyncError(GenericRisFundingRestClient client, List<String> texts) {
-    var payload = new AppendableTicketCreate(
-        String.format(SYNC_ERROR_KEY_TEMPLATE, client.getMemberId().toUpperCase()),
-        SYNC_ERROR_STANDARD_DESCRIPTION, texts);
-    ticketingService.createOrAppend(payload);
+    try {
+      var payload = new AppendableTicketCreate(
+          String.format(SYNC_ERROR_KEY_TEMPLATE, client.getMemberId().toUpperCase()),
+          SYNC_ERROR_STANDARD_DESCRIPTION, texts);
+      ticketingService.createOrAppend(payload);
+    } catch (Exception e) {
+      log.error(String.format("Error creating or appending sync error ticket for client %s, continue with trying to send mail", client.getMemberId()), e);
+    }
+
+    String contactEmail = contactEmails.get(client.getMemberId());
+    if (contactEmail != null) {
+      syncErrorNotificationService.sendSyncErrorNotification(client.getMemberId(), contactEmail, texts);
+    } else {
+      log.warnf("No contact email configured for provider '%s', skipping sync error email notification", client.getMemberId());
+    }
   }
 
-  ;
 }
