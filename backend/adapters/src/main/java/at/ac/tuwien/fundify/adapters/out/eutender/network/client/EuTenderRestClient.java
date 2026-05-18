@@ -21,7 +21,7 @@ import org.eclipse.microprofile.rest.client.inject.RestClient;
 @ApplicationScoped
 public class EuTenderRestClient implements GenericRisFundingRestClient {
 
-    private static final int PAGE_SIZE = 10;
+    private static final int PAGE_SIZE = 50;
     private static final int MAX_PARALLEL_REQUESTS = 10;
 
     @Inject

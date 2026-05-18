@@ -73,7 +73,7 @@ public class EuTenderToRisMapper {
         if (identifierValue != null) {
             RisIdentifier identifier = new RisIdentifier();
             identifier.setType(RisIdentifierTypeEnum.EU_ID);
-            identifier.setValue(identifierValue);
+            identifier.setValue(identifierValue + "-" + meta.getCallccm2Id());
             call.setIdentifiers(List.of(identifier));
         }
 

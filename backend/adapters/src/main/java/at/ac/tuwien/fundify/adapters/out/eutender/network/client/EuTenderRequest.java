@@ -14,4 +14,9 @@ public class EuTenderRequest {
     @FormParam("languages")
     @PartType(MediaType.APPLICATION_JSON)
     public String languages = "[\"en\"]";
+
+    @FormParam("sort")
+    @PartType(MediaType.APPLICATION_JSON)
+    public String sort = "{\"order\":\"DESC\",\"field\":\"startDate\"}";
+
 }
