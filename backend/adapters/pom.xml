@@ -69,6 +69,11 @@
     </dependency>
     <dependency>
       <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-resteasy-multipart</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>io.quarkus</groupId>
       <artifactId>quarkus-config-yaml</artifactId>
     </dependency>
     <dependency>
@@ -206,32 +211,6 @@
               </configOptions>
             </configuration>
           </execution>
-<!--          <execution>-->
-<!--            <?m2e execute onConfiguration?>-->
-<!--            <id>orgunit</id>-->
-<!--            <goals>-->
-<!--              <goal>generate</goal>-->
-<!--            </goals>-->
-<!--            <configuration>-->
-<!--              <inputSpec>${project.basedir}/src/main/resources/openapi/orgunit-spec-v1.json-->
-<!--              </inputSpec>-->
-<!--              <language>java</language>-->
-<!--              <generateModels>true</generateModels>-->
-<!--              <modelPackage>at.ac.tuwien.fundify.adapters.common.ris.model.v1</modelPackage>-->
-<!--              <generateApis>false</generateApis>-->
-<!--              <generateSupportingFiles>false</generateSupportingFiles>-->
-<!--              <generateModelTests>false</generateModelTests>-->
-<!--              <generateModelDocumentation>true</generateModelDocumentation>-->
-<!--              <templateDirectory>${project.basedir}/src/main/resources/templates</templateDirectory>-->
-<!--              <modelNamePrefix>Ris</modelNamePrefix>-->
-<!--              <configOptions>-->
-<!--                <jakarta>true</jakarta>-->
-<!--                <dateLibrary>java8</dateLibrary>-->
-<!--                <library>resteasy</library>-->
-<!--                <sourceFolder>src/main/java</sourceFolder>-->
-<!--              </configOptions>-->
-<!--            </configuration>-->
-<!--          </execution>-->
           <execution>
             <?m2e execute onConfiguration?>
             <id>info</id>

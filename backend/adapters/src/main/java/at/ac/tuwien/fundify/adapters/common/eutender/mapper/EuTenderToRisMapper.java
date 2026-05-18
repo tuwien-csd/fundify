@@ -32,7 +32,9 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import lombok.extern.jbosslog.JBossLog;
 
+@JBossLog
 public class EuTenderToRisMapper {
 
     public static final EuTenderToRisMapper INSTANCE = new EuTenderToRisMapper();
@@ -53,14 +55,14 @@ public class EuTenderToRisMapper {
 
         String title = first(meta != null ? meta.getTitle() : null);
         if (title != null) {
-            call.setName(List.of(risText("en", title)));
+            call.setName(List.of(risText(title)));
         }
 
-        call.setAcronym(first(meta != null ? meta.getCallIdentifier() : null));
+        call.setAcronym(first(meta != null ? meta.getIdentifier() : null));
 
         String descHtml = first(meta != null ? meta.getDescriptionByte() : null);
         if (descHtml != null) {
-            call.setDescription(List.of(risText("en", stripHtml(descHtml))));
+            call.setDescription(List.of(risText(stripHtml(descHtml))));
         }
 
         if (result.getUrl() != null) {
@@ -152,9 +154,9 @@ public class EuTenderToRisMapper {
         return RisFundingType.CALL;
     }
 
-    private RisText risText(String lang, String text) {
+    private RisText risText(String text) {
         RisText risText = new RisText();
-        risText.setLang(lang);
+        risText.setLang("en");
         risText.setTrans(RisTranslationEnum.O);
         risText.setText(text);
         return risText;
@@ -163,7 +165,7 @@ public class EuTenderToRisMapper {
     private RisFunder europeanCommissionFunder() {
         RisOrgUnit orgUnit = new RisOrgUnit();
         orgUnit.setId("ec-european-commission");
-        orgUnit.setName(List.of(risText("en", "European Commission")));
+        orgUnit.setName(List.of(risText("European Commission")));
         orgUnit.setWebsite("https://ec.europa.eu/");
 
         RisFunder funder = new RisFunder();
