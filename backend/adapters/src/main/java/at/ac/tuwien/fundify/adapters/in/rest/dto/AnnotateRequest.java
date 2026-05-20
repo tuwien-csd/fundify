@@ -1,9 +1,13 @@
 package at.ac.tuwien.fundify.adapters.in.rest.dto;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
 public record AnnotateRequest(
-    String callId,
-    String universityId,
-    CallAnnotationWebModel annotation
+    @NotBlank String callId,
+    @NotBlank String universityId,
+    @NotNull @Valid CallAnnotationWebModel annotation
 ) implements WebModel {
 
     @Override

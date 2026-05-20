@@ -1,13 +1,9 @@
 package at.ac.tuwien.fundify.bootstrap.e2e;
 
-import static at.ac.tuwien.fundify.adapters.in.rest.constants.FundingEntityMethodPath.ADD_ENTITY;
-import static at.ac.tuwien.fundify.adapters.in.rest.constants.FundingEntityMethodPath.DELETE_ENTITY_BY_ID_REPLACE_PARAMTER;
-import static at.ac.tuwien.fundify.adapters.in.rest.constants.FundingEntityMethodPath.ENTITY_BY_ID_REPLACE_PARAMETER;
-import static at.ac.tuwien.fundify.adapters.in.rest.constants.FundingEntityMethodPath.ENTITY_LIST;
-import static at.ac.tuwien.fundify.adapters.in.rest.constants.FundingEntityMethodPath.REFERENCE_BY_ID_REPLACE_PARAMETER;
+import static at.ac.tuwien.fundify.adapters.in.rest.constants.FundingEntityMethodPath.BY_ID;
+import static at.ac.tuwien.fundify.adapters.in.rest.constants.FundingEntityMethodPath.REFERENCE_BY_ID;
 import static at.ac.tuwien.fundify.adapters.in.rest.constants.FundingEntityMethodPath.REFERENCE_LIST;
-import static at.ac.tuwien.fundify.adapters.in.rest.constants.FundingEntityMethodPath.REFERENCE_LIST_SEARCH_ADD_QUERY_PARAM;
-import static at.ac.tuwien.fundify.adapters.in.rest.constants.FundingEntityMethodPath.UPDATE_ENTITY;
+import static at.ac.tuwien.fundify.adapters.in.rest.constants.FundingEntityMethodPath.REFERENCE_SEARCH;
 import static io.restassured.RestAssured.given;
 
 import at.ac.tuwien.fundify.adapters.in.rest.dto.FunderRefWebModel;
@@ -59,7 +55,7 @@ class FunderTest {
         .contentType(ContentType.JSON)
         .body(requestFunder)
         .when()
-        .post(ADD_ENTITY)
+        .post()
         .then()
         .statusCode(200)
         .extract()
@@ -81,7 +77,7 @@ class FunderTest {
         .contentType(ContentType.JSON)
         .body(requestFunder)
         .when()
-        .put(UPDATE_ENTITY)
+        .put(funder.id.toHexString())
         .then()
         .statusCode(200)
         .extract()
@@ -101,7 +97,7 @@ class FunderTest {
         .contentType(ContentType.JSON)
         .body(requestFunder)
         .when()
-        .put(UPDATE_ENTITY)
+        .put(validId)
         .then()
         .statusCode(404);
   }
@@ -116,7 +112,7 @@ class FunderTest {
 
     given()
         .when()
-        .delete(DELETE_ENTITY_BY_ID_REPLACE_PARAMTER, funderId)
+        .delete(BY_ID, funderId)
         .then()
         .statusCode(204);
 
@@ -136,7 +132,7 @@ class FunderTest {
     given()
         .pathParam("id", funderId)
         .when()
-        .delete(DELETE_ENTITY_BY_ID_REPLACE_PARAMTER)
+        .delete(BY_ID)
         .then()
         .statusCode(204);
 
@@ -144,7 +140,7 @@ class FunderTest {
     given()
         .pathParam("id", funderId)
         .when()
-        .delete(DELETE_ENTITY_BY_ID_REPLACE_PARAMTER)
+        .delete(BY_ID)
         .then()
         .statusCode(404);
   }
@@ -159,7 +155,7 @@ class FunderTest {
 
     List<FunderWebModel> funders = given()
         .when()
-        .get(ENTITY_LIST)
+        .get()
         .then()
         .statusCode(200)
         .extract()
@@ -205,7 +201,7 @@ class FunderTest {
 
     FunderWebModel result = given()
         .when()
-        .get(ENTITY_BY_ID_REPLACE_PARAMETER, funder.id.toHexString())
+        .get(BY_ID, funder.id.toHexString())
         .then()
         .statusCode(200)
         .extract()
@@ -223,7 +219,7 @@ class FunderTest {
 
     FunderRefWebModel result = given()
         .when()
-        .get(REFERENCE_BY_ID_REPLACE_PARAMETER, funder.id.toHexString())
+        .get(REFERENCE_BY_ID, funder.id.toHexString())
         .then()
         .statusCode(200)
         .extract()
@@ -246,7 +242,7 @@ class FunderTest {
     List<FunderRefWebModel> results = given()
         .queryParam("term", "searchTerm")
         .when()
-        .get(REFERENCE_LIST_SEARCH_ADD_QUERY_PARAM)
+        .get(REFERENCE_SEARCH)
         .then()
         .statusCode(200)
         .extract()

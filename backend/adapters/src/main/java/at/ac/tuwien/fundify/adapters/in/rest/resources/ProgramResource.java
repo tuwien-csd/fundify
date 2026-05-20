@@ -14,6 +14,7 @@ import at.ac.tuwien.fundify.domain.common.exceptions.FundifyException;
 import io.quarkus.security.Authenticated;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.groups.ConvertGroup;
+import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
@@ -28,7 +29,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.jbosslog.JBossLog;
 import jakarta.validation.Valid;
 
-@Path("/api/program")
+@Path("/api/programs")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 @Authenticated
@@ -55,6 +56,9 @@ public class ProgramResource {
   @RolesAllowed({UserRole.Names.FUNDER, UserRole.Names.ADMIN})
   @Path("/{id}")
   public ProgramWebModel update(@PathParam(PATH_PARAM_ID) String programId, @Valid @ConvertGroup(to = ValidationGroups.Put.class) ProgramWebModel programWebModel) throws FundifyException {
+    if (!programId.equals(programWebModel.id())) {
+      throw new BadRequestException("Path ID does not match body ID");
+    }
     return ProgramWebModelMapper.INSTANCE.fromDomain(
         programUseCase.updateProgram(ProgramWebModelMapper.INSTANCE.toDomain(programWebModel))
     );
