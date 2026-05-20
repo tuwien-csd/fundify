@@ -35,7 +35,7 @@ export const CallsStore = signalStore(
       callToCreate: CallCreateWebModel
     ): Promise<CallWebModel | undefined> {
       try {
-        const response = await backendService.client.POST('/api/call/add', {
+        const response = await backendService.client.POST('/api/calls', {
           body: callToCreate,
         });
         if (response.data) {
@@ -58,7 +58,8 @@ export const CallsStore = signalStore(
       callToUpdate: CallUpdateWebModel
     ): Promise<CallWebModel | undefined> {
       try {
-        const response = await backendService.client.PUT('/api/call/update', {
+        const response = await backendService.client.PUT('/api/calls/{id}', {
+          params: { path: { id: callToUpdate.id } },
           body: callToUpdate,
         });
         if (response.data) {
@@ -79,7 +80,7 @@ export const CallsStore = signalStore(
     },
     async fetchAll(): Promise<void> {
       try {
-        const response = await backendService.client.GET('/api/call');
+        const response = await backendService.client.GET('/api/calls');
         if (response.data) {
           patchState(store, addEntities(response.data));
         } else {
@@ -94,7 +95,7 @@ export const CallsStore = signalStore(
     async fetchById(id: string): Promise<CallWebModel | undefined> {
       try {
         const response = await backendService.client.GET(
-          '/api/call/detail/{id}',
+          '/api/calls/{id}',
           {
             params: {
               path: { id: id },
@@ -116,7 +117,7 @@ export const CallsStore = signalStore(
     async deleteById(id: string): Promise<void> {
       try {
         const response = await backendService.client.DELETE(
-          '/api/call/delete/{id}',
+          '/api/calls/{id}',
           {
             params: {
               path: { id: id },
@@ -140,7 +141,7 @@ export const CallsStore = signalStore(
     ): Promise<void> {
       try {
         const response = await backendService.client.PATCH(
-          '/api/call/{id}/subscriptions',
+          '/api/calls/{id}/subscriptions',
           {
             params: {
               path: { id: id },

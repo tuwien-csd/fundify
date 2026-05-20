@@ -1,17 +1,18 @@
 package at.ac.tuwien.fundify.adapters.in.rest.dto;
 
 import at.ac.tuwien.fundify.domain.common.UserRole;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.util.List;
-import lombok.NonNull;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 
 public record UserPermissionsUpdateWebModel(
 
     @Schema(required = true)
-    @NonNull
+    @NotNull
     List<UserRole> roles,
     @Schema(required = true)
-    @NonNull
+    @NotBlank
     String affiliationId) {
 
 }

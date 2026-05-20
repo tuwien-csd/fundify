@@ -70,7 +70,7 @@ describe('FunderService', () => {
       tick();
 
       expect(backendServiceSpy.get).toHaveBeenCalledWith(
-        `funder${ApiPath.ENTITY_LIST}`
+        `funders`
       );
       expect(result).toEqual(mockFunders);
     }));
@@ -90,7 +90,7 @@ describe('FunderService', () => {
       tick();
 
       expect(backendServiceSpy.get).toHaveBeenCalledWith(
-        `funder${ApiPath.REFERENCE_LIST}`
+        `funders${ApiPath.REFERENCE_LIST}`
       );
       expect(result).toEqual(mockRefs);
     }));
@@ -111,7 +111,7 @@ describe('FunderService', () => {
       tick();
 
       expect(backendServiceSpy.get).toHaveBeenCalledWith(
-        `funder${ApiPath.ENTITY_BY_ID_APPEND_PARAMETER}1`
+        `funders/1`
       );
       expect(result).toEqual(mockFunder);
     }));
@@ -138,7 +138,7 @@ describe('FunderService', () => {
       tick();
 
       expect(backendServiceSpy.post).toHaveBeenCalledWith(
-        `funder${ApiPath.ADD_ENTITY}`,
+        `funders`,
         mockFunder
       );
       expect(result).toEqual(mockFunder);
@@ -166,7 +166,7 @@ describe('FunderService', () => {
       tick();
 
       expect(backendServiceSpy.put).toHaveBeenCalledWith(
-        `funder${ApiPath.UPDATE_ENTITY}`,
+        `funders/1`,
         mockFunder
       );
       expect(result).toEqual(mockFunder);
@@ -195,7 +195,7 @@ describe('FunderService', () => {
       tick();
 
       expect(backendServiceSpy.delete).toHaveBeenCalledWith(
-        `funder${ApiPath.DELETE_ENTITY}${funderId}`
+        `funders/${funderId}`
       );
       expect(result).toEqual(mockFunder);
     }));
@@ -220,7 +220,7 @@ describe('FunderService', () => {
         searchText
       );
       expect(backendServiceSpy.get).toHaveBeenCalledWith(
-        `funder${ApiPath.REFERENCE_LIST_SEARCH_ADD_QUERY_PARAM}`,
+        `funders${ApiPath.REFERENCE_LIST_SEARCH_ADD_QUERY_PARAM}`,
         { params: expectedParams }
       );
       expect(result).toEqual(mockRefs);

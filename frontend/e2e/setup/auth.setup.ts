@@ -13,7 +13,7 @@ setup('authenticate as funder', async ({ page }) => {
 });
 
 setup('authenticate as institution', async ({ page }) => {
-  await authenticateWithCredential(page, E2E_CREDENTIALS.INSTITUTION);
+  await authenticateWithCredential(page, E2E_CREDENTIALS.ANNOTATOR);
 });
 
 async function authenticateWithCredential(

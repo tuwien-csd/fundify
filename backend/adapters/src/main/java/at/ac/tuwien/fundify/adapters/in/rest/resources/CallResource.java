@@ -1,13 +1,9 @@
 package at.ac.tuwien.fundify.adapters.in.rest.resources;
 
-import static at.ac.tuwien.fundify.adapters.in.rest.constants.FundingEntityMethodPath.ADD_ENTITY;
-import static at.ac.tuwien.fundify.adapters.in.rest.constants.FundingEntityMethodPath.DELETE_ENTITY_BY_ID_REPLACE_PARAMTER;
-import static at.ac.tuwien.fundify.adapters.in.rest.constants.FundingEntityMethodPath.ENTITY_BY_ID_REPLACE_PARAMETER;
-import static at.ac.tuwien.fundify.adapters.in.rest.constants.FundingEntityMethodPath.ENTITY_LIST;
+import static at.ac.tuwien.fundify.adapters.in.rest.constants.FundingEntityMethodPath.BY_ID;
 import static at.ac.tuwien.fundify.adapters.in.rest.constants.FundingEntityMethodPath.ENTITY_UPDATE_SUBSCRIPTIONS;
 import static at.ac.tuwien.fundify.adapters.in.rest.constants.FundingEntityMethodPath.PATH_PARAM_ID;
 import static at.ac.tuwien.fundify.adapters.in.rest.constants.FundingEntityMethodPath.QUERY_PARAM_STATUS;
-import static at.ac.tuwien.fundify.adapters.in.rest.constants.FundingEntityMethodPath.UPDATE_ENTITY;
 
 import at.ac.tuwien.fundify.adapters.in.rest.dto.CallCreateWebModel;
 import at.ac.tuwien.fundify.adapters.in.rest.dto.CallUpdateWebModel;
@@ -28,6 +24,7 @@ import io.quarkus.security.Authenticated;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.validation.Valid;
+import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
@@ -48,7 +45,7 @@ import lombok.extern.jbosslog.JBossLog;
  * Provides endpoints for adding, updating, deleting, and retrieving calls.
  * Error handling is done using {@link CallExceptionMapper}.
  */
-@Path("/api/call")
+@Path("/api/calls")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 @JBossLog
@@ -62,33 +59,29 @@ public class CallResource {
   private final UserService userService;
 
   @POST
-  @Path(ADD_ENTITY)
-  @Produces(MediaType.APPLICATION_JSON)
-  @Consumes(MediaType.APPLICATION_JSON)
   @RolesAllowed({UserRole.Names.FUNDER, UserRole.Names.ADMIN, UserRole.Names.ANNOTATOR})
   public CallWebModel add(@Valid CallCreateWebModel callCreateWebModel)
       throws FundifyException {
-      CallId callId = callUseCase.addCall(CallWebModelMapper.INSTANCE.toDomain(callCreateWebModel));
-      if (callId == null) {
-        return null;
-      }
-      String userId = userService.getCurrentUserId();
-      return CallWebModelMapper.INSTANCE.fromDomain(callUseCase.getCall(callId), userId);
+    CallId callId = callUseCase.addCall(CallWebModelMapper.INSTANCE.toDomain(callCreateWebModel));
+    String userId = userService.getCurrentUserId();
+    return CallWebModelMapper.INSTANCE.fromDomain(callUseCase.getCall(callId), userId);
   }
 
   @PUT
-  @Path(UPDATE_ENTITY)
-  @Produces(MediaType.APPLICATION_JSON)
-  @Consumes(MediaType.APPLICATION_JSON)
+  @Path(BY_ID)
   @RolesAllowed({UserRole.Names.FUNDER, UserRole.Names.ADMIN, UserRole.Names.ANNOTATOR})
-  public CallWebModel update(@Valid CallUpdateWebModel callUpdateWebModel) throws FundifyException {
+  public CallWebModel update(@PathParam(PATH_PARAM_ID) String pathId,
+                             @Valid CallUpdateWebModel callUpdateWebModel) throws FundifyException {
+    if (!pathId.equals(callUpdateWebModel.id())) {
+      throw new BadRequestException("Path ID does not match body ID");
+    }
     String userId = userService.getCurrentUserId();
     CallId callId = callUseCase.updateCall(CallWebModelMapper.INSTANCE.toDomain(callUpdateWebModel));
-      return CallWebModelMapper.INSTANCE.fromDomain(callUseCase.getCall(callId), userId);
+    return CallWebModelMapper.INSTANCE.fromDomain(callUseCase.getCall(callId), userId);
   }
 
   @DELETE
-  @Path((DELETE_ENTITY_BY_ID_REPLACE_PARAMTER))
+  @Path(BY_ID)
   @RolesAllowed({UserRole.Names.FUNDER, UserRole.Names.ADMIN, UserRole.Names.ANNOTATOR})
   public void delete(@PathParam(PATH_PARAM_ID) String callId)
       throws FundifyException {
@@ -96,36 +89,30 @@ public class CallResource {
   }
 
   @GET
-  @Path(ENTITY_LIST)
   public List<CallWebModel> list(@QueryParam(QUERY_PARAM_STATUS) EPublicationStatus status) {
     String userId = userService.getCurrentUserId();
-    return CallWebModelMapper.INSTANCE.fromDomain(
-          callAccessor.getByStatus(EPublicationStatus.defaultToPublished(status)), userId);
+    if (status == null) {
+      return CallWebModelMapper.INSTANCE.fromDomain(callAccessor.getAll(), userId);
+    }
+    return CallWebModelMapper.INSTANCE.fromDomain(callAccessor.getByStatus(status), userId);
   }
 
   @GET
-  public List<CallWebModel> getAll() {
-    String userId = userService.getCurrentUserId();
-      return CallWebModelMapper.INSTANCE.fromDomain(
-          callAccessor.getAll(), userId
-    );
-  }
-
-  @GET
-  @Path(ENTITY_BY_ID_REPLACE_PARAMETER)
+  @Path(BY_ID)
   public CallWebModel getById(@PathParam(PATH_PARAM_ID) String callId)
       throws EntityNotFoundException {
-      String userId = userService.getCurrentUserId();
-      return CallWebModelMapper.INSTANCE.fromDomain(callAccessor.getById(new CallId(callId)), userId);
+    String userId = userService.getCurrentUserId();
+    return CallWebModelMapper.INSTANCE.fromDomain(callAccessor.getById(new CallId(callId)), userId);
   }
 
   @PATCH
   @Path(ENTITY_UPDATE_SUBSCRIPTIONS)
   @RolesAllowed(UserRole.Names.ANNOTATOR)
-  public CallWebModel setSubscriptionForUser(@PathParam(PATH_PARAM_ID) String callId, ESubscriptionStatusWebModel newSubscriptionStatus)
+  public CallWebModel setSubscriptionForUser(@PathParam(PATH_PARAM_ID) String callId,
+      ESubscriptionStatusWebModel newSubscriptionStatus)
       throws FundifyException {
-      FundifyUser currentUser = userService.getCurrentUser();
-      return CallWebModelMapper.INSTANCE.fromDomain(callUseCase.setSubscriptionForCurrentUser(new CallId(callId),
-          CallWebModelMapper.INSTANCE.fromDto(newSubscriptionStatus), currentUser), currentUser.id());
+    FundifyUser currentUser = userService.getCurrentUser();
+    return CallWebModelMapper.INSTANCE.fromDomain(callUseCase.setSubscriptionForCurrentUser(new CallId(callId),
+        CallWebModelMapper.INSTANCE.fromDto(newSubscriptionStatus), currentUser), currentUser.id());
   }
 }
