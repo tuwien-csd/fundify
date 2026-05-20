@@ -8,6 +8,10 @@ import { MatSort } from '@angular/material/sort';
 import { FormBuilder } from '@angular/forms';
 import { AuthService } from '../../../core/auth/services/auth.service';
 import { ActivatedRoute } from '@angular/router';
+import { Call } from '../../models/call.interface';
+import { AnnotatedCall } from '../../models/annotated-call.interface';
+import { CallAnnotationListViewElement } from './call-annotation-list.component';
+import { PublicationStatusEnum } from '../../../shared/models/enums/publication-status.enum';
 
 describe('CallAnnotationListComponent', () => {
   let component: CallAnnotationListComponent;
@@ -49,5 +53,19 @@ describe('CallAnnotationListComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('should exclude draft calls from the annotation list view', () => {
+    const calls: Call[] = [
+      { id: 'published-1', status: PublicationStatusEnum.PUBLISHED },
+      { id: 'draft-1', status: PublicationStatusEnum.DRAFT },
+      { id: 'published-2', status: PublicationStatusEnum.PUBLISHED },
+    ];
+
+    type WithMerge = { mergeToListViewElements: (calls: Call[], annotatedCalls: AnnotatedCall[]) => CallAnnotationListViewElement[] };
+    const result = (component as unknown as WithMerge).mergeToListViewElements(calls, []);
+
+    expect(result.length).toBe(2);
+    expect(result.map((e) => e.callId)).toEqual(['published-1', 'published-2']);
   });
 });
