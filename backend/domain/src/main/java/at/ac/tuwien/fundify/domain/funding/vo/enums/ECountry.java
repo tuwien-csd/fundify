@@ -195,5 +195,6 @@ public enum ECountry {
     UNITED_KINGDOM,
     VIETNAM,
     CENTRAL_AFRICAN_REPUBLIC,
-    CYPRUS
+    CYPRUS,
+    TAIWAN
 }

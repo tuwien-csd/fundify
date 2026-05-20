@@ -194,6 +194,7 @@ export const CountryEnum = {
   VIETNAM: 'Vietnam',
   CENTRAL_AFRICAN_REPUBLIC: 'Central African Republic',
   CYPRUS: 'Cyprus',
+  TAIWAN: 'Taiwan (Chinese Taipei)',
 } as const;
 
 export type CountryEnum = (typeof CountryEnum)[keyof typeof CountryEnum];
