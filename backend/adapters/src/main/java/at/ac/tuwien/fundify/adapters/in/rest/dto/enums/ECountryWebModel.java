@@ -199,7 +199,8 @@ public enum ECountryWebModel {
     UNITED_KINGDOM("United Kingdom"),
     VIETNAM("Vietnam"),
     CENTRAL_AFRICAN_REPUBLIC("Central African Republic"),
-    CYPRUS("Cyprus");
+    CYPRUS("Cyprus"),
+    TAIWAN("Taiwan (Chinese Taipei)");
 
     private final String value;
 
