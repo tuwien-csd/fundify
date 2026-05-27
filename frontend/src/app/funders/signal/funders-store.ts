@@ -34,7 +34,7 @@ export const FundersStore = signalStore(
       funderToCreate: FunderCreateWebModel
     ): Promise<FunderWebModel | undefined> {
       try {
-        const response = await backendService.client.POST('/api/funder/add', {
+        const response = await backendService.client.POST('/api/funders', {
           body: funderToCreate,
         });
         if (response.data) {
@@ -61,7 +61,8 @@ export const FundersStore = signalStore(
       funderToUpdate: FunderWebModel
     ): Promise<FunderWebModel | undefined> {
       try {
-        const response = await backendService.client.PUT('/api/funder/update', {
+        const response = await backendService.client.PUT('/api/funders/{id}', {
+          params: { path: { id: funderToUpdate.id } },
           body: funderToUpdate,
         });
         if (response.data) {
@@ -84,9 +85,7 @@ export const FundersStore = signalStore(
     },
     async fetchAll(): Promise<void> {
       try {
-        const response = await backendService.client.GET(
-          '/api/funder/detail/list'
-        );
+        const response = await backendService.client.GET('/api/funders');
         if (response.data) {
           patchState(store, setAllEntities(response.data));
         } else {
@@ -101,7 +100,7 @@ export const FundersStore = signalStore(
     async fetchById(id: string): Promise<FunderWebModel | undefined> {
       try {
         const response = await backendService.client.GET(
-          '/api/funder/detail/{id}',
+          '/api/funders/{id}',
           {
             params: {
               path: { id: id },
@@ -123,7 +122,7 @@ export const FundersStore = signalStore(
     async deleteById(id: string): Promise<void> {
       try {
         const response = await backendService.client.DELETE(
-          '/api/funder/delete/{id}',
+          '/api/funders/{id}',
           {
             params: {
               path: { id: id },

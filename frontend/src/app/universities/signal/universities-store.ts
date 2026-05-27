@@ -35,7 +35,7 @@ export const UniversitiesStore = signalStore(
     ): Promise<UniversityWebModel | undefined> {
       try {
         const response = await backendService.client.POST(
-          '/api/university/add',
+          '/api/universities',
           {
             body: universityToCreate,
           }
@@ -65,8 +65,9 @@ export const UniversitiesStore = signalStore(
     ): Promise<UniversityWebModel | undefined> {
       try {
         const response = await backendService.client.PUT(
-          '/api/university/update',
+          '/api/universities/{id}',
           {
+            params: { path: { id: UniversityToUpdate.id } },
             body: UniversityToUpdate,
           }
         );
@@ -92,9 +93,7 @@ export const UniversitiesStore = signalStore(
     },
     async fetchAll(): Promise<void> {
       try {
-        const response = await backendService.client.GET(
-          '/api/university/detail/list'
-        );
+        const response = await backendService.client.GET('/api/universities');
         if (response.data) {
           patchState(store, setAllEntities(response.data));
         } else {
@@ -109,7 +108,7 @@ export const UniversitiesStore = signalStore(
     async fetchById(id: string): Promise<UniversityWebModel | undefined> {
       try {
         const response = await backendService.client.GET(
-          '/api/university/detail/{id}',
+          '/api/universities/{id}',
           {
             params: {
               path: { id: id },
@@ -131,7 +130,7 @@ export const UniversitiesStore = signalStore(
     async deleteById(id: string): Promise<void> {
       try {
         const response = await backendService.client.DELETE(
-          '/api/university/delete/{id}',
+          '/api/universities/{id}',
           {
             params: {
               path: { id: id },

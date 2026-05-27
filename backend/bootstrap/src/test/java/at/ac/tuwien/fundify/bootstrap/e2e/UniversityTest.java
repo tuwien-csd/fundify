@@ -1,8 +1,7 @@
 package at.ac.tuwien.fundify.bootstrap.e2e;
 
 
-import static at.ac.tuwien.fundify.adapters.in.rest.constants.FundingEntityMethodPath.ENTITY_BY_ID_REPLACE_PARAMETER;
-import static at.ac.tuwien.fundify.adapters.in.rest.constants.FundingEntityMethodPath.ENTITY_LIST;
+import static at.ac.tuwien.fundify.adapters.in.rest.constants.FundingEntityMethodPath.BY_ID;
 import static at.ac.tuwien.fundify.adapters.in.rest.constants.FundingEntityMethodPath.PATH_PARAM_ID;
 import static io.restassured.RestAssured.given;
 
@@ -42,7 +41,7 @@ class UniversityTest {
         // Test listing universities
         List<UniversityWebModel> universities = given()
                 .when()
-                .get(ENTITY_LIST)
+                .get()
                 .then()
                 .statusCode(200)
                 .extract()
@@ -65,7 +64,7 @@ class UniversityTest {
         UniversityWebModel responseUniversity = given()
                 .pathParam(PATH_PARAM_ID, universityId)
                 .when()
-                .get(ENTITY_BY_ID_REPLACE_PARAMETER)
+                .get(BY_ID)
                 .then()
                 .statusCode(200)
                 .extract()
@@ -83,7 +82,7 @@ class UniversityTest {
         given()
                 .pathParam(PATH_PARAM_ID, invalidId)
                 .when()
-                .get(ENTITY_BY_ID_REPLACE_PARAMETER)
+                .get(BY_ID)
                 .then()
                 .statusCode(404);
     }

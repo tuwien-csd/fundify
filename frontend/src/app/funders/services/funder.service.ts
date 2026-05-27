@@ -12,11 +12,11 @@ import { ApiPath } from '../../shared/models/enums/api-path';
 export class FunderService {
   private backendService = inject(BackendService);
 
-  private entityPathPart = 'funder';
+  private entityPathPart = 'funders';
 
   getFunders(): Observable<FunderWebModel[]> {
     return this.backendService.get<FunderWebModel[]>(
-      `${this.entityPathPart}${ApiPath.ENTITY_LIST}`
+      `${this.entityPathPart}`
     );
   }
 
@@ -28,27 +28,27 @@ export class FunderService {
 
   getFunder(id: string): Observable<FunderWebModel> {
     return this.backendService.get<FunderWebModel>(
-      `${this.entityPathPart}${ApiPath.ENTITY_BY_ID_APPEND_PARAMETER}${id}`
+      `${this.entityPathPart}/${id}`
     );
   }
 
   addFunder(funder: FunderWebModel): Observable<FunderWebModel> {
     return this.backendService.post<FunderWebModel>(
-      `${this.entityPathPart}${ApiPath.ADD_ENTITY}`,
+      `${this.entityPathPart}`,
       funder
     );
   }
 
   updateFunder(funder: FunderWebModel): Observable<FunderWebModel> {
     return this.backendService.put<FunderWebModel>(
-      `${this.entityPathPart}${ApiPath.UPDATE_ENTITY}`,
+      `${this.entityPathPart}/${funder.id}`,
       funder
     );
   }
 
   deleteFunder(funderId: string): Observable<FunderWebModel> {
     return this.backendService.delete<FunderWebModel>(
-      `${this.entityPathPart}${ApiPath.DELETE_ENTITY}${funderId}`
+      `${this.entityPathPart}/${funderId}`
     );
   }
 

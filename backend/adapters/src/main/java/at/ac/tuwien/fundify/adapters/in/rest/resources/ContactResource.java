@@ -5,6 +5,7 @@ import at.ac.tuwien.fundify.adapters.in.rest.mapper.TicketWebModelMapper;
 import at.ac.tuwien.fundify.application.port.out.ticketing.TicketingService;
 import at.ac.tuwien.fundify.domain.common.exceptions.FundifyException;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.validation.Valid;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
@@ -24,7 +25,7 @@ public class ContactResource {
   private final TicketingService ticketingService;
 
   @POST
-  public void create(TicketCreateWebModel createInput) throws FundifyException {
+  public void create(@Valid TicketCreateWebModel createInput) throws FundifyException {
     log.info("Creating a ticket for user with email: " + createInput.email());
     this.ticketingService.createTicket(TicketWebModelMapper.INSTANCE.toDomain(createInput));
   }

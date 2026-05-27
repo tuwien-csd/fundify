@@ -19,6 +19,8 @@ import at.ac.tuwien.fundify.domain.common.exceptions.FundifyException;
 import io.quarkus.security.Authenticated;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
@@ -29,6 +31,7 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.jbosslog.JBossLog;
@@ -47,7 +50,7 @@ public class AnnotatedCallResource {
 
   @POST
   @RolesAllowed(UserRole.Names.ANNOTATOR)
-  public AnnotatedCallId annotate(AnnotateRequest requestBody) throws FundifyException {
+  public AnnotatedCallId annotate(@Valid AnnotateRequest requestBody) throws FundifyException {
       return annotatedCallUseCase.addAnnotation(
           new CallId(requestBody.callId()),
           new UniversityId(requestBody.universityId()),
@@ -59,7 +62,7 @@ public class AnnotatedCallResource {
   @Path("/{id}")
   @RolesAllowed(UserRole.Names.ANNOTATOR)
   public AnnotatedCallId updateAnnotation(@PathParam("id") String id,
-      CallAnnotationWebModel annotation) throws FundifyException {
+                                          @Valid CallAnnotationWebModel annotation) throws FundifyException {
       return annotatedCallUseCase.updateAnnotation(
           new AnnotatedCallId(id),
           CallAnnotationWebModelMapper.INSTANCE.toDomain(annotation)
@@ -69,8 +72,9 @@ public class AnnotatedCallResource {
   @DELETE
   @Path("/{id}")
   @RolesAllowed(UserRole.Names.ANNOTATOR)
-  public boolean deleteAnnotation(@PathParam("id") String id) throws FundifyException {
-      return annotatedCallUseCase.deleteAnnotation(new AnnotatedCallId(id));
+  public Response deleteAnnotation(@PathParam("id") String id) throws FundifyException {
+      annotatedCallUseCase.deleteAnnotation(new AnnotatedCallId(id));
+      return Response.noContent().build();
   }
 
   @PUT
@@ -99,8 +103,9 @@ public class AnnotatedCallResource {
   @GET
   @Path("/by-id")
   @RolesAllowed({UserRole.Names.ANNOTATOR, UserRole.Names.ADMIN})
-  public AnnotatedCallWebModel findByCallIdAndUniversityId(@QueryParam("callId") String callId,
-      @QueryParam("universityId") String universityId) throws EntityNotFoundException {
+  public AnnotatedCallWebModel findByCallIdAndUniversityId(
+      @NotBlank @QueryParam("callId") String callId,
+      @NotBlank @QueryParam("universityId") String universityId) throws EntityNotFoundException {
     return AnnotatedCallWebModelMapper.INSTANCE
         .toWebModel(annotatedCallAccessor
             .getByCallIdAndUniversityId(new CallId(callId), new UniversityId(universityId)));

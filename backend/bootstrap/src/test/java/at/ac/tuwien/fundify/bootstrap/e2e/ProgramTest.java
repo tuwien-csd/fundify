@@ -1,7 +1,6 @@
 package at.ac.tuwien.fundify.bootstrap.e2e;
 
 import static at.ac.tuwien.fundify.adapters.in.rest.constants.FundingEntityMethodPath.QUERY_PARAM_STATUS;
-import static at.ac.tuwien.fundify.adapters.in.rest.constants.FundingEntityMethodPath.UPDATE_ENTITY;
 import static at.ac.tuwien.fundify.bootstrap.utils.TestConstants.FFG_FUNDER_AFFILIATION;
 import static io.restassured.RestAssured.given;
 
@@ -227,7 +226,7 @@ class ProgramTest {
                 .contentType(ContentType.JSON)
                 .body(requestProgram)
                 .when()
-                .put(UPDATE_ENTITY)
+                .put(programId)
                 .then()
                 .statusCode(200)
                 .extract()
@@ -259,7 +258,7 @@ class ProgramTest {
                 .contentType(ContentType.JSON)
                 .body(requestProgram)
                 .when()
-                .put(UPDATE_ENTITY)
+                .put(existingProgram.id.toHexString())
                 .then()
                 .statusCode(200)
                 .extract()
@@ -284,7 +283,7 @@ class ProgramTest {
                 .contentType(ContentType.JSON)
                 .body(requestProgram)
                 .when()
-                .put(UPDATE_ENTITY)
+                .put(validId)
                 .then()
                 .statusCode(404);
     }
@@ -430,7 +429,7 @@ class ProgramTest {
           .contentType(ContentType.JSON)
           .body(requestProgram)
           .when()
-          .put(UPDATE_ENTITY)
+          .put(programId)
           .then()
           .statusCode(403);
     }
@@ -449,7 +448,7 @@ class ProgramTest {
           .contentType(ContentType.JSON)
           .body(requestProgram)
           .when()
-          .put(UPDATE_ENTITY)
+          .put(programIdManagedBySync)
           .then()
           .statusCode(403);
     }

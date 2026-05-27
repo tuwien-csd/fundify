@@ -184,18 +184,15 @@ class AnnotatedCallTest {
 
     @Test
     @WithTUWUser
-    void givenValidId_whenDeleteAnnotation_thenReturnsTrueAndStatus200() {
-        boolean response = given()
-                .contentType(ContentType.JSON)
-                .pathParam("id", ANNOTATED_CALL_ID)
-                .when()
-                .delete("/{id}")
-                .then()
-                .statusCode(200)
-                .extract()
-                .as(Boolean.class);
-
-        Assertions.assertTrue(response);
+    void givenValidId_whenDeleteAnnotation_thenReturnsTrueAndStatus204() {
+        given()
+            .contentType(ContentType.JSON)
+            .pathParam("id", ANNOTATED_CALL_ID)
+            .when()
+            .delete("/{id}")
+            .then()
+            .statusCode(204)
+            .extract();
     }
 
     @Test

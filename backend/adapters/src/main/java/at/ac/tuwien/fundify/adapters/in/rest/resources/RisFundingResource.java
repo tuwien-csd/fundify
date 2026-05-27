@@ -31,6 +31,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.validation.constraints.Min;
+import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
@@ -72,8 +74,15 @@ public class RisFundingResource {
             @Parameter(description = "Filter for running calls") @QueryParam("runningCalls") Boolean runningCalls,
             @Parameter(description = "Region filter") @QueryParam("region") RisEligibleApplicantsRegion risRegion,
             @Parameter(description = "Funder ID filter") @QueryParam("funderId") String funderId,
-            @Parameter(description = "Applicants scope filter") @QueryParam("applicantsScope") RisEligibleApplicantsScope risApplicantsScope) {
-            return getRisFundings(risFundingType, risTargetGroup, runningCalls, risRegion, funderId, risApplicantsScope);
+            @Parameter(description = "Applicants scope filter") @QueryParam("applicantsScope") RisEligibleApplicantsScope risApplicantsScope,
+            @QueryParam("page[page]") @DefaultValue("0") @Min(0) int page,
+            @QueryParam("page[size]") @DefaultValue("20") @Min(0) int size) {
+            List<RisFunding> all = getRisFundings(risFundingType, risTargetGroup, runningCalls, risRegion, funderId, risApplicantsScope);
+            int fromIndex = page * size;
+            if (fromIndex >= all.size()) {
+                return List.of();
+            }
+            return all.subList(fromIndex, Math.min(fromIndex + size, all.size()));
     }
 
     @GET

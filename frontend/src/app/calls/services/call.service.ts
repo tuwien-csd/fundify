@@ -19,12 +19,12 @@ export class CallService {
   private backendService = inject(BackendService);
   private openApiBeClientService = inject(BackendServiceV2);
 
-  private entityPathPart = 'call';
+  private entityPathPart = 'calls';
   private annotatedCallPathPart = 'annotated-calls';
   private vocabularyPathPart = 'vocabularies';
 
   getCalls(): Observable<Call[]> {
-    return from(this.openApiBeClientService.client.GET('/api/call')).pipe(
+    return from(this.openApiBeClientService.client.GET('/api/calls')).pipe(
       map(({ data, error }) => {
         if (error) throw error;
 
@@ -45,7 +45,7 @@ export class CallService {
       PublicationStatusEnum.DRAFT
     );
     return this.backendService.get<Call[]>(
-      `${this.entityPathPart}${ApiPath.ENTITY_LIST}`,
+      `${this.entityPathPart}`,
       { params }
     );
   }
@@ -63,27 +63,27 @@ export class CallService {
 
   getCall(id: string): Observable<Call> {
     return this.backendService.get<Call>(
-      `${this.entityPathPart}${ApiPath.ENTITY_BY_ID_APPEND_PARAMETER}${id}`
+      `${this.entityPathPart}/${id}`
     );
   }
 
   updateCall(call: Call): Observable<Call> {
     return this.backendService.put<Call>(
-      `${this.entityPathPart}${ApiPath.UPDATE_ENTITY}`,
+      `${this.entityPathPart}/${call.id}`,
       call
     );
   }
 
   addCall(call: Call): Observable<Call> {
     return this.backendService.post<Call>(
-      `${this.entityPathPart}${ApiPath.ADD_ENTITY}`,
+      `${this.entityPathPart}`,
       call
     );
   }
 
   deleteCall(callId: string): Observable<Call> {
     return this.backendService.delete<Call>(
-      `${this.entityPathPart}${ApiPath.DELETE_ENTITY}${callId}`
+      `${this.entityPathPart}/${callId}`
     );
   }
 

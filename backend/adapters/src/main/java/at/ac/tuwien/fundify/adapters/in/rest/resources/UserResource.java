@@ -8,6 +8,7 @@ import at.ac.tuwien.fundify.domain.common.UserPermissionHolder;
 import at.ac.tuwien.fundify.domain.common.UserRole;
 import io.quarkus.security.Authenticated;
 import jakarta.annotation.security.RolesAllowed;
+import jakarta.validation.Valid;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.PUT;
@@ -39,7 +40,7 @@ public class UserResource {
     @Path("/{id}/permissions")
     @Consumes(MediaType.APPLICATION_JSON)
     @RolesAllowed(UserRole.Names.ADMIN)
-    public UserPermissionHolder updateUser(@PathParam("id") String id, UserPermissionsUpdateWebModel updateInput) {
+    public UserPermissionHolder updateUser(@PathParam("id") String id, @Valid UserPermissionsUpdateWebModel updateInput) {
       var updateObject = UserPermissionsWebModelMapper.INSTANCE.toDomain(updateInput, id);
       return userPermissionManagementUseCase.updatePermissions(updateObject);
     }
