@@ -5,7 +5,6 @@ import {
   MatNavList,
   MatListItem,
   MatListItemIcon,
-  MatDivider,
 } from '@angular/material/list';
 import { RouterLinkActive, RouterLink } from '@angular/router';
 import { MatIcon } from '@angular/material/icon';
@@ -52,6 +51,7 @@ import { MatIcon } from '@angular/material/icon';
         <mat-icon matListItemIcon>account_balance</mat-icon>
         <span class="menu-text">Institutions</span>
       </a>
+      <!-- TODO: re-enable settings link when needed
       <mat-divider></mat-divider>
       <a
         mat-list-item
@@ -61,6 +61,7 @@ import { MatIcon } from '@angular/material/icon';
         <mat-icon matListItemIcon>settings</mat-icon>
         <span class="menu-text">Settings</span>
       </a>
+      -->
     </mat-nav-list>
   `,
   styleUrls: ['./sidebar.component.scss'],
@@ -70,8 +71,7 @@ import { MatIcon } from '@angular/material/icon';
     RouterLinkActive,
     RouterLink,
     MatIcon,
-    MatListItemIcon,
-    MatDivider,
+    MatListItemIcon
   ],
 })
 export class SidebarComponent {
