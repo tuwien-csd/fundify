@@ -78,7 +78,6 @@ public class RisFundingResource {
             @QueryParam("page[page]") @DefaultValue("0") @Min(0) int page,
             @QueryParam("page[size]") @DefaultValue("20") @Min(0) int size) {
             List<RisFunding> all = getRisFundings(risFundingType, risTargetGroup, runningCalls, risRegion, funderId, risApplicantsScope);
-            //TODO Pagination is done here, because the data is fetched over two tables
             int fromIndex = page * size;
             if (fromIndex >= all.size()) {
                 return List.of();

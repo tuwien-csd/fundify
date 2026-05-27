@@ -12,7 +12,7 @@ public record UniversityCreateWebModel(
     @NotNull @Size(min = 1)
     @Valid
     List<TranslatedTextWebModel> name,
-    String acronym,
+    @Schema(required = true) String acronym,
     String emailDomain,
     @Schema(required = true) String website,
     String submissionSystem,

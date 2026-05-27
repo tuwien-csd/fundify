@@ -13,6 +13,7 @@ import at.ac.tuwien.fundify.domain.funding.Call;
 import at.ac.tuwien.fundify.domain.funding.vo.enums.EAustrianState;
 import at.ac.tuwien.fundify.domain.funding.vo.enums.ECallType;
 import at.ac.tuwien.fundify.domain.funding.vo.enums.ERegionalScope;
+import org.bson.Document;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.util.List;
@@ -113,7 +114,8 @@ public class CallMongoEntityQuery implements CallQuery {
                         .withFunderId(funderId)
                         .withApplicantsScope(applicantsScope)
                         .withStatus(status)
-                        .build()
+                        .build(),
+                new Document("_id", 1)
         ).list();
         return CallMongoEntityMapper.INSTANCE.toDomain(result, mongoCrossReferenceResolver);
     }
@@ -155,7 +157,8 @@ public class CallMongoEntityQuery implements CallQuery {
                         .withFunderId(funderId)
                         .withApplicantsScope(applicantsScope)
                         .withStatus(status)
-                        .build()
+                        .build(),
+                new Document("_id", 1)
         ).list();
         return CallMongoEntityMapper.INSTANCE.toDTOs(result, mongoCrossReferenceResolver);
     }

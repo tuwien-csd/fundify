@@ -17,7 +17,7 @@ public record FunderWebModel(
     List<TranslatedTextWebModel> name,
     String risId,
     @Schema(required = true) String website,
-    String acronym,
+    @Schema(required = true) String acronym,
     @Valid List<IdentifierWebModel> identifiers,
     String submissionSystem,
     String phone,
