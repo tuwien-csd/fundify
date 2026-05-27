@@ -146,10 +146,9 @@ public class EuTenderToRisMapper {
             return RisFundingType.CALL;
         }
         EuTenderAction first = actions.getFirst();
-        if (first.getDeadlineDates() != null && !first.getDeadlineDates().isEmpty()) {
-            if (first.getStatus() != null && "Open".equalsIgnoreCase(first.getStatus().getAbbreviation())) {
+        if (first.getDeadlineDates() != null && !first.getDeadlineDates().isEmpty() &&
+            first.getStatus() != null && "Open".equalsIgnoreCase(first.getStatus().getAbbreviation())) {
                 return RisFundingType.ONGOING_CALL;
-            }
         }
         return RisFundingType.CALL;
     }

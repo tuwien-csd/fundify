@@ -518,6 +518,7 @@ components:
         - INFRASTRUCTURE
         - NETWORKING
         - MOBILITY_PROGRAMME
+        - EU_FUNDING
       type: string
     RisFundingType:
       enum:
@@ -649,6 +650,7 @@ components:
         - INDEPENDENT_RESEARCHER
         - GOVERNMENT
         - UNIVERSITY_COLLEGE_OF_TEACHER_EDUCATION
+        - EU_FUNDING
       type: string
     RisText:
       type: object
