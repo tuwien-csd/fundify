@@ -110,6 +110,9 @@ export class CallsComponent {
       if (property === 'name') {
         return item.name?.map((name) => name.text).join('') ?? 0;
       }
+      if (property === 'status') {
+        return this.getCallStatus(item);
+      }
       return (item[property as keyof typeof item] as string) ?? 0;
     };
     dataSource.sort.active = 'status';
