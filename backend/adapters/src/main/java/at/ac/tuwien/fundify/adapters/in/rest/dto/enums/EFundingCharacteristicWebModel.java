@@ -17,7 +17,8 @@ public enum EFundingCharacteristicWebModel {
     PROJECT_FUNDING("Project Funding"),
     INFRASTRUCTURE("Infrastructure"),
     NETWORKING("Networking"),
-    MOBILITY_PROGRAMME("Mobility Programme");
+    MOBILITY_PROGRAMME("Mobility Programme"),
+    EU_FUNDING("EU-Funding");
 
     private final String value;
 

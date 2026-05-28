@@ -13,7 +13,9 @@ import at.ac.tuwien.fundify.domain.funding.Call;
 import at.ac.tuwien.fundify.domain.funding.FunderReference;
 import at.ac.tuwien.fundify.domain.funding.Program;
 import at.ac.tuwien.fundify.domain.funding.ProgramReference;
+import at.ac.tuwien.fundify.domain.funding.vo.Identifier;
 import at.ac.tuwien.fundify.domain.funding.vo.enums.EEntryOrigin;
+import at.ac.tuwien.fundify.domain.funding.vo.enums.EIdentifierType;
 import jakarta.enterprise.context.ApplicationScoped;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -97,11 +99,19 @@ public class FundingSynchronizer implements SyncExternalFundingsUseCase {
     call.setJointCallPartner(getJointCallpartnerIfReferencesExist(call));
     call.setLastSync(now);
 
-    Optional<Call> storedCall = callRepository.findByRisId(call.getExternalIdentifier().getRisId());
+    Optional<Call> storedCall = findExistingCall(call);
     storedCall.ifPresentOrElse(
         existing -> updateExistingCall(call, existing),
         () -> persistNewCall(call, now)
     );
+  }
+
+  private Optional<Call> findExistingCall(Call call) {
+    Identifier euId = call.getExternalIdentifier().getIdentifier(EIdentifierType.EU_ID);
+    if (euId != null) {
+      return callRepository.findByEuId(euId.value());
+    }
+    return callRepository.findByRisId(call.getExternalIdentifier().getRisId());
   }
 
   private void updateExistingCall(Call call, Call existing) {

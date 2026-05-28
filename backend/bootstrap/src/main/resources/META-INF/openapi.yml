@@ -530,6 +530,7 @@ components:
         - INFRASTRUCTURE
         - NETWORKING
         - MOBILITY_PROGRAMME
+        - EU_FUNDING
       type: string
     RisFundingType:
       enum:
@@ -562,6 +563,7 @@ components:
         - ROR
         - RINGGOLD
         - RIS_SYNERGY
+        - EU_ID
       type: string
     RisLegalType:
       enum:
@@ -660,6 +662,7 @@ components:
         - INDEPENDENT_RESEARCHER
         - GOVERNMENT
         - UNIVERSITY_COLLEGE_OF_TEACHER_EDUCATION
+        - EU_FUNDING
       type: string
     RisText:
       type: object
