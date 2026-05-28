@@ -23,5 +23,7 @@ public interface CallRepository {
 
     Optional<Call> findByRisId(RisId risId);
 
+    Optional<Call> findByEuId(String euId);
+
     Optional<CallIdMapping> findIdMappingByRisId(RisId risId);
 }

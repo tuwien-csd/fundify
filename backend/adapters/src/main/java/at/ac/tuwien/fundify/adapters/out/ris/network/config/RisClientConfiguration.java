@@ -1,5 +1,6 @@
 package at.ac.tuwien.fundify.adapters.out.ris.network.config;
 
+import at.ac.tuwien.fundify.adapters.out.eutender.network.client.EuTenderRestClient;
 import at.ac.tuwien.fundify.adapters.out.ris.network.client.FwfRestClient;
 import at.ac.tuwien.fundify.adapters.out.ris.network.client.FwfTestRestClient;
 import at.ac.tuwien.fundify.adapters.out.ris.network.client.GenericRisFundingRestClient;
@@ -29,11 +30,13 @@ public class RisClientConfiguration {
   RisClientConfiguration(
       @RestClient WwtfRestClient wwtfRestClient,
       @RestClient FwfTestRestClient fwfTestRestClient,
-      @RestClient FwfRestClient fwfRestClient) {
+      @RestClient FwfRestClient fwfRestClient,
+      EuTenderRestClient euTenderRestClient) {
     log.info("Initializing RIS client configuration");
     registerIfEnabled(fwfRestClient);
     registerIfEnabled(fwfTestRestClient);
     registerIfEnabled(wwtfRestClient);
+    registerIfEnabled(euTenderRestClient);
     log.infof("Registered RIS clients: %s", registeredRestClients.keySet());
   }
 

@@ -1,6 +1,7 @@
 package at.ac.tuwien.fundify.adapters.common.ris.mapper;
 
 import at.ac.tuwien.fundify.adapters.common.ris.model.v1.RisText;
+import at.ac.tuwien.fundify.adapters.common.ris.model.v1.RisTranslationEnum;
 import at.ac.tuwien.fundify.domain.common.ELanguage;
 import at.ac.tuwien.fundify.domain.common.ETranslation;
 import at.ac.tuwien.fundify.domain.common.TranslatedText;
@@ -21,7 +22,7 @@ public interface RisTextMapper {
     List<TranslatedText> toDomain(List<RisText> source);
 
     @Named("eTranslationFromRisTrans")
-    default ETranslation eTranslationFromRisTrans(RisText.TransEnum trans) {
+    default ETranslation eTranslationFromRisTrans(RisTranslationEnum trans) {
         return switch (trans) {
             case O -> ETranslation.ORIGINAL;
             case H -> ETranslation.TRANSLATION_HUMAN;
@@ -45,17 +46,17 @@ public interface RisTextMapper {
     List<RisText> fromDomain(List<TranslatedText> source);
 
     @Named("risTransFromETranslation")
-    default RisText.TransEnum risTransFromETranslation(ETranslation translation) {
+    default RisTranslationEnum risTransFromETranslation(ETranslation translation) {
 
         // this should not happen, but if it does, we take default H
         if (translation == null) {
-            return RisText.TransEnum.H;
+            return RisTranslationEnum.H;
         }
 
         return switch (translation) {
-            case ORIGINAL -> RisText.TransEnum.O;
-            case TRANSLATION_HUMAN -> RisText.TransEnum.H;
-            case TRANSLATION_MACHINE -> RisText.TransEnum.M;
+            case ORIGINAL -> RisTranslationEnum.O;
+            case TRANSLATION_HUMAN -> RisTranslationEnum.H;
+            case TRANSLATION_MACHINE -> RisTranslationEnum.M;
         };
     }
 

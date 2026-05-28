@@ -582,7 +582,8 @@
           "PROJECT_FUNDING",
           "INFRASTRUCTURE",
           "NETWORKING",
-          "MOBILITY_PROGRAMME"
+          "MOBILITY_PROGRAMME",
+          "EU_FUNDING"
         ]
       },
       "FundingType": {
@@ -629,7 +630,8 @@
           "ORCID",
           "ROR",
           "RINGGOLD",
-          "RIS_SYNERGY"
+          "RIS_SYNERGY",
+          "EU_ID"
         ]
       },
       "LegalType": {
@@ -845,7 +847,8 @@
           "PRIVATE_NON_PROFIT",
           "INDEPENDENT_RESEARCHER",
           "GOVERNMENT",
-          "UNIVERSITY_COLLEGE_OF_TEACHER_EDUCATION"
+          "UNIVERSITY_COLLEGE_OF_TEACHER_EDUCATION",
+          "EU_FUNDING"
         ]
       },
       "Text": {

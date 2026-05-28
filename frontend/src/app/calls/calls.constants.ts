@@ -35,6 +35,7 @@ export const CALL_DETAILS_CONSTANTS = {
   FUNDING_TYPE_LABEL: 'Funding Type',
   APPlICATION_LANGUAGE_LABEL: 'Application Language',
   RIS_ID_LABEL: 'RIS Synergy ID',
+  EU_ID_LABEL: 'EU ID',
   RIS_ID_PLACEHOLDER: 'Enter RIS Synergy ID',
   PART_OF_LABEL: 'Part Of',
   PART_OF_PLACEHOLDER: 'Search Program...',

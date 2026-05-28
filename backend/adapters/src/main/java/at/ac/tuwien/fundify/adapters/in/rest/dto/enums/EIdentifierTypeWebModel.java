@@ -12,7 +12,9 @@ public enum EIdentifierTypeWebModel {
     ORCID("ORCID"),
     ROR("ROR"),
     RINGGOLD("Ringgold"),
-    RIS_SYNERGY("Ris Synergy");
+    RIS_SYNERGY("Ris Synergy"),
+    EU_ID("EU-ID"),
+    CROSSREF_FUNDERID("CROSSREF_FUNDERID");
 
     private final String value;
 

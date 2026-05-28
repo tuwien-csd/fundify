@@ -2,7 +2,7 @@
 POST {{tokenEndpoint}}
 Content-Type: application/x-www-form-urlencoded
 
-grant_type=password&client_id=admin-cli&username= {{admin.username}}&password={{admin.password}}
+grant_type=password&client_id=fundify&username= {{admin.username}}&password={{admin.password}}
 
 > {% client.global.set("auth_token", response.body.access_token) %}
 

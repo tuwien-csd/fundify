@@ -22,6 +22,7 @@ import { EntryOriginEnum } from '../../../shared/models/enums/entry-origin.enum'
 import { ActionPermissions } from '../../../core/models/ActionPermissions';
 import { PermissionService } from '../../../core/auth/services/permission.service';
 import { Call } from '../../models/call.interface';
+import { IdentifierTypeEnum } from '../../../shared/models/enums/identifier-type.enum';
 import {
   LOCAL_STORAGE_KEYS,
   LocalStorageService,
@@ -132,6 +133,10 @@ export class CallDetailPreviewComponent implements OnInit {
         label: this.CALL_DETAILS_CONSTANTS.RIS_ID_LABEL,
         value: this.call.risId ?? CALL_DETAILS_CONSTANTS.PLACEHOLDER,
       },
+      ...(this.getEuId() ? [{
+        label: this.CALL_DETAILS_CONSTANTS.EU_ID_LABEL,
+        value: this.getEuId()!,
+      }] : []),
       {
         label: this.CALL_DETAILS_CONSTANTS.PART_OF_LABEL,
         value: this.formatFundingRef(this.call.partOf),
@@ -323,6 +328,12 @@ export class CallDetailPreviewComponent implements OnInit {
         value: this.formatJointCallPartners(),
       },
     ];
+  }
+
+  private getEuId(): string | undefined {
+    return this.call.identifiers?.find(
+      (i) => i.type === IdentifierTypeEnum.EU_ID
+    )?.value;
   }
 
   private formatDateRange(
