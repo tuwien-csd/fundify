@@ -190,8 +190,8 @@ export class CallsComponent {
     }
 
     const now = new Date();
-    const startDate = this.getCallStartDate(call.callStages ?? []);
-    const endDate = this.getCallEndDate(call.callStages ?? []);
+    const startDate = this.getCallStartDate(call?.callStages ?? []);
+    const endDate = this.getCallEndDate(call?.callStages ?? []);
 
     if (startDate > now) {
       return 'Upcoming';
@@ -204,14 +204,14 @@ export class CallsComponent {
 
   private getCallStartDate(callStages: DateInfoRange[]): Date {
     if (callStages.length === 0) return new Date(0);
-    return new Date(callStages[0].duration.start!);
+    const firstStageStart = callStages[0].duration?.start;
+    return firstStageStart ? new Date(firstStageStart) : new Date(0);
   }
 
   private getCallEndDate(callStages: DateInfoRange[]): Date {
     if (callStages.length === 0) return new Date(2100, 1, 1);
-    return new Date(
-      callStages[callStages.length - 1].duration.end ?? new Date(2100, 1, 1)
-    );
+    const lastStageEnd = callStages[callStages.length - 1].duration?.end;
+    return lastStageEnd ? new Date(lastStageEnd) : new Date(2100, 1, 1);
   }
 
   private combineCallFields(call: CallWebModel): string {

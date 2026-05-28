@@ -19,6 +19,7 @@ import { AnswerYnEnum } from 'src/app/shared/models/enums/answer-yn.enum';
 import { AustrianStateEnum } from 'src/app/shared/models/enums/austrian-state.enum';
 import { CallTypeEnum } from 'src/app/shared/models/enums/call-type.enum';
 import { CareerStageEnum } from 'src/app/shared/models/enums/career-stage.enum';
+import { CountryEnum } from 'src/app/shared/models/enums/country.enum';
 import { DecisionProcessEnum } from 'src/app/shared/models/enums/decision-process.enum';
 import { FundingCharacteristicEnum } from 'src/app/shared/models/enums/funding-characteristic.enum';
 import { FundingRegexp } from 'src/app/shared/models/enums/funding-regexp.enum';
@@ -77,6 +78,7 @@ import { AuthService } from '../../../core/auth/services/auth.service';
 import { FundingEntityRef } from '../../../shared/models/interfaces/funding-entity-ref.interface';
 import { TranslatedText } from '../../../shared/models/interfaces/translated-text.interface';
 import { FunderSearchComponent } from '../../../shared/components/funder-search/funder-search.component';
+import { SearchSelectComponent } from '../../../shared/components/search-select/search-select.component';
 import { MatError } from '@angular/material/form-field';
 
 @Component({
@@ -110,6 +112,7 @@ import { MatError } from '@angular/material/form-field';
     MatIcon,
     MatTooltip,
     FunderSearchComponent,
+    SearchSelectComponent,
     MatError,
   ],
 })
@@ -150,6 +153,7 @@ export class CallDetailEditComponent implements OnInit {
   careerStages: typeof CareerStageEnum = CareerStageEnum;
   applicationLanguages: typeof LanguageEnum = LanguageEnum;
   eligibleApplicantsRegions: typeof AustrianStateEnum = AustrianStateEnum;
+  countries: typeof CountryEnum = CountryEnum;
   modesOfSubmission: typeof ModeOfSubmissionEnum = ModeOfSubmissionEnum;
   decisionProcesses: typeof DecisionProcessEnum = DecisionProcessEnum;
   fundingCharacteristics: typeof FundingCharacteristicEnum =
@@ -252,6 +256,8 @@ export class CallDetailEditComponent implements OnInit {
       eligibleApplicantsScope: [this.call.eligibleApplicantsScope],
       dmpRequired: [this.call.dmpRequired],
       eligibleApplicantsRegions: [this.call.eligibleApplicantsRegions],
+      eligibleTargetRegions: [this.call.eligibleTargetRegions],
+      eligibleSourceRegions: [this.call.eligibleSourceRegions],
       submissionModes: [this.call.submissionModes],
       characteristics: [this.call.characteristics],
       decisionProcess: [this.call.decisionProcess],

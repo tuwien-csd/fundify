@@ -1,0 +1,917 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Funding Api",
+    "description": "### Ids for Example Fundings:\n\n> ***Call:*** AAUFUND1234\n>\n> ***Programme:*** AAUFUND1235",
+    "license": {
+      "name": "EUPL 1.2",
+      "url": "https://eupl.eu/1.2/en/"
+    },
+    "version": "1.2"
+  },
+  "servers": [
+    {
+      "url": "https://rissyn.arisnet.ac.at/ris-synergy/funding"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Fundings",
+      "description": "In the RIS-Synergy Network, the Endpoints for fetching a list of Programmes and Calls or a single Programme or Call are provided by the RIS-APP \"Eingabetool\". The Endpoint for fetching a single Entity of the other Funding Types which describes the contract for a project are only provided by the funders."
+    }
+  ],
+  "paths": {
+    "/v1/fundings": {
+      "get": {
+        "tags": [
+          "Fundings"
+        ],
+        "summary": "GET Endpoint for Fundings",
+        "description": "Get Endpoint for retrieving all Fundings",
+        "operationId": "findAll",
+        "parameters": [
+          {
+            "name": "fundingType",
+            "in": "query",
+            "description": "\tNach spezifischen Typ gefilterte Fundings abfragen\nVocabulary: [Eligible Applicants Scope - Vocabulary](https://documentation.forschungsdaten.at/?page_id=303)",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/FundingType"
+            }
+          },
+          {
+            "name": "targetGroup",
+            "in": "query",
+            "description": "\tNach spezifischen Zielgruppen (Organisationstypen) gefilterte Calls abfragen\nVocabulary: [Target group - Vocabulary](https://documentation.forschungsdaten.at/?page_id=322)",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/TargetGroup"
+            }
+          },
+          {
+            "name": "runningCalls",
+            "in": "query",
+            "description": "\tDeadline der (ersten) Call-Stage liegt in der Zukunft (Feld: Call stage start 1)\n\tOngoing Call: Deadline = fiktives Datum in der Zukunft\n\tBeginndatum liegt in der Vergangenheit oder in der Gegenwart + Enddatum in der Zukunft oder ist nicht eingetragen\n\ttrue: liefert nur laufende Calls\n\tfalse: liefert nur Calls welche die Anforderungen für running Calls nicht erfüllen.\n\tnicht angegeben: liefert alle Calls",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "region",
+            "in": "query",
+            "description": "\tBundeslandspezifische Calls abfragen\nVocabulary: [Eligible Applicants Region - Vocabulary](https://documentation.forschungsdaten.at/?page_id=346)",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/EligibleApplicantsRegion"
+            }
+          },
+          {
+            "name": "funderId",
+            "in": "query",
+            "description": "\tCalls eines Fördergebers abfragen: Fördergeber ID",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "applicantsScope",
+            "in": "query",
+            "description": "\tNationale oder internationale Calls abfragen\nVocabulary: [Eligible Applicants Scope - Vocabulary](https://documentation.forschungsdaten.at/?page_id=343)",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/EligibleApplicantsScope"
+            }
+          },
+          {
+            "name": "page[page]",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "page[size]",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Funding"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/fundings/{id}": {
+      "get": {
+        "tags": [
+          "Fundings"
+        ],
+        "summary": "GET Endpoint for Funding",
+        "description": "Get Endpoint for retrieving Funding via ID",
+        "operationId": "findByKey",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Funding"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "BaseFunding": {
+        "required": [
+          "id",
+          "name",
+          "type"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "$ref": "#/components/schemas/FundingType"
+          },
+          "name": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Text"
+            }
+          },
+          "acronym": {
+            "type": "string",
+            "nullable": true
+          },
+          "identifiers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Identifier"
+            }
+          }
+        },
+        "nullable": true
+      },
+      "Call": {
+        "required": [
+          "applicationLanguages",
+          "characteristics",
+          "fullyFunded",
+          "funder",
+          "fundingScheme",
+          "id",
+          "legalType",
+          "maxProjectDuration",
+          "minProjectDuration",
+          "name",
+          "subjects",
+          "submissionModes",
+          "targetGroups",
+          "type"
+        ],
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Funding"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "callVolumeProjects": {
+                "type": "integer",
+                "format": "int32",
+                "nullable": true
+              },
+              "callStages": {
+                "type": "array",
+                "nullable": true,
+                "items": {
+                  "$ref": "#/components/schemas/CallStage"
+                }
+              },
+              "contacts": {
+                "type": "array",
+                "nullable": true,
+                "items": {
+                  "$ref": "#/components/schemas/Contact"
+                }
+              },
+              "amount": {
+                "$ref": "#/components/schemas/Volume"
+              },
+              "decisionProcesses": {
+                "type": "array",
+                "nullable": true,
+                "items": {
+                  "$ref": "#/components/schemas/DecisionProcess"
+                }
+              },
+              "decisionProcessDetails": {
+                "type": "array",
+                "nullable": true,
+                "items": {
+                  "$ref": "#/components/schemas/Text"
+                }
+              },
+              "submissionModes": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/SubmissionMode"
+                }
+              },
+              "dmpRequired": {
+                "type": "boolean",
+                "nullable": true
+              },
+              "dmpGuidelines": {
+                "type": "string",
+                "nullable": true
+              },
+              "projectStart": {
+                "type": "array",
+                "nullable": true,
+                "items": {
+                  "$ref": "#/components/schemas/Text"
+                }
+              },
+              "targetGroupSpecified": {
+                "type": "array",
+                "nullable": true,
+                "items": {
+                  "$ref": "#/components/schemas/Text"
+                }
+              },
+              "eligibleApplicants": {
+                "type": "array",
+                "nullable": true,
+                "items": {
+                  "$ref": "#/components/schemas/Text"
+                }
+              },
+              "eligibleApplicantsScope": {
+                "$ref": "#/components/schemas/EligibleApplicantsScope"
+              },
+              "eligibleApplicantsRegions": {
+                "type": "array",
+                "nullable": true,
+                "items": {
+                  "$ref": "#/components/schemas/EligibleApplicantsRegion"
+                }
+              },
+              "minProjectVolume": {
+                "$ref": "#/components/schemas/Volume"
+              },
+              "maxProjectVolume": {
+                "$ref": "#/components/schemas/Volume"
+              },
+              "fullyFunded": {
+                "type": "boolean"
+              },
+              "minInkind": {
+                "type": "number"
+              },
+              "inkindDetails": {
+                "type": "array",
+                "nullable": true,
+                "items": {
+                  "$ref": "#/components/schemas/Text"
+                }
+              },
+              "maxOverHeads": {
+                "type": "number"
+              },
+              "overheadsDetails": {
+                "type": "array",
+                "nullable": true,
+                "items": {
+                  "$ref": "#/components/schemas/Text"
+                }
+              },
+              "minProjectDuration": {
+                "$ref": "#/components/schemas/TimeSpan"
+              },
+              "maxProjectDuration": {
+                "$ref": "#/components/schemas/TimeSpan"
+              },
+              "reportingPeriods": {
+                "type": "array",
+                "nullable": true,
+                "items": {
+                  "$ref": "#/components/schemas/Text"
+                }
+              },
+              "applicationLanguages": {
+                "type": "array",
+                "description": "[ISO Codes](https://en.wikipedia.org/wiki/List_of_ISO_639_language_codes)",
+                "items": {
+                  "type": "string",
+                  "description": "[ISO Codes](https://en.wikipedia.org/wiki/List_of_ISO_639_language_codes)"
+                }
+              },
+              "partOf": {
+                "$ref": "#/components/schemas/BaseFunding"
+              },
+              "thematicOrientations": {
+                "type": "array",
+                "nullable": true,
+                "items": {
+                  "type": "array",
+                  "nullable": true,
+                  "items": {
+                    "$ref": "#/components/schemas/Text"
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "CallStage": {
+        "type": "object",
+        "properties": {
+          "number": {
+            "type": "string",
+            "nullable": true
+          },
+          "callStageStart": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "callStageEnd": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "callStageDescription": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Text"
+            }
+          }
+        },
+        "nullable": true
+      },
+      "CareerStage": {
+        "type": "string",
+        "description": "[Vocabulary](https://documentation.forschung-daten.at/vocabulary/career-stage)",
+        "nullable": true,
+        "enum": [
+          "EXPERTS",
+          "STUDENTS",
+          "DOCTORAL_STUDENTS",
+          "EARLY_STAGE_RESEARCHERS",
+          "MID_CAREER_RESEARCHERS",
+          "ESTABLISHED_RESEARCHERS",
+          "UNDERGRADUATE_STUDENTS",
+          "GRADUATE_STUDENTS",
+          "POSTGRADUATE_STUDENTS",
+          "POSTDOCTORAL_RESEARCHERS",
+          "SCIENTISTS",
+          "SCIENTIFIC_INSTITUTION"
+        ]
+      },
+      "Contact": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          }
+        },
+        "nullable": true
+      },
+      "DecisionProcess": {
+        "type": "string",
+        "description": "[Vocabulary](https://documentation.forschung-daten.at/vocabulary/decision-process)",
+        "nullable": true,
+        "enum": [
+          "PEER_REVIEW",
+          "JURY",
+          "BOARD_OF_TRUSTEES"
+        ]
+      },
+      "EligibleApplicantsRegion": {
+        "type": "string",
+        "description": "[Vocabulary](https://documentation.forschung-daten.at/vocabulary/eligible-applicants-region)",
+        "nullable": true,
+        "enum": [
+          "VIENNA",
+          "BURGENLAND",
+          "LOWER_AUSTRIA",
+          "CARINTHIA",
+          "UPPER_AUSTRIA",
+          "SALZBURG",
+          "STYRIA",
+          "TYROL",
+          "VORARLBERG"
+        ]
+      },
+      "EligibleApplicantsScope": {
+        "type": "string",
+        "description": "[Vocabulary](https://documentation.forschung-daten.at/vocabulary/eligible-applicants-scope)",
+        "nullable": true,
+        "enum": [
+          "NATIONAL",
+          "REGIONAL"
+        ]
+      },
+      "Funder": {
+        "required": [
+          "funder",
+          "funderType"
+        ],
+        "type": "object",
+        "properties": {
+          "funderType": {
+            "$ref": "#/components/schemas/OrganisationFundingRoleEnum"
+          },
+          "funder": {
+            "$ref": "#/components/schemas/OrgUnit"
+          }
+        }
+      },
+      "Funding": {
+        "required": [
+          "characteristics",
+          "funder",
+          "fundingScheme",
+          "id",
+          "legalType",
+          "name",
+          "subjects",
+          "targetGroups",
+          "type"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "$ref": "#/components/schemas/FundingType"
+          },
+          "name": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Text"
+            }
+          },
+          "identifiers": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/Identifier"
+            }
+          },
+          "acronym": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/Text"
+            }
+          },
+          "funder": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Funder"
+            }
+          },
+          "characteristics": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FundingCharacteristic"
+            }
+          },
+          "targetGroups": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TargetGroup"
+            }
+          },
+          "subjects": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Subject"
+            }
+          },
+          "careerStages": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/CareerStage"
+            }
+          },
+          "fundingScheme": {
+            "$ref": "#/components/schemas/FundingType"
+          },
+          "legalType": {
+            "$ref": "#/components/schemas/LegalType"
+          },
+          "website": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "type": "string",
+              "nullable": true
+            }
+          }
+        },
+        "discriminator": {
+          "propertyName": "type",
+          "mapping": {
+            "CALL": "#/components/schemas/RisCall",
+            "PROGRAMME": "#/components/schemas/RisProgramme"
+          }
+        }
+      },
+      "FundingCharacteristic": {
+        "type": "string",
+        "description": "[Vocabulary](https://documentation.forschung-daten.at/vocabulary/funding-characteristics)",
+        "enum": [
+          "INTERNATIONAL_PROGRAMME",
+          "BILATERAL_PROGRAMME",
+          "NATIONAL_PROGRAMME",
+          "INDIVIDUAL_PROJECT",
+          "CONSORTIUM",
+          "SCIENTIFIC_PROGRAMME",
+          "COOPERATIVE_PROGRAMME",
+          "PERSONAL_GRANT",
+          "PROJECT_FUNDING",
+          "INFRASTRUCTURE",
+          "NETWORKING",
+          "MOBILITY_PROGRAMME"
+        ]
+      },
+      "FundingType": {
+        "type": "string",
+        "description": "[Vocabulary](https://documentation.forschung-daten.at/vocabulary/funding-type)",
+        "enum": [
+          "PROGRAMME",
+          "CALL",
+          "ONGOING_CALL",
+          "RESEARCH_CONTRACT",
+          "AWARD",
+          "GRANT",
+          "SCHOLARSHIP",
+          "SEMESTER_GRANT",
+          "SUMMER_GRANT",
+          "PRACTICAL_TRAINING",
+          "SUBSIDY",
+          "RESEARCH_ALLOWANCE"
+        ]
+      },
+      "Identifier": {
+        "required": [
+          "type",
+          "value"
+        ],
+        "type": "object",
+        "properties": {
+          "type": {
+            "$ref": "#/components/schemas/IdentifierTypeEnum"
+          },
+          "value": {
+            "type": "string"
+          }
+        }
+      },
+      "IdentifierTypeEnum": {
+        "type": "string",
+        "description": "[Vocabulary](https://documentation.forschung-daten.at/vocabulary/identifier)",
+        "enum": [
+          "CROSSREF_GRANTID",
+          "CROSSREF_FUNDERID",
+          "PROJECT_NUMBER",
+          "APPLICATION_NUMBER",
+          "ORCID",
+          "ROR",
+          "RINGGOLD",
+          "RIS_SYNERGY"
+        ]
+      },
+      "LegalType": {
+        "type": "string",
+        "description": "[Vocabulary](https://documentation.forschung-daten.at/vocabulary/legal-type)",
+        "enum": [
+          "PROJECT26",
+          "PROJECT27",
+          "INDIV"
+        ]
+      },
+      "LevelEnum": {
+        "type": "string",
+        "description": "[Vocabulary](https://documentation.forschung-daten.at/vocabulary/organisation-levels)",
+        "nullable": true,
+        "enum": [
+          "LEVEL_1",
+          "LEVEL_2",
+          "Level_3"
+        ]
+      },
+      "OrgUnit": {
+        "required": [
+          "id",
+          "name",
+          "website"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Text"
+            }
+          },
+          "orgUnitType": {
+            "$ref": "#/components/schemas/OrganisationTypeEnum"
+          },
+          "acronym": {
+            "type": "string",
+            "nullable": true
+          },
+          "electronicAddress": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "type": "string",
+              "nullable": true
+            }
+          },
+          "partOf": {
+            "$ref": "#/components/schemas/OrgUnit"
+          },
+          "identifiers": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/Identifier"
+            }
+          },
+          "address": {
+            "$ref": "#/components/schemas/PostAddress"
+          },
+          "submissionSystem": {
+            "type": "string",
+            "nullable": true
+          },
+          "level": {
+            "$ref": "#/components/schemas/LevelEnum"
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "website": {
+            "type": "string"
+          }
+        }
+      },
+      "OrganisationFundingRoleEnum": {
+        "type": "string",
+        "description": "[Vocabulary](https://documentation.forschung-daten.at/vocabulary/funder-type)",
+        "enum": [
+          "EXECUTIVE_ORGANISATION",
+          "JOINT_CALL_PARTNER"
+        ]
+      },
+      "OrganisationTypeEnum": {
+        "type": "string",
+        "description": "[Vocabulary](https://documentation.forschung-daten.at/vocabulary/organisation-types)",
+        "nullable": true,
+        "enum": [
+          "UNIVERSITY",
+          "VICE_RECTORATE",
+          "FACULTY",
+          "SCHOOL",
+          "DEPARTMENT",
+          "UNIT",
+          "CENTRAL_SERVICES",
+          "UNIVERSITY_CENTRE",
+          "CLINIC",
+          "CLINICAL_UNIT"
+        ]
+      },
+      "PostAddress": {
+        "type": "object",
+        "properties": {
+          "countryCode": {
+            "type": "string"
+          },
+          "addrline1": {
+            "type": "string"
+          },
+          "postCode": {
+            "type": "string"
+          },
+          "cityTown": {
+            "type": "string"
+          },
+          "stateOfCountry": {
+            "type": "string"
+          }
+        },
+        "nullable": true
+      },
+      "Programme": {
+        "required": [
+          "characteristics",
+          "funder",
+          "fundingScheme",
+          "id",
+          "legalType",
+          "name",
+          "subjects",
+          "targetGroups",
+          "type"
+        ],
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Funding"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "programmeTracks": {
+                "type": "array",
+                "nullable": true,
+                "items": {
+                  "type": "array",
+                  "nullable": true,
+                  "items": {
+                    "$ref": "#/components/schemas/Text"
+                  }
+                }
+              },
+              "startDate": {
+                "type": "string",
+                "format": "date-time",
+                "nullable": true
+              },
+              "endDate": {
+                "type": "string",
+                "format": "date-time",
+                "nullable": true
+              }
+            }
+          }
+        ]
+      },
+      "Subject": {
+        "required": [
+          "fraction",
+          "value"
+        ],
+        "type": "object",
+        "properties": {
+          "fraction": {
+            "type": "number"
+          },
+          "value": {
+            "type": "string"
+          }
+        }
+      },
+      "SubmissionMode": {
+        "type": "string",
+        "description": "[Vocabulary](https://documentation.forschung-daten.at/vocabulary/submission-mode)",
+        "enum": [
+          "ONLINE_FULL",
+          "ONLINE_PARTLY",
+          "OFFLINE"
+        ]
+      },
+      "TargetGroup": {
+        "type": "string",
+        "description": "[Vocabulary](https://documentation.forschung-daten.at/vocabulary/target-group)",
+        "enum": [
+          "UNIVERSITY",
+          "UNIVERSITY_OF_APPLIED_SCIENCES",
+          "PRIVATE_UNIVERSITY",
+          "RESEARCH_INSTITUTE",
+          "COMPANY",
+          "PRIVATE_NON_PROFIT",
+          "INDEPENDENT_RESEARCHER",
+          "GOVERNMENT",
+          "UNIVERSITY_COLLEGE_OF_TEACHER_EDUCATION"
+        ]
+      },
+      "Text": {
+        "required": [
+          "lang",
+          "text",
+          "trans"
+        ],
+        "type": "object",
+        "properties": {
+          "lang": {
+            "type": "string"
+          },
+          "trans": {
+            "$ref": "#/components/schemas/TranslationEnum"
+          },
+          "text": {
+            "type": "string"
+          }
+        },
+        "description": "Class for Multilingual Strings; Including Language Code and Translation Method"
+      },
+      "TimeSpan": {
+        "type": "object",
+        "properties": {
+          "days": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "months": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "years": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          }
+        }
+      },
+      "TranslationEnum": {
+        "type": "string",
+        "description": "O=Original; H=Human-Translated; M=Machine-Translated",
+        "enum": [
+          "O",
+          "H",
+          "M"
+        ]
+      },
+      "Volume": {
+        "required": [
+          "amount",
+          "currency"
+        ],
+        "type": "object",
+        "properties": {
+          "currency": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "number"
+          }
+        }
+      }
+    }
+  }
+}

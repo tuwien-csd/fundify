@@ -1,11 +1,6 @@
 package at.ac.tuwien.fundify.bootstrap.e2e;
 
-import at.ac.tuwien.fundify.adapters.common.ris.model.v1.RisCall;
-import at.ac.tuwien.fundify.adapters.common.ris.model.v1.RisFunder;
-import at.ac.tuwien.fundify.adapters.common.ris.model.v1.RisFunding;
-import at.ac.tuwien.fundify.adapters.common.ris.model.v1.RisFundingType;
-import at.ac.tuwien.fundify.adapters.common.ris.model.v1.RisOrgUnit;
-import at.ac.tuwien.fundify.adapters.common.ris.model.v1.RisProgramme;
+import at.ac.tuwien.fundify.adapters.common.ris.model.v1.*;
 import at.ac.tuwien.fundify.adapters.out.ris.network.client.GenericRisFundingRestClient;
 import jakarta.enterprise.context.ApplicationScoped;
 
@@ -56,7 +51,7 @@ public class MockRestClient implements GenericRisFundingRestClient {
 
     private List<RisFunder> getFunders() {
         RisFunder mockRisFunder = new RisFunder();
-        mockRisFunder.setFunderType(RisFunder.FunderTypeEnum.EXECUTIVE_ORGANISATION);
+        mockRisFunder.setFunderType(RisOrganisationFundingRoleEnum.EXECUTIVE_ORGANISATION);
 
         RisOrgUnit mockOrgUnit = new RisOrgUnit();
         mockOrgUnit.setId("1");

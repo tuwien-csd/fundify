@@ -36,8 +36,12 @@ export class AnnotatedCallDisplayPipe implements PipeTransform {
     value: CallAnnotationListViewElement
   ): PublicationStatus {
     const now = new Date();
-    const startDate = new Date(value.callStartDate);
-    const endDate = new Date(value.callEndDate);
+    const startDate = value.callStartDate
+      ? new Date(value.callStartDate)
+      : new Date(0);
+    const endDate = value.callEndDate
+      ? new Date(value.callEndDate)
+      : new Date(2100, 0, 1);
 
     if (startDate > now) {
       return 'Upcoming';

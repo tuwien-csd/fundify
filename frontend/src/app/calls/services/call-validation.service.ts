@@ -15,14 +15,9 @@ export class CallValidationService {
       !!call.characteristics?.length &&
       !!call.fundingScheme &&
       !!call.legalType &&
-      !!call.minProjectVolume &&
-      !!call.maxProjectVolume &&
       !!call.fullyFunded &&
-      !!call.minInkind &&
-      !!call.maxOverhead &&
       !!call.minProjectDuration &&
       !!call.maxProjectDuration &&
-      !!call.callStages?.length &&
       !!call.applicationLanguages?.length &&
       !!call.submissionModes?.length &&
       !!call.contacts?.length &&

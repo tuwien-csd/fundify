@@ -1,23 +1,11 @@
 package at.ac.tuwien.fundify.adapters.in.rest.dto;
 
-import at.ac.tuwien.fundify.adapters.in.rest.dto.enums.EAnswerYNWebModel;
-import at.ac.tuwien.fundify.adapters.in.rest.dto.enums.EAustrianStateWebModel;
-import at.ac.tuwien.fundify.adapters.in.rest.dto.enums.ECallTypeWebModel;
-import at.ac.tuwien.fundify.adapters.in.rest.dto.enums.ECareerStageWebModel;
-import at.ac.tuwien.fundify.adapters.in.rest.dto.enums.EDecisionProcessWebModel;
-import at.ac.tuwien.fundify.adapters.in.rest.dto.enums.EEntryOriginWebModel;
-import at.ac.tuwien.fundify.adapters.in.rest.dto.enums.EFundingCharacteristicWebModel;
-import at.ac.tuwien.fundify.adapters.in.rest.dto.enums.EFundingSchemeWebModel;
-import at.ac.tuwien.fundify.adapters.in.rest.dto.enums.ELanguageWebModel;
-import at.ac.tuwien.fundify.adapters.in.rest.dto.enums.ELegalTypeWebModel;
-import at.ac.tuwien.fundify.adapters.in.rest.dto.enums.EModeOfSubmissionWebModel;
-import at.ac.tuwien.fundify.adapters.in.rest.dto.enums.EPublicationStatusWebModel;
-import at.ac.tuwien.fundify.adapters.in.rest.dto.enums.ERegionalScopeWebModel;
-import at.ac.tuwien.fundify.adapters.in.rest.dto.enums.ESubscriptionStatusWebModel;
-import at.ac.tuwien.fundify.adapters.in.rest.dto.enums.ETargetGroupWebModel;
+import at.ac.tuwien.fundify.adapters.in.rest.dto.enums.*;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 
 public record CallWebModel (
@@ -52,21 +40,11 @@ public record CallWebModel (
         @Schema(required = true)
         ELegalTypeWebModel legalType,
         @Schema(required = true)
-        MonetaryNumberWebModel minProjectVolume,
-        @Schema(required = true)
-        MonetaryNumberWebModel maxProjectVolume,
-        @Schema(required = true)
         EAnswerYNWebModel fullyFunded,
-        @Schema(required = true)
-        BigDecimal minInkind,
-        @Schema(required = true)
-        BigDecimal maxOverhead,
         @Schema(required = true)
         TimeSpanWebModel minProjectDuration,
         @Schema(required = true)
         TimeSpanWebModel maxProjectDuration,
-        @Schema(required = true)
-        List<CallStageWebModel> callStages,
         @Schema(required = true)
         List<ELanguageWebModel> applicationLanguages,
         @Schema(required = true)
@@ -78,6 +56,11 @@ public record CallWebModel (
         @Schema(required = true)
         ESubscriptionStatusWebModel subscriptionStatus,
         // optional fields
+        List<CallStageWebModel> callStages,
+        BigDecimal minInkind,
+        BigDecimal maxOverhead,
+        MonetaryNumberWebModel minProjectVolume,
+        MonetaryNumberWebModel maxProjectVolume,
         String acronym,
         List<IdentifierWebModel> identifiers,
         List<TranslatedTextWebModel> targetGroupSpecified,
@@ -87,6 +70,8 @@ public record CallWebModel (
         List<TranslatedTextWebModel> eligibleApplicants,
         ERegionalScopeWebModel eligibleApplicantsScope,
         List<EAustrianStateWebModel> eligibleApplicantsRegions,
+        List<ECountryWebModel> eligibleTargetRegions,
+        List<ECountryWebModel> eligibleSourceRegions,
         Integer callVolumeProjects,
         MonetaryNumberWebModel callVolumeAmount,
         List<TranslatedTextWebModel> inkindDetails,

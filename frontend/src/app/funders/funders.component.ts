@@ -1,11 +1,4 @@
-import {
-  AfterViewInit,
-  Component,
-  computed,
-  inject,
-  OnInit,
-  ViewChild,
-} from '@angular/core';
+import { Component, computed, inject, OnInit, ViewChild } from '@angular/core';
 import { FunderWebModel } from './models/funder.interface';
 import { FUNDERS_CONSTANTS } from './funders.constants';
 import { ROUTER_LINKS } from '../core/router-links.constants';
@@ -80,7 +73,7 @@ import { FundersStore } from './signal/funders-store';
     MatButton,
   ],
 })
-export class FundersComponent implements OnInit, AfterViewInit {
+export class FundersComponent implements OnInit {
   permissionService = inject(PermissionService);
   authService = inject(AuthService);
   fundersStore = inject(FundersStore);
@@ -101,29 +94,27 @@ export class FundersComponent implements OnInit, AfterViewInit {
       label: 'Universities',
     },
   ];
+  displayedColumns: string[] = this.FUNDERS_CONSTANTS.TABLE_COLUMNS.map(
+    (column) => column.field
+  );
+
+  displayedColumnsWithMenu: string[] = [...this.displayedColumns, 'menu'];
+  @ViewChild(MatSort, { static: true }) sort!: MatSort;
+
+  @ViewChild(MatPaginator, { static: true }) paginator!: MatPaginator;
+
   dataSource = computed(() => {
     const dataSource = new MatTableDataSource<FunderWebModel>(
       this.fundersStore.entities()
     );
     dataSource.filterPredicate = this.createFilterPredicate();
+    dataSource.sort = this.sort;
+    dataSource.paginator = this.paginator;
     return dataSource;
   });
 
-  displayedColumns: string[] = this.FUNDERS_CONSTANTS.TABLE_COLUMNS.map(
-    (column) => column.field
-  );
-  displayedColumnsWithMenu: string[] = [...this.displayedColumns, 'menu'];
-
-  @ViewChild(MatSort, { static: true }) sort!: MatSort;
-  @ViewChild(MatPaginator, { static: true }) paginator!: MatPaginator;
-
   ngOnInit(): void {
     this.fundersStore.fetchAll();
-  }
-
-  ngAfterViewInit(): void {
-    this.dataSource().sort = this.sort;
-    this.dataSource().paginator = this.paginator;
   }
 
   applyFilter(event: Event): void {

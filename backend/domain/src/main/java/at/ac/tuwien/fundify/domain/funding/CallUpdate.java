@@ -16,15 +16,8 @@ import at.ac.tuwien.fundify.domain.funding.vo.Contact;
 import at.ac.tuwien.fundify.domain.funding.vo.MonetaryNumber;
 import at.ac.tuwien.fundify.domain.funding.vo.StandardizedSubject;
 import at.ac.tuwien.fundify.domain.funding.vo.TimeSpan;
-import at.ac.tuwien.fundify.domain.funding.vo.enums.EAnswerYN;
-import at.ac.tuwien.fundify.domain.funding.vo.enums.EAustrianState;
-import at.ac.tuwien.fundify.domain.funding.vo.enums.ECallType;
-import at.ac.tuwien.fundify.domain.funding.vo.enums.ECareerStage;
-import at.ac.tuwien.fundify.domain.funding.vo.enums.EDecisionProcess;
-import at.ac.tuwien.fundify.domain.funding.vo.enums.EFundingScheme;
-import at.ac.tuwien.fundify.domain.funding.vo.enums.ELegalType;
-import at.ac.tuwien.fundify.domain.funding.vo.enums.EModeOfSubmission;
-import at.ac.tuwien.fundify.domain.funding.vo.enums.ERegionalScope;
+import at.ac.tuwien.fundify.domain.funding.vo.enums.*;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -70,6 +63,8 @@ public class CallUpdate implements Entity<CallId>, Publishable {
   private List<TranslatedText> eligibleApplicants;
   private ERegionalScope eligibleApplicantsScope;
   private List<EAustrianState> eligibleApplicantsRegions;
+  private List<ECountry> eligibleTargetRegions;
+  private List<ECountry> eligibleSourceRegions;
   private Integer callVolumeProjects;
   private MonetaryNumber callVolumeAmount;
   private List<TranslatedText> inkindDetails;

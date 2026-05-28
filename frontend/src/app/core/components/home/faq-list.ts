@@ -28,6 +28,11 @@ export const FUNDIFY_FAQ_LIST = [
     answer:
       'FUNDify is an open-source project and you are welcomed to contribute. Visit our official GitHub repository for more information.',
   },
+   {
+    question: 'I cannot see the closed calls anymore',
+    answer:
+      'Check that the button "hide closed calls" in the Fundings section is deactivated.',
+  },
 ] as const satisfies FAQ[];
 
 type FAQ = { question: string; answer: string };

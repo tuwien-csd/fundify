@@ -7,7 +7,7 @@ import {
 
 import { environment } from './environments/environment';
 import { ConfigService } from './app/core/services/config.service';
-import { MAT_DATE_LOCALE, MatNativeDateModule } from '@angular/material/core';
+import { MAT_DATE_LOCALE } from '@angular/material/core';
 import { bootstrapApplication, BrowserModule } from '@angular/platform-browser';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { CoreModule } from './app/core/core.module';
@@ -19,6 +19,8 @@ import { OAuthStorage, provideOAuthClient } from 'angular-oauth2-oidc';
 import { AppComponent } from './app/app.component';
 import { provideRouter, withComponentInputBinding } from '@angular/router';
 import { mainRoutes } from './app/app.routes';
+import { provideDateFnsAdapter } from '@angular/material-date-fns-adapter';
+import { de } from 'date-fns/locale';
 
 if (environment.production) {
   enableProdMode();
@@ -43,8 +45,7 @@ bootstrapApplication(AppComponent, {
         maxAge: 25,
         logOnly: environment.production,
         connectInZone: true,
-      }),
-      MatNativeDateModule
+      })
     ),
     provideOAuthClient(),
     { provide: OAuthStorage, useFactory: storageFactory },
@@ -53,7 +54,8 @@ bootstrapApplication(AppComponent, {
       const configService = inject(ConfigService);
       return configService.initializeApp(); // Will delay the app initialization until the config is loaded.
     }),
-    { provide: MAT_DATE_LOCALE, useValue: 'de-DE' },
+    provideDateFnsAdapter(),
+    { provide: MAT_DATE_LOCALE, useValue: de },
     provideAnimations(),
   ],
 }).catch((err) => console.error(err));

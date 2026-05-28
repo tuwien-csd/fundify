@@ -1,9 +1,8 @@
 package at.ac.tuwien.fundify.adapters.common.ris.mapper;
 
-import static at.ac.tuwien.fundify.adapters.common.ris.model.v1.RisFunder.FunderTypeEnum.EXECUTIVE_ORGANISATION;
-
 import at.ac.tuwien.fundify.adapters.common.ris.model.v1.RisFunder;
 import at.ac.tuwien.fundify.adapters.common.ris.model.v1.RisFundingType;
+import at.ac.tuwien.fundify.adapters.common.ris.model.v1.RisOrganisationFundingRoleEnum;
 import at.ac.tuwien.fundify.adapters.common.ris.model.v1.RisProgramme;
 import at.ac.tuwien.fundify.domain.funding.FunderReference;
 import at.ac.tuwien.fundify.domain.funding.Program;
@@ -45,7 +44,7 @@ public interface RisProgramMapper {
             return null;
         }
         return funder.stream()
-                .filter(f -> f.getFunderType() == RisFunder.FunderTypeEnum.EXECUTIVE_ORGANISATION)
+                .filter(f -> f.getFunderType() == RisOrganisationFundingRoleEnum.EXECUTIVE_ORGANISATION)
                 .findFirst()
                 .map(f -> RisFunderRefMapper.INSTANCE.toDomain(f, memberId))
                 .orElse(null);
@@ -66,7 +65,7 @@ public interface RisProgramMapper {
         if (funder == null) {
             return new ArrayList<>();
         }
-        return List.of(RisFunderRefMapper.INSTANCE.fromDomain(funder).funderType(EXECUTIVE_ORGANISATION));
+        return List.of(RisFunderRefMapper.INSTANCE.fromDomain(funder).funderType(RisOrganisationFundingRoleEnum.EXECUTIVE_ORGANISATION));
     }
 
     @AfterMapping

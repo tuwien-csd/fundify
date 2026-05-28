@@ -199,6 +199,24 @@
             </app-multiple-choice-field>
           </div>
           <div class="detail-item">
+            <app-search-select
+              formControlName="eligibleTargetRegions"
+              [type]="countries"
+              [multiSelect]="true"
+              [label]="CALL_DETAILS_CONSTANTS.ELIGIBLE_TARGET_REGIONS_LABEL"
+            >
+            </app-search-select>
+          </div>
+          <div class="detail-item">
+            <app-search-select
+              formControlName="eligibleSourceRegions"
+              [type]="countries"
+              [multiSelect]="true"
+              [label]="CALL_DETAILS_CONSTANTS.ELIGIBLE_SOURCE_REGIONS_LABEL"
+            >
+            </app-search-select>
+          </div>
+          <div class="detail-item">
             <app-single-choice-field
               formControlName="fundingScheme"
               [type]="fundingSchemes"
@@ -220,7 +238,6 @@
             <div class="detail-item">
               <app-monetary-field
                 formControlName="minProjectVolume"
-                [required]="true"
                 [label]="CALL_DETAILS_CONSTANTS.MIN_PROJECT_VOLUME_LABEL"
               >
               </app-monetary-field>
@@ -228,7 +245,6 @@
             <div class="detail-item">
               <app-monetary-field
                 formControlName="maxProjectVolume"
-                [required]="true"
                 [label]="CALL_DETAILS_CONSTANTS.MAX_PROJECT_VOLUME_LABEL"
               >
               </app-monetary-field>
@@ -278,7 +294,6 @@
             <div class="detail-item">
               <app-number-field
                 formControlName="maxOverhead"
-                [required]="true"
                 [nonNegative]="true"
                 [decimalPlaces]="2"
                 [hideValidation]="false"
@@ -290,7 +305,6 @@
             <div class="detail-item">
               <app-number-field
                 formControlName="minInkind"
-                [required]="true"
                 [nonNegative]="true"
                 [decimalPlaces]="2"
                 [hideValidation]="false"
@@ -340,8 +354,7 @@
                   CALL_DETAILS_CONSTANTS.CALL_STAGE_DATE_RANGE_LABEL
                 "
                 [labelInfo]="CALL_DETAILS_CONSTANTS.CALL_STAGE_DETAILS_LABEL"
-                [required]="true"
-                [descriptionRequired]="true"
+                [descriptionRequired]="false"
               >
               </app-date-ranges-info-field>
             </div>
