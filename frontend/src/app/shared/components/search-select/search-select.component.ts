@@ -1,4 +1,5 @@
 import {
+  AfterViewInit,
   Component,
   computed,
   inject,
@@ -7,7 +8,6 @@ import {
   OnDestroy,
   OnInit,
   signal,
-  AfterViewInit,
 } from '@angular/core';
 import {
   ControlValueAccessor,
@@ -75,6 +75,8 @@ export class SearchSelectComponent
   implements OnInit, OnDestroy, Validator, ControlValueAccessor, AfterViewInit
 {
   type = input<object>([]);
+  /** Optional structured options: label is displayed, value is stored in the form control. */
+  options = input<{ value: string; label: string }[] | null>(null);
   placeholder = input<string>('');
   required = input<boolean>(false);
   label = input<string>('');
@@ -86,6 +88,16 @@ export class SearchSelectComponent
   private choices: string[] = [];
   private touchedChangeSub?: Subscription;
   private onChangeSubs: Subscription[] = [];
+
+  private readonly labelToValue = computed(() => {
+    const opts = this.options();
+    return opts ? new Map(opts.map((o) => [o.label, o.value])) : null;
+  });
+
+  private readonly valueToLabel = computed(() => {
+    const opts = this.options();
+    return opts ? new Map(opts.map((o) => [o.value, o.label])) : null;
+  });
 
   protected readonly VALIDATORS = VALIDATORS;
   protected readonly FUNDING_SEARCH_LABELS = FUNDING_SEARCH_LABELS;
@@ -101,35 +113,45 @@ export class SearchSelectComponent
     wrapLabelRequiredOrOptional(this.label(), this.required())
   );
   protected filteredItems = computed(() => {
-    // Filter by search value
+    const searchValue = this.searchValue();
+    const opts = this.options();
+
+    if (opts) {
+      return opts
+        .filter(
+          (o) =>
+            !searchValue ||
+            o.label.toLowerCase().includes(searchValue.toLowerCase())
+        )
+        .sort((a, b) => a.label.localeCompare(b.label))
+        .map((o) => o.label);
+    }
+
     const filtered = this.choices.filter((item) => {
       if (!item) return false;
-
-      const searchValue = this.searchValue();
       if (!searchValue) return true;
       return item.toLowerCase().includes(searchValue.toLowerCase());
     });
-
-    // Sort alphabetically by display text
-    return filtered.sort((a, b) => {
-      const textA = a.toLowerCase();
-      const textB = b.toLowerCase();
-      return textA.localeCompare(textB);
-    });
+    return filtered.sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()));
   });
 
   ngOnInit() {
-    this.choices = Object.values(this.type()).filter((item) => {
-      return isNaN(Number(item));
-    });
-    this.applySearchDisabledState(this.selectionsFormArray.length);
-    this.selectionsFormArray.valueChanges.subscribe((arr) => {
-      this.applySearchDisabledState(arr?.length ?? 0);
+    if (!this.options()) {
+      this.choices = Object.values(this.type()).filter((item) => {
+        return isNaN(Number(item));
+      });
+    }
+    this.applySearchDisabledState();
+    this.selectionsFormArray.valueChanges.subscribe(() => {
+      this.applySearchDisabledState();
     });
 
-    (this.form.get('search') as FormControl).valueChanges.subscribe((it) =>
-      this.searchValue.set(it)
-    );
+    (this.form.get('search') as FormControl).valueChanges.subscribe((it) => {
+      this.searchValue.set(it);
+      if (!this.multiSelect() && !it) {
+        this.selectionsFormArray.clear();
+      }
+    });
   }
 
   ngOnDestroy() {
@@ -172,13 +194,22 @@ export class SearchSelectComponent
   writeValue(value: string | string[]) {
     this.selectionsFormArray.clear();
     if (value) {
-      const values = this.multiSelect() ? value : [value];
-      const selectedItems = this.choices.filter((item) =>
-        values.includes(item)
-      );
-      selectedItems.forEach((item: string) => {
-        this.selectionsFormArray.push(this.fb.control(item));
-      });
+      const values: string[] = this.multiSelect() ? (value as string[]) : [value as string];
+      if (this.options()) {
+        values.forEach((v) => this.selectionsFormArray.push(this.fb.control(v)));
+        if (!this.multiSelect() && values[0]) {
+          const v2l = this.valueToLabel();
+          const label = v2l ? (v2l.get(values[0]) ?? values[0]) : values[0];
+          this.search.setValue(label, { emitEvent: false });
+        }
+      } else {
+        const selectedItems = this.choices.filter((item) => values.includes(item));
+        selectedItems.forEach((item: string) => {
+          this.selectionsFormArray.push(this.fb.control(item));
+        });
+      }
+    } else if (!this.multiSelect()) {
+      this.search.setValue('', { emitEvent: false });
     }
   }
 
@@ -195,21 +226,31 @@ export class SearchSelectComponent
     return item ?? '';
   }
 
-  isItemSelected(item: string): boolean {
-    const selectedItems: string[] = this.selectionsFormArray.value || [];
-    return selectedItems.some((selected) => selected === item);
+  isItemSelected(label: string): boolean {
+    const selectedValues: string[] = this.selectionsFormArray.value || [];
+    const l2v = this.labelToValue();
+    const valueToCheck = l2v ? (l2v.get(label) ?? label) : label;
+    return selectedValues.some((v) => v === valueToCheck);
   }
 
   setSelectedItem() {
-    if (!this.multiSelect() && this.selectionsFormArray.value.length > 0) {
+    const selectedLabel = this.search.value;
+    if (!selectedLabel) return;
+    const l2v = this.labelToValue();
+    const storedValue = l2v ? (l2v.get(selectedLabel) ?? selectedLabel) : selectedLabel;
+    if (!this.multiSelect()) {
+      this.selectionsFormArray.clear();
+      this.selectionsFormArray.push(this.fb.control(storedValue));
+      // label stays in the input via mat-autocomplete displayWith
+    } else {
+      this.selectionsFormArray.push(this.fb.control(storedValue));
       this.search.setValue('');
-      return;
     }
-    const selectedValue = this.search.value;
-    if (selectedValue) {
-      this.selectionsFormArray.push(this.fb.control(selectedValue));
-      this.search.setValue('');
-    }
+  }
+
+  protected getChipLabel(value: string): string {
+    const v2l = this.valueToLabel();
+    return v2l ? (v2l.get(value) ?? value) : value;
   }
 
   removeItem(index: number) {
@@ -240,12 +281,9 @@ export class SearchSelectComponent
     return validatorList;
   }
 
-  private applySearchDisabledState(selectionLen: number): void {
-    const shouldDisable = !this.multiSelect() && selectionLen > 0;
+  private applySearchDisabledState(): void {
     const control = this.search;
-    if (shouldDisable && control.enabled) {
-      control.disable({ emitEvent: false });
-    } else if (!shouldDisable && control.disabled) {
+    if (control.disabled) {
       control.enable({ emitEvent: false });
     }
   }

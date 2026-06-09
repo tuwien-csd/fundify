@@ -51,6 +51,16 @@ import { MatIcon } from '@angular/material/icon';
         <mat-icon matListItemIcon>account_balance</mat-icon>
         <span class="menu-text">Institutions</span>
       </a>
+      @if (userRoles.includes(UserRoleEnum.ADMIN)) {
+        <a
+          mat-list-item
+          [routerLink]="[ROUTER_LINKS.USERS, ROUTER_LINKS.USER_PERMISSIONS]"
+          routerLinkActive="active"
+        >
+          <mat-icon matListItemIcon>manage_accounts</mat-icon>
+          <span class="menu-text">Users</span>
+        </a>
+      }
       <!-- TODO: re-enable settings link when needed
       <mat-divider></mat-divider>
       <a

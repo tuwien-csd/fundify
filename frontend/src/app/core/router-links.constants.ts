@@ -32,4 +32,7 @@ export const ROUTER_LINKS = {
   PAGE_NOT_FOUND: 'page-not-found',
   NOT_AUTHORIZED: 'not-authorized',
   LOGIN: '/auth',
+
+  USERS: 'users',
+  USER_PERMISSIONS: 'permissions',
 } as const;

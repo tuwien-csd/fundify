@@ -1,41 +1,54 @@
 <div [formGroup]="form" class="search-select-container">
   <div class="form-item-label">{{ displayedLabel() }}</div>
   <div class="form-item-container">
-    <mat-form-field appearance="fill" class="search-field">
-      <input
-        matInput
-        formControlName="search"
-        [placeholder]="placeholder() || FUNDING_SEARCH_LABELS.SEARCH_LABEL"
-        [matAutocomplete]="auto"
-      />
-      <mat-autocomplete
-        #auto="matAutocomplete"
-        [displayWith]="displayFn.bind(this)"
-        (optionSelected)="setSelectedItem()"
-      >
-        @for (item of filteredItems(); track item) {
-          <mat-option
-            [value]="item"
-            [disabled]="isItemSelected(item)"
-            [class.selected-item]="isItemSelected(item)"
-          >
-            {{ displayFn(item) }}
-          </mat-option>
-        }
-      </mat-autocomplete>
-    </mat-form-field>
-    @if (form.invalid && (form.dirty || form.touched)) {
-      <mat-error>
-        {{ getValidationErrors(form, VALIDATORS.REQUIRED) }}
-      </mat-error>
-    }
-    <mat-chip-listbox class="chip-list">
-      @for (item of selectionsFormArray.controls; track item; let i = $index) {
-        <mat-chip color="accent" [removable]="true" (removed)="removeItem(i)">
-          {{ displayFn(item.value) }}
+    @if (!multiSelect() && selectionsFormArray.length > 0) {
+      <mat-chip-listbox class="chip-list">
+        <mat-chip color="accent" [removable]="true" (removed)="removeItem(0)">
+          {{ getChipLabel(selectionsFormArray.controls[0].value) }}
           <mat-icon matChipRemove>cancel</mat-icon>
         </mat-chip>
+      </mat-chip-listbox>
+    } @else {
+      <mat-form-field appearance="fill" class="search-field">
+        <input
+          matInput
+          formControlName="search"
+          [placeholder]="placeholder() || FUNDING_SEARCH_LABELS.SEARCH_LABEL"
+          [matAutocomplete]="auto"
+          #trigger="matAutocompleteTrigger"
+          (click)="trigger.openPanel()"
+        />
+        <mat-autocomplete
+          #auto="matAutocomplete"
+          [displayWith]="displayFn.bind(this)"
+          (optionSelected)="setSelectedItem()"
+        >
+          @for (item of filteredItems(); track item) {
+            <mat-option
+              [value]="item"
+              [disabled]="isItemSelected(item)"
+              [class.selected-item]="isItemSelected(item)"
+            >
+              {{ displayFn(item) }}
+            </mat-option>
+          }
+        </mat-autocomplete>
+      </mat-form-field>
+      @if (form.invalid && (form.dirty || form.touched)) {
+        <mat-error>
+          {{ getValidationErrors(form, VALIDATORS.REQUIRED) }}
+        </mat-error>
       }
-    </mat-chip-listbox>
+      @if (multiSelect()) {
+        <mat-chip-listbox class="chip-list">
+          @for (item of selectionsFormArray.controls; track item; let i = $index) {
+            <mat-chip color="accent" [removable]="true" (removed)="removeItem(i)">
+              {{ getChipLabel(item.value) }}
+              <mat-icon matChipRemove>cancel</mat-icon>
+            </mat-chip>
+          }
+        </mat-chip-listbox>
+      }
+    }
   </div>
 </div>

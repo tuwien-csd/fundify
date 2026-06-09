@@ -45,6 +45,12 @@ export const mainRoutes: Routes = [
     canActivate: [isAuthenticatedGuard],
   },
   {
+    path: ROUTER_LINKS.USERS,
+    loadChildren: () =>
+      import('./users/users.routes').then((it) => it.userRoutes),
+    canActivate: [isAuthenticatedGuard],
+  },
+  {
     path: ROUTER_LINKS.CONTACT,
     component: ContactFormContainerComponent,
   },

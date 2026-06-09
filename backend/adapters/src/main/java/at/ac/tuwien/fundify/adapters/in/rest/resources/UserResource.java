@@ -3,7 +3,9 @@ package at.ac.tuwien.fundify.adapters.in.rest.resources;
 import at.ac.tuwien.fundify.adapters.in.rest.dto.UserPermissionsUpdateWebModel;
 import at.ac.tuwien.fundify.adapters.in.rest.mapper.UserPermissionsWebModelMapper;
 import at.ac.tuwien.fundify.application.port.common.UserService;
+import at.ac.tuwien.fundify.application.port.in.users.KeycloakUserLookupUseCase;
 import at.ac.tuwien.fundify.application.port.in.users.UserPermissionManagementUseCase;
+import at.ac.tuwien.fundify.domain.common.KeycloakUser;
 import at.ac.tuwien.fundify.domain.common.UserPermissionHolder;
 import at.ac.tuwien.fundify.domain.common.UserRole;
 import io.quarkus.security.Authenticated;
@@ -16,6 +18,7 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.jbosslog.JBossLog;
 
@@ -29,6 +32,13 @@ public class UserResource {
 
     private final UserService userService;
     private final UserPermissionManagementUseCase userPermissionManagementUseCase;
+    private final KeycloakUserLookupUseCase keycloakUserLookupUseCase;
+
+    @GET
+    @RolesAllowed(UserRole.Names.ADMIN)
+    public List<KeycloakUser> getAllUsers() {
+      return keycloakUserLookupUseCase.getAllUsers();
+    }
 
     @GET
     @Path("/me")
