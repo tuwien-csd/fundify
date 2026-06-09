@@ -21,6 +21,7 @@ import at.ac.tuwien.fundify.domain.common.exceptions.InsufficientPermissionsExce
 import at.ac.tuwien.fundify.domain.common.exceptions.UnexpectedErrorException;
 import at.ac.tuwien.fundify.domain.funding.*;
 import at.ac.tuwien.fundify.domain.funding.vo.enums.EEntryOrigin;
+import at.ac.tuwien.fundify.domain.funding.vo.enums.EUpdateSource;
 import jakarta.enterprise.context.ApplicationScoped;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -39,6 +40,7 @@ import org.mapstruct.factory.Mappers;
 public class CallService implements CallUseCase {
 
   private final CallRepository callRepository;
+  private final CallVersioningService callVersioningService;
   private final BasePermissionService basePermissionService;
   private final FunderRepository funderRepository;
   private final UserService userService;
@@ -64,7 +66,7 @@ public class CallService implements CallUseCase {
         call.setCallOwner(funder);
     }
 
-    if (!currentUserMayWrite(call, funderId)) {
+    if (currentUserMayNotWrite(call, funderId)) {
       throw new InsufficientPermissionsException();
     }
 
@@ -107,7 +109,7 @@ public class CallService implements CallUseCase {
         .orElseThrow(() -> EntityNotFoundException.callNotFound(call.getId().toString()));
     FunderReference funderReference = call.getFunder();
 
-    if (!currentUserMayWrite(callFromDb, funderReference.id())) {
+    if (currentUserMayNotWrite(callFromDb, funderReference.id())) {
       throw new InsufficientPermissionsException(call.getId().value());
     }
 
@@ -122,6 +124,7 @@ public class CallService implements CallUseCase {
       }
     }
 
+    callVersioningService.createVersionIfChanged(callFromDb, call, EUpdateSource.MANUAL);
     call.setLastUpdatedAt(LocalDateTime.now()); // add timestamp for last update
     Call callUpdate = CallUpdateMapper.INSTANCE.updateCallFromCallUpdate(call, callFromDb);
     Call updatedCall = callRepository.update(callUpdate)
@@ -139,7 +142,7 @@ public class CallService implements CallUseCase {
     Call call = callRepository.findById(id)
         .orElseThrow(() -> EntityNotFoundException.callNotFound(id.toString()));
 
-    if (!currentUserMayWrite(call, call.getFunder().id())) {
+    if (currentUserMayNotWrite(call, call.getFunder().id())) {
       throw new InsufficientPermissionsException(call.getId().value());
     }
 
@@ -184,17 +187,17 @@ public class CallService implements CallUseCase {
     call.setLastSync(now);
   }
 
-  private boolean currentUserMayWrite(Call call, FunderId funderId) {
+  private boolean currentUserMayNotWrite(Call call, FunderId funderId) {
     //If the call is managed through the sync, it cannot be updated via the API.
     if (EEntryOrigin.ENDPOINT.equals(call.getEntryOrigin())) {
       log.infof(
           "Call with id '%s' cannot be updated via the API because it is managed through the sync.",
           call.getId().value());
-      return false;
+      return true;
     }
     // Admins can write all other calls.
     if (userService.isUserAdmin()) {
-      return true;
+      return false;
     }
 
     String callOwnerAcronym = call.getCallOwner().getAcronym();
@@ -202,11 +205,11 @@ public class CallService implements CallUseCase {
     if (userService.isUserAnnotator()) {
         Funder funder = funderRepository.findById(funderId)
                 .orElseThrow(() -> EntityNotFoundException.funderNotFound(funderId.toString()));
-        return funder.getExternallyAdministered() &&
-                basePermissionService.currentUserIsAffiliatedWith(callOwnerAcronym);
+        return !funder.getExternallyAdministered() ||
+            !basePermissionService.currentUserIsAffiliatedWith(callOwnerAcronym);
     }
     // Funders can only write calls they are affiliated with.
-    return basePermissionService.currentUserIsAffiliatedWith(callOwnerAcronym);
+    return !basePermissionService.currentUserIsAffiliatedWith(callOwnerAcronym);
   }
 
   @Mapper

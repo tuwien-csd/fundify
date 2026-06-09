@@ -1,0 +1,59 @@
+<h2 mat-dialog-title>Version History</h2>
+
+<mat-dialog-content>
+  @if (loading) {
+    <div class="spinner-container">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+  } @else if (!versions.length) {
+    <p class="no-versions">No version history available.</p>
+  } @else {
+    <div class="version-viewer">
+      <div class="nav-bar">
+        <button mat-icon-button (click)="goNewer()" [disabled]="isLatest" aria-label="Newer version">
+          <mat-icon>chevron_left</mat-icon>
+        </button>
+        <span class="nav-label">
+          Version {{ currentIndex + 1 }} / {{ versions.length }}
+          @if (isLatest) { <span class="latest-badge">latest</span> }
+        </span>
+        <button mat-icon-button (click)="goOlder()" [disabled]="isOldest" aria-label="Older version">
+          <mat-icon>chevron_right</mat-icon>
+        </button>
+      </div>
+
+      @if (currentVersion; as version) {
+        <div class="version-meta">
+          <mat-icon class="source-icon" [ngClass]="version.updateSource === 'SYNC' ? 'sync' : 'manual'">
+            {{ version.updateSource === 'SYNC' ? 'sync' : 'edit' }}
+          </mat-icon>
+          <span class="source-label" [ngClass]="version.updateSource === 'SYNC' ? 'sync' : 'manual'">
+            {{ version.updateSource }}
+          </span>
+          <span class="version-date">{{ version.versionedAt ? (version.versionedAt | date: 'dd.MM.yyyy HH:mm') : '—' }}</span>
+        </div>
+
+        <div class="version-fields">
+          @for (fieldDef of fieldDefs; track fieldDef.key) {
+            <div class="field-row" [ngClass]="{ changed: isChanged(fieldDef.key) }">
+              <span class="field-label">{{ fieldDef.label }}</span>
+              @if (isChanged(fieldDef.key)) {
+                <div class="field-value-diff">
+                  <span class="field-value old-value">{{ fieldDef.format(version) }}</span>
+                  <mat-icon class="diff-arrow">arrow_downward</mat-icon>
+                  <span class="field-value new-value">{{ getNewerFormattedValue(fieldDef) }}</span>
+                </div>
+              } @else {
+                <span class="field-value">{{ fieldDef.format(version) }}</span>
+              }
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-stroked-button (click)="onClose()">Close</button>
+</mat-dialog-actions>

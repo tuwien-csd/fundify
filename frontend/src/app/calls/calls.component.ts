@@ -42,6 +42,8 @@ import { RouterLink } from '@angular/router';
 import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
 import { CallDisplayPipe } from './pipes/call-display.pipe';
 import { CallsStore } from './signal/calls-store';
+import { MatDialog } from '@angular/material/dialog';
+import { CallVersionHistoryDialogComponent, CallVersionHistoryDialogData } from './components/call-version-history-dialog/call-version-history-dialog.component';
 
 @Component({
   selector: 'app-calls',
@@ -81,6 +83,7 @@ import { CallsStore } from './signal/calls-store';
 })
 export class CallsComponent {
   private callsStore = inject(CallsStore);
+  private dialog = inject(MatDialog);
 
   protected readonly CALL_CONSTANTS = CALLS_CONSTANTS;
   protected readonly BUTTON_LABELS = BUTTON_LABELS;
@@ -154,6 +157,21 @@ export class CallsComponent {
 
   onUnsubscribe(callId: string): void {
     this.callsStore.changeSubscriptionById(callId, 'UNSUBSCRIBED');
+  }
+
+  onShowHistory(call: CallWebModel): void {
+    const data: CallVersionHistoryDialogData = {
+      callId: call.id,
+      currentFields: {
+        name: call.name,
+        description: call.description,
+        eligibleApplicants: call.eligibleApplicants,
+        callStages: call.callStages,
+        callVolumeAmount: call.callVolumeAmount,
+        website: call.website,
+      },
+    };
+    this.dialog.open(CallVersionHistoryDialogComponent, { width: '680px', data });
   }
 
   private applyFilters() {
