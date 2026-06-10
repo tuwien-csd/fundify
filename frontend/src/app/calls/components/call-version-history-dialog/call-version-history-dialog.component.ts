@@ -5,6 +5,8 @@ import { MatButton, MatIconButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { BackendServiceV2 } from '../../../core/services/backend-service-v2.service';
+import { NotificationService } from '../../../shared/services/notification-service.service';
+import { CALL_DETAILS_CONSTANTS } from '../../calls.constants';
 import { components } from '../../../../generated/refop-be';
 
 type CallVersionWebModel = components['schemas']['CallVersionWebModel'];
@@ -38,12 +40,14 @@ export interface CallVersionHistoryDialogData {
 export class CallVersionHistoryDialogComponent implements OnInit {
   private dialogRef = inject(MatDialogRef<CallVersionHistoryDialogComponent>);
   private backendService = inject(BackendServiceV2);
+  private notificationService = inject(NotificationService);
   data = inject<CallVersionHistoryDialogData>(MAT_DIALOG_DATA);
 
   versions: CallVersionWebModel[] = [];
   changedFields: Set<string>[] = [];
   currentIndex = 0;
   loading = true;
+  loadError = false;
 
   readonly fieldDefs: { key: keyof VersionFields; label: string; format: (v: CallVersionWebModel) => string }[] = [
     { key: 'name',               label: 'Title',              format: v => this.formatTranslatedText(v.name) },
@@ -75,13 +79,25 @@ export class CallVersionHistoryDialogComponent implements OnInit {
       const response = await this.backendService.client.GET('/api/calls/{id}/versions', {
         params: { path: { id: this.data.callId } },
       });
-      this.versions = (response.data ?? []).sort(
+      if (response.error || !response.data) {
+        this.handleLoadError(response.error);
+        return;
+      }
+      this.versions = response.data.sort(
         (a, b) => new Date(b.versionedAt ?? 0).getTime() - new Date(a.versionedAt ?? 0).getTime()
       );
       this.changedFields = this.computeChangedFields(this.versions, this.data.currentFields);
+    } catch (error) {
+      this.handleLoadError(error);
     } finally {
       this.loading = false;
     }
+  }
+
+  private handleLoadError(error: unknown): void {
+    console.error('Error loading call version history:', error);
+    this.loadError = true;
+    this.notificationService.error(CALL_DETAILS_CONSTANTS.ERRORS.GENERIC_ERROR);
   }
 
   goNewer(): void {

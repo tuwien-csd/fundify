@@ -153,6 +153,7 @@ public class CallService implements CallUseCase {
     if (!deleted) {
       throw new UnexpectedErrorException("Error deleting call with ID: " + id);
     }
+    callVersioningService.deleteVersions(id);
   }
 
   @Override

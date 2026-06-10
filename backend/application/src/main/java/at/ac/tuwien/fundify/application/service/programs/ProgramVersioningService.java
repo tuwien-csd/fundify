@@ -1,6 +1,7 @@
 package at.ac.tuwien.fundify.application.service.programs;
 
 import at.ac.tuwien.fundify.application.port.out.persistence.ProgramVersionRepository;
+import at.ac.tuwien.fundify.domain.common.ProgramId;
 import at.ac.tuwien.fundify.domain.funding.Program;
 import at.ac.tuwien.fundify.domain.funding.ProgramVersion;
 import at.ac.tuwien.fundify.domain.funding.vo.enums.EUpdateSource;
@@ -19,6 +20,10 @@ public class ProgramVersioningService {
         if (hasRelevantChange(existing, incoming)) {
             programVersionRepository.persist(snapshotOf(existing, source));
         }
+    }
+
+    public void deleteVersions(ProgramId programId) {
+        programVersionRepository.deleteByProgramId(programId);
     }
 
     private boolean hasRelevantChange(Program existing, Program incoming) {

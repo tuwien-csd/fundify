@@ -9,4 +9,6 @@ public interface CallVersionRepository {
     void persist(CallVersion callVersion);
 
     List<CallVersion> findByCallId(CallId callId);
+
+    void deleteByCallId(CallId callId);
 }

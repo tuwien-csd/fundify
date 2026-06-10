@@ -9,4 +9,6 @@ public interface ProgramVersionRepository {
     void persist(ProgramVersion programVersion);
 
     List<ProgramVersion> findByProgramId(ProgramId programId);
+
+    void deleteByProgramId(ProgramId programId);
 }

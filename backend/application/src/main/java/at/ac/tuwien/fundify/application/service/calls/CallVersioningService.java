@@ -1,6 +1,7 @@
 package at.ac.tuwien.fundify.application.service.calls;
 
 import at.ac.tuwien.fundify.application.port.out.persistence.CallVersionRepository;
+import at.ac.tuwien.fundify.domain.common.CallId;
 import at.ac.tuwien.fundify.domain.funding.Call;
 import at.ac.tuwien.fundify.domain.funding.CallUpdate;
 import at.ac.tuwien.fundify.domain.funding.CallVersion;
@@ -26,6 +27,10 @@ public class CallVersioningService {
         if (hasRelevantChange(existing, incoming)) {
             callVersionRepository.persist(snapshotOf(existing, source));
         }
+    }
+
+    public void deleteVersions(CallId callId) {
+        callVersionRepository.deleteByCallId(callId);
     }
 
     private boolean hasRelevantChange(Call existing, Call incoming) {

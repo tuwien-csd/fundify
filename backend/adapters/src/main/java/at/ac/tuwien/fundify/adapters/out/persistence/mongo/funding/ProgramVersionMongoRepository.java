@@ -31,6 +31,12 @@ public class ProgramVersionMongoRepository implements ProgramVersionRepository {
             .toList();
     }
 
+    @Override
+    public void deleteByProgramId(ProgramId programId) {
+        ObjectId objectId = ObjectIdUtils.toObjectId(programId.value());
+        ProgramVersionMongoEntity.delete("programId", objectId);
+    }
+
     private ProgramVersion toDomain(ProgramVersionMongoEntity entity) {
         return new ProgramVersion(
             entity.id != null ? entity.id.toHexString() : null,

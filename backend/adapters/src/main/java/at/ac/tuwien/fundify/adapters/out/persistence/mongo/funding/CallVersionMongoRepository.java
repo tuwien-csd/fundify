@@ -35,6 +35,12 @@ public class CallVersionMongoRepository implements CallVersionRepository {
             .toList();
     }
 
+    @Override
+    public void deleteByCallId(CallId callId) {
+        ObjectId objectId = ObjectIdUtils.toObjectId(callId.value());
+        CallVersionMongoEntity.delete("callId", objectId);
+    }
+
     private CallVersion toDomain(CallVersionMongoEntity entity) {
         return new CallVersion(
             entity.id != null ? entity.id.toHexString() : null,

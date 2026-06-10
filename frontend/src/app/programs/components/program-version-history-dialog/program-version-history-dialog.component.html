@@ -5,6 +5,8 @@
     <div class="spinner-container">
       <mat-spinner diameter="40"></mat-spinner>
     </div>
+  } @else if (loadError) {
+    <p class="no-versions">Could not load version history. Please try again later.</p>
   } @else if (!versions.length) {
     <p class="no-versions">No version history available.</p>
   } @else {

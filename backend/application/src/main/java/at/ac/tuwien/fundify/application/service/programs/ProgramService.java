@@ -80,7 +80,6 @@ public class ProgramService implements ProgramUseCase {
 
     Program programFromDb = programRepository.findById(program.getId())
         .orElseThrow(() -> EntityNotFoundException.programNotFound(program.getId().value()));
-    programVersioningService.createVersionIfChanged(programFromDb, program, EUpdateSource.MANUAL);
     FunderReference funder = program.getFunder();
 
     if (currentUserMayNotWrite(programFromDb, funder.acronym())) {
@@ -94,6 +93,7 @@ public class ProgramService implements ProgramUseCase {
         updateLastSyncDate(program);
       }
     }
+    programVersioningService.createVersionIfChanged(programFromDb, program, EUpdateSource.MANUAL);
     return programRepository.update(program).orElseThrow(
         () -> new UnexpectedErrorException("Error updating program with ID: " + programFromDb.getId().value()));
   }
@@ -117,6 +117,7 @@ public class ProgramService implements ProgramUseCase {
     if (!deleted) {
       throw new UnexpectedErrorException("Error deleting program with ID: " + id);
     }
+    programVersioningService.deleteVersions(id);
   }
 
   private void updateLastSyncDate(Program program) {

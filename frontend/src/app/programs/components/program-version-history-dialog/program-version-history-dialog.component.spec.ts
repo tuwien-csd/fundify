@@ -4,6 +4,7 @@ import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ProgramVersionHistoryDialogComponent } from './program-version-history-dialog.component';
 import { BackendServiceV2 } from '../../../core/services/backend-service-v2.service';
+import { NotificationService } from '../../../shared/services/notification-service.service';
 
 describe('ProgramVersionHistoryDialogComponent', () => {
   let component: ProgramVersionHistoryDialogComponent;
@@ -12,6 +13,8 @@ describe('ProgramVersionHistoryDialogComponent', () => {
   let mockBackendService: { client: { GET: jasmine.Spy } };
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- mock object
   let mockDialogRef: { close: jasmine.Spy };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- mock object
+  let mockNotificationService: { error: jasmine.Spy; success: jasmine.Spy };
 
   beforeEach(async () => {
     mockBackendService = {
@@ -20,6 +23,10 @@ describe('ProgramVersionHistoryDialogComponent', () => {
       },
     };
     mockDialogRef = { close: jasmine.createSpy('close') };
+    mockNotificationService = {
+      error: jasmine.createSpy('error'),
+      success: jasmine.createSpy('success'),
+    };
 
     await TestBed.configureTestingModule({
       imports: [ProgramVersionHistoryDialogComponent],
@@ -29,6 +36,7 @@ describe('ProgramVersionHistoryDialogComponent', () => {
         { provide: BackendServiceV2, useValue: mockBackendService },
         { provide: MatDialogRef, useValue: mockDialogRef },
         { provide: MAT_DIALOG_DATA, useValue: { programId: 'program-1', currentFields: {} } },
+        { provide: NotificationService, useValue: mockNotificationService },
       ],
     }).compileComponents();
 
@@ -52,6 +60,31 @@ describe('ProgramVersionHistoryDialogComponent', () => {
 
     expect(component.loading).toBeFalse();
     expect(component.versions.length).toBe(2);
+  });
+
+  it('ngOnInit sets loadError and notifies when the request returns an error', async () => {
+    mockBackendService.client.GET.and.returnValue(
+      Promise.resolve({ error: { message: 'boom' } })
+    );
+
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    expect(component.loading).toBeFalse();
+    expect(component.loadError).toBeTrue();
+    expect(component.versions.length).toBe(0);
+    expect(mockNotificationService.error).toHaveBeenCalled();
+  });
+
+  it('ngOnInit sets loadError and notifies when the request rejects', async () => {
+    mockBackendService.client.GET.and.returnValue(Promise.reject(new Error('network')));
+
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    expect(component.loading).toBeFalse();
+    expect(component.loadError).toBeTrue();
+    expect(mockNotificationService.error).toHaveBeenCalled();
   });
 
   describe('goNewer and goOlder navigation', () => {
