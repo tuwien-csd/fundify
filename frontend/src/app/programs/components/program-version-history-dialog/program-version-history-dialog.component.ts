@@ -7,22 +7,20 @@ import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { BackendServiceV2 } from '../../../core/services/backend-service-v2.service';
 import { components } from '../../../../generated/refop-be';
 
-type CallVersionWebModel = components['schemas']['CallVersionWebModel'];
-type VersionFields = Pick<CallVersionWebModel, 'name' | 'description' | 'eligibleApplicants' | 'callStages' | 'callVolumeAmount' | 'website'>;
+type ProgramVersionWebModel = components['schemas']['ProgramVersionWebModel'];
+type VersionFields = Pick<ProgramVersionWebModel, 'description' | 'duration'>;
 
-const TRACKED_FIELDS: (keyof VersionFields)[] = [
-  'name', 'description', 'eligibleApplicants', 'callStages', 'callVolumeAmount', 'website',
-];
+const TRACKED_FIELDS: (keyof VersionFields)[] = ['description', 'duration'];
 
-export interface CallVersionHistoryDialogData {
-  callId: string;
+export interface ProgramVersionHistoryDialogData {
+  programId: string;
   currentFields?: Record<string, unknown>;
 }
 
 @Component({
-  selector: 'app-call-version-history-dialog',
-  templateUrl: './call-version-history-dialog.component.html',
-  styleUrls: ['./call-version-history-dialog.component.scss'],
+  selector: 'app-program-version-history-dialog',
+  templateUrl: './program-version-history-dialog.component.html',
+  styleUrls: ['./program-version-history-dialog.component.scss'],
   imports: [
     MatDialogTitle,
     MatDialogContent,
@@ -35,26 +33,22 @@ export interface CallVersionHistoryDialogData {
     NgClass,
   ],
 })
-export class CallVersionHistoryDialogComponent implements OnInit {
-  private dialogRef = inject(MatDialogRef<CallVersionHistoryDialogComponent>);
+export class ProgramVersionHistoryDialogComponent implements OnInit {
+  private dialogRef = inject(MatDialogRef<ProgramVersionHistoryDialogComponent>);
   private backendService = inject(BackendServiceV2);
-  data = inject<CallVersionHistoryDialogData>(MAT_DIALOG_DATA);
+  data = inject<ProgramVersionHistoryDialogData>(MAT_DIALOG_DATA);
 
-  versions: CallVersionWebModel[] = [];
+  versions: ProgramVersionWebModel[] = [];
   changedFields: Set<string>[] = [];
   currentIndex = 0;
   loading = true;
 
-  readonly fieldDefs: { key: keyof VersionFields; label: string; format: (v: CallVersionWebModel) => string }[] = [
-    { key: 'name',               label: 'Title',              format: v => this.formatTranslatedText(v.name) },
-    { key: 'description',        label: 'Description',        format: v => this.formatTranslatedText(v.description) },
-    { key: 'eligibleApplicants', label: 'Eligible Applicants', format: v => this.formatTranslatedText(v.eligibleApplicants) },
-    { key: 'callStages',         label: 'Deadline',           format: v => this.formatCallStages(v.callStages) },
-    { key: 'callVolumeAmount',   label: 'Volume',             format: v => this.formatVolume(v.callVolumeAmount) },
-    { key: 'website',            label: 'Link',               format: v => v.website?.join(', ') || '—' },
+  readonly fieldDefs: { key: keyof VersionFields; label: string; format: (v: ProgramVersionWebModel) => string }[] = [
+    { key: 'description', label: 'Description', format: v => this.formatTranslatedText(v.description) },
+    { key: 'duration',    label: 'Duration',    format: v => this.formatDateRange(v.duration) },
   ];
 
-  get currentVersion(): CallVersionWebModel | undefined {
+  get currentVersion(): ProgramVersionWebModel | undefined {
     return this.versions[this.currentIndex];
   }
 
@@ -72,8 +66,8 @@ export class CallVersionHistoryDialogComponent implements OnInit {
 
   async ngOnInit(): Promise<void> {
     try {
-      const response = await this.backendService.client.GET('/api/calls/{id}/versions', {
-        params: { path: { id: this.data.callId } },
+      const response = await this.backendService.client.GET('/api/programs/{id}/versions', {
+        params: { path: { id: this.data.programId } },
       });
       this.versions = (response.data ?? []).sort(
         (a, b) => new Date(b.versionedAt ?? 0).getTime() - new Date(a.versionedAt ?? 0).getTime()
@@ -97,9 +91,9 @@ export class CallVersionHistoryDialogComponent implements OnInit {
   }
 
   getNewerFormattedValue(fieldDef: (typeof this.fieldDefs)[number]): string {
-    const newerData: CallVersionWebModel | undefined =
+    const newerData: ProgramVersionWebModel | undefined =
       this.currentIndex === 0
-        ? (this.data.currentFields as CallVersionWebModel | undefined)
+        ? (this.data.currentFields as ProgramVersionWebModel | undefined)
         : this.versions[this.currentIndex - 1];
     return newerData ? fieldDef.format(newerData) : '—';
   }
@@ -109,29 +103,22 @@ export class CallVersionHistoryDialogComponent implements OnInit {
     return texts.map(t => `${t.text} (${t.language})`).join(', ');
   }
 
-  formatCallStages(stages: { number?: number; duration?: { start?: string; end?: string } }[] | undefined): string {
-    if (!stages?.length) return '—';
+  formatDateRange(duration: { start?: string; end?: string } | undefined): string {
+    if (!duration) return '—';
     const fmt = (s: string) => {
       const d = new Date(s);
       return `${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getFullYear()).slice(-2)}`;
     };
-    return stages.map(s => {
-      const start = s.duration?.start ? fmt(s.duration.start) : '?';
-      const end = s.duration?.end ? fmt(s.duration.end) : '?';
-      return `Stage ${s.number}: ${start} – ${end}`;
-    }).join(', ');
-  }
-
-  formatVolume(volume: { amount?: number; currency?: string } | undefined): string {
-    if (!volume) return '—';
-    return `${volume.amount ?? '?'} ${volume.currency ?? ''}`.trim();
+    const start = duration.start ? fmt(duration.start) : '?';
+    const end = duration.end ? fmt(duration.end) : '?';
+    return `${start} – ${end}`;
   }
 
   onClose(): void {
     this.dialogRef.close();
   }
 
-  private computeChangedFields(versions: CallVersionWebModel[], currentFields?: Record<string, unknown>): Set<string>[] {
+  private computeChangedFields(versions: ProgramVersionWebModel[], currentFields?: Record<string, unknown>): Set<string>[] {
     return versions.map((version, i) => {
       const nextState: Record<string, unknown> | undefined = i === 0 ? currentFields : versions[i - 1];
       if (!nextState) return new Set<string>();
