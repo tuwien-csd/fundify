@@ -77,7 +77,7 @@ export const POST_ADDRESS_LABELS = {
 };
 
 export const VALIDATORS = {
-  REQUIRED: 'equired',
+  REQUIRED: 'required',
   EMAIL: 'email',
   PHONE: 'phone',
   URL: 'url',

@@ -10,6 +10,8 @@ import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideNativeDateAdapter } from '@angular/material/core';
 import { OAuthServiceMock } from '../../../testing/mocks/OAuthService.mock';
+import { MatDialog } from '@angular/material/dialog';
+import { CallVersionHistoryDialogComponent } from '../call-version-history-dialog/call-version-history-dialog.component';
 
 describe('CallDetailPreviewComponent', () => {
   let component: CallDetailPreviewComponent;
@@ -47,6 +49,7 @@ describe('CallDetailPreviewComponent', () => {
         { provide: LocalStorageService, useValue: mockLocalStorageService },
         { provide: PermissionService, useValue: mockPermissionService },
         { provide: CallValidationService, useValue: mockValidationService },
+        { provide: MatDialog, useValue: { open: jasmine.createSpy('open') } },
       ],
     }).compileComponents();
   });
@@ -89,5 +92,15 @@ describe('CallDetailPreviewComponent', () => {
     spyOn(component.edit, 'emit');
     component.onEdit();
     expect(component.edit.emit).toHaveBeenCalledWith(ViewEnum.EDIT);
+  });
+
+  it('should open CallVersionHistoryDialog on onShowHistory', () => {
+    const dialog = TestBed.inject(MatDialog);
+    component.call = { ...CALLS[0], id: 'test-id' };
+    component.onShowHistory();
+    expect(dialog.open).toHaveBeenCalledWith(
+      CallVersionHistoryDialogComponent,
+      jasmine.objectContaining({ width: '680px' })
+    );
   });
 });
