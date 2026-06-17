@@ -26,7 +26,7 @@ public class KeycloakAdminUserRepository implements KeycloakUserRepository {
 
   @Override
   public List<KeycloakUser> findAll() {
-    return keycloak.realm(realm).users().list().stream()
+    return keycloak.realm(realm).users().list(0, 99999).stream()
         .map(this::toDomain)
         .toList();
   }

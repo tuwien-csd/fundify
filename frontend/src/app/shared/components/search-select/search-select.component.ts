@@ -239,7 +239,11 @@ export class SearchSelectComponent
     const l2v = this.labelToValue();
     const storedValue = l2v ? (l2v.get(selectedLabel) ?? selectedLabel) : selectedLabel;
     if (!this.multiSelect()) {
-      this.selectionsFormArray.clear();
+      // Only one selection allowed: keep the existing one and discard the search.
+      if (this.selectionsFormArray.length > 0) {
+        this.search.setValue('', { emitEvent: false });
+        return;
+      }
       this.selectionsFormArray.push(this.fb.control(storedValue));
       // label stays in the input via mat-autocomplete displayWith
     } else {

@@ -7,6 +7,7 @@ import at.ac.tuwien.fundify.domain.common.UserPermissionHolder;
 import io.quarkus.cache.CacheInvalidateAll;
 import io.quarkus.cache.CacheResult;
 import jakarta.enterprise.context.ApplicationScoped;
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.jbosslog.JBossLog;
@@ -31,5 +32,18 @@ public class UserPermissionManagementService implements UserPermissionManagement
   @CacheResult(cacheName = "user-permissions")
   public Optional<UserPermissionHolder> getPermissions(String userId) {
     return userPermissionRepository.findByUserId(userId);
+  }
+
+  @Override
+  public List<UserPermissionHolder> getAllPermissions() {
+    return userPermissionRepository.findAllPermissions();
+  }
+
+  @Override
+  @CacheInvalidateAll(cacheName = "user-permissions")
+  public void deletePermissions(String userId) {
+    log.infof("Delete for user %s initiated by %s", userId,
+        userService.getCurrentUserIdAndName());
+    userPermissionRepository.deleteByUserId(userId);
   }
 }

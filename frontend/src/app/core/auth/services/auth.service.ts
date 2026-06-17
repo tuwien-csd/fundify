@@ -1,4 +1,5 @@
 import { computed, inject, Injectable, resource, signal } from '@angular/core';
+import { toObservable } from '@angular/core/rxjs-interop';
 import { AuthConfig, OAuthService } from 'angular-oauth2-oidc';
 import { User } from '../models/user.interface';
 import { UserRoleEnum } from '../models/user-role.enum';
@@ -25,6 +26,10 @@ export class AuthService {
     token: null,
   });
 
+  // True once the OAuth flow has finished initializing (discovery doc loaded
+  // and any persisted session restored). Used to know when token() is reliable.
+  private oauthInitialized = signal(false);
+
   // selectors
   user = computed(() => this.state().user);
   token = computed(() => this.state().token);
@@ -50,6 +55,25 @@ export class AuthService {
     }
     return undefined;
   });
+
+  /**
+   * Becomes true once the OAuth flow has initialized AND, when a user is logged
+   * in, their permissions/roles have been loaded from the backend.
+   *
+   * Route guards must await this before evaluating roles: on a hard page reload
+   * the guard would otherwise race the async `/api/users/me` fetch, see an empty
+   * roles() and wrongly redirect to the "not authorized" page.
+   */
+  readonly authResolved = computed(() => {
+    if (!this.oauthInitialized()) return false;
+    // Not logged in: nothing more to wait for, let the guard decide/redirect.
+    if (!this.token()) return true;
+    // Logged in: wait until the user-details fetch has settled.
+    const status = this.userDetailsResource.status();
+    return status === 'resolved' || status === 'error';
+  });
+
+  readonly authResolved$ = toObservable(this.authResolved);
 
   userAffiliationId = computed(() => {
     return this.userPermissions()?.affiliationId;
@@ -126,6 +150,10 @@ export class AuthService {
       ) {
         this.updateFromOAuth();
       }
+
+      // Signal that auth init is done (token() is now reliable) so route guards
+      // can stop waiting and evaluate access.
+      this.oauthInitialized.set(true);
     });
   }
 

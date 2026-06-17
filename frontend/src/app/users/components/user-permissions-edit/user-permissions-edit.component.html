@@ -3,46 +3,85 @@
     <mat-card-title>{{ USER_PERMISSIONS_CONSTANTS.TITLE }}</mat-card-title>
   </container-header>
   <container-content>
-    <form [formGroup]="detailsForm">
-      <div class="flex flex-row gap-4">
-        <app-search-select
-          formControlName="userId"
-          [options]="userOptions()"
-          [required]="true"
-          [multiSelect]="false"
-          placeholder="Search by email*"
-        />
-        <app-select-field
-          formControlName="roles"
-          [textLabel]="USER_PERMISSIONS_CONSTANTS.ROLES_LABEL"
-          [options]="USER_ROLE_OPTIONS"
-          [required]="true"
-          [multiple]="true"
-        />
-        <app-text-field
-          formControlName="affiliationId"
-          [textLabel]="USER_PERMISSIONS_CONSTANTS.AFFILIATION_ID_LABEL"
-          [placeholder]="USER_PERMISSIONS_CONSTANTS.AFFILIATION_ID_PLACEHOLDER"
-          [required]="true"
-        />
-      </div>
-    </form>
+    @if (formVisible()) {
+      <form [formGroup]="detailsForm">
+          <h3 class="user-permissions-table-title">
+              {{ USER_PERMISSIONS_CONSTANTS.TABLE_TITLE_NEW }}
+          </h3>
+        <div class="flex flex-row gap-4 items-center">
+          <app-search-select
+            formControlName="userId"
+            [options]="userOptions()"
+            [required]="true"
+            [multiSelect]="false"
+            placeholder="User (Search by email)*"
+          />
+          <app-select-field
+            formControlName="roles"
+            [textLabel]="USER_PERMISSIONS_CONSTANTS.ROLES_LABEL"
+            [options]="USER_ROLE_OPTIONS"
+            [required]="true"
+            [multiple]="true"
+          />
+          <app-text-field
+            formControlName="affiliationId"
+            [textLabel]="USER_PERMISSIONS_CONSTANTS.AFFILIATION_ID_LABEL"
+            [placeholder]="USER_PERMISSIONS_CONSTANTS.AFFILIATION_ID_PLACEHOLDER"
+            [required]="true"
+          />
+          <button
+            mat-raised-button
+            class="submit-button form-item-button"
+            color="primary"
+            type="submit"
+            [disabled]="!formValidSignal()"
+            (click)="onSave()"
+          >
+            {{ BUTTON_LABELS.SUBMIT }}
+          </button>
+        </div>
+      </form>
+    }
+
+    <div class="user-permissions-table-section">
+      <h3 class="user-permissions-table-title">
+        {{ USER_PERMISSIONS_CONSTANTS.TABLE_TITLE_EXISTING }}
+      </h3>
+      <mat-table [dataSource]="permissionRows()" class="user-permissions-table">
+        <ng-container matColumnDef="email">
+          <mat-header-cell *matHeaderCellDef>
+            {{ USER_PERMISSIONS_CONSTANTS.EMAIL_LABEL }}
+          </mat-header-cell>
+          <mat-cell *matCellDef="let row">{{ row.email }}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="roles">
+          <mat-header-cell *matHeaderCellDef>
+            {{ USER_PERMISSIONS_CONSTANTS.ROLES_LABEL }}
+          </mat-header-cell>
+          <mat-cell *matCellDef="let row">{{ row.roles }}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="affiliationId">
+          <mat-header-cell *matHeaderCellDef>
+            {{ USER_PERMISSIONS_CONSTANTS.AFFILIATION_ID_LABEL }}
+          </mat-header-cell>
+          <mat-cell *matCellDef="let row">{{ row.affiliationId }}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="actions">
+          <mat-header-cell *matHeaderCellDef></mat-header-cell>
+          <mat-cell *matCellDef="let row">
+            <button
+              mat-icon-button
+              color="warn"
+              [attr.aria-label]="BUTTON_LABELS.DELETE"
+              (click)="onDelete(row.userId)"
+            >
+              <mat-icon>delete</mat-icon>
+            </button>
+          </mat-cell>
+        </ng-container>
+        <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
+      </mat-table>
+    </div>
   </container-content>
-  <container-actions class="flex flex-row w-full justify-between p-1 m-2">
-    <button mat-stroked-button class="form-item-button" (click)="onBack()">
-      <mat-icon>arrow_back</mat-icon>
-      {{ BUTTON_LABELS.BACK }}
-    </button>
-    <div class="spacer"></div>
-    <button
-      mat-raised-button
-      class="submit-button form-item-button"
-      color="primary"
-      type="submit"
-      [disabled]="!formValidSignal()"
-      (click)="onSave()"
-    >
-      {{ BUTTON_LABELS.SUBMIT }}
-    </button>
-  </container-actions>
 </app-generic-details-container>

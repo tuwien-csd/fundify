@@ -4,6 +4,7 @@ import at.ac.tuwien.fundify.application.port.out.persistence.UserPermissionRepos
 import at.ac.tuwien.fundify.domain.common.UserPermissionHolder;
 import io.quarkus.mongodb.panache.PanacheMongoRepository;
 import jakarta.enterprise.context.ApplicationScoped;
+import java.util.List;
 import java.util.Optional;
 import lombok.extern.jbosslog.JBossLog;
 
@@ -23,5 +24,17 @@ public class UserPermissionMongoRepository implements UserPermissionRepository, 
     return find("_id", userId)
         .firstResultOptional()
         .map(UserPermissionMongoEntityMapper.INSTANCE::toDomain);
+  }
+
+  @Override
+  public List<UserPermissionHolder> findAllPermissions() {
+    return listAll().stream()
+        .map(UserPermissionMongoEntityMapper.INSTANCE::toDomain)
+        .toList();
+  }
+
+  @Override
+  public void deleteByUserId(String userId) {
+    delete("_id", userId);
   }
 }

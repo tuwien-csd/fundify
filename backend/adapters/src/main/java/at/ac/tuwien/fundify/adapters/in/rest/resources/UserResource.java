@@ -12,6 +12,7 @@ import io.quarkus.security.Authenticated;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
@@ -41,6 +42,13 @@ public class UserResource {
     }
 
     @GET
+    @Path("/permissions")
+    @RolesAllowed(UserRole.Names.ADMIN)
+    public List<UserPermissionHolder> getAllPermissions() {
+      return userPermissionManagementUseCase.getAllPermissions();
+    }
+
+    @GET
     @Path("/me")
     public UserPermissionHolder getUserInfo() {
       return userService.getCurrentUserPermissionHolder();
@@ -53,6 +61,13 @@ public class UserResource {
     public UserPermissionHolder updateUser(@PathParam("id") String id, @Valid UserPermissionsUpdateWebModel updateInput) {
       var updateObject = UserPermissionsWebModelMapper.INSTANCE.toDomain(updateInput, id);
       return userPermissionManagementUseCase.updatePermissions(updateObject);
+    }
+
+    @DELETE
+    @Path("/{id}/permissions")
+    @RolesAllowed(UserRole.Names.ADMIN)
+    public void deletePermissions(@PathParam("id") String id) {
+      userPermissionManagementUseCase.deletePermissions(id);
     }
 
 }
