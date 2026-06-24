@@ -1800,6 +1800,106 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/registration-requests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get All */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["RegistrationRequest"][];
+                    };
+                };
+                /** @description Not Authorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Not Allowed */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/registration-requests/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description No Content */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Not Authorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Not Allowed */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/universities": {
         parameters: {
             query?: never;
@@ -3014,6 +3114,8 @@ export interface components {
             type: components["schemas"]["EIdentifierTypeWebModel"];
             value: string;
         };
+        /** Format: date-time */
+        Instant: string;
         KeycloakUser: {
             id?: string;
             username?: string;
@@ -3063,6 +3165,14 @@ export interface components {
             registrationDate: components["schemas"]["LocalDateTime"];
             lastSync: components["schemas"]["LocalDateTime"];
             risId: string;
+        };
+        RegistrationRequest: {
+            id?: string;
+            name?: string;
+            email?: string;
+            kindOfInstitution?: string;
+            message?: string;
+            createdAt?: components["schemas"]["Instant"];
         };
         StandardizedSubjectWebModel: {
             /** Format: int32 */

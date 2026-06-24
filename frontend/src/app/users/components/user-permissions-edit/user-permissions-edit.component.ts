@@ -1,3 +1,4 @@
+import { DatePipe } from '@angular/common';
 import {
   Component,
   computed,
@@ -35,6 +36,7 @@ import { TextFieldComponent } from '../../../shared/components/text-field/text-f
 import { UsersStore } from '../../signal/users-store';
 import { NotificationService } from '../../../shared/services/notification-service.service';
 import {
+  REGISTRATION_REQUESTS_CONSTANTS,
   USER_PERMISSIONS_CONSTANTS,
   USER_ROLE_OPTIONS,
 } from '../../users.constants';
@@ -52,6 +54,7 @@ type UserPermissionsForm = {
   templateUrl: './user-permissions-edit.component.html',
   styleUrls: ['./user-permissions-edit.component.scss'],
   imports: [
+    DatePipe,
     FormsModule,
     ReactiveFormsModule,
     GenericDetailsContainerComponent,
@@ -81,6 +84,8 @@ export class UserPermissionsEditComponent {
   private notificationService = inject(NotificationService);
 
   protected readonly USER_PERMISSIONS_CONSTANTS = USER_PERMISSIONS_CONSTANTS;
+  protected readonly REGISTRATION_REQUESTS_CONSTANTS =
+    REGISTRATION_REQUESTS_CONSTANTS;
   protected readonly USER_ROLE_OPTIONS = USER_ROLE_OPTIONS;
   protected readonly BUTTON_LABELS = BUTTON_LABELS;
 
@@ -99,6 +104,15 @@ export class UserPermissionsEditComponent {
 
   protected readonly displayedColumns =
     USER_PERMISSIONS_CONSTANTS.TABLE_COLUMNS.map((column) => column.field);
+
+  protected readonly displayedRegistrationColumns =
+    REGISTRATION_REQUESTS_CONSTANTS.TABLE_COLUMNS.map((column) => column.field);
+
+  protected registrationRows = computed(() => this.store.registrationRequests());
+
+  // Set when the form is prefilled from a registration request, so the request
+  // can be removed once the corresponding user has been created.
+  private pendingRegistrationId = signal<string | null>(null);
 
   protected permissionRows = computed(() => {
     const emailByUserId = new Map(
@@ -133,6 +147,7 @@ export class UserPermissionsEditComponent {
   constructor() {
     this.store.loadKeycloakUsers();
     this.store.loadUserPermissions();
+    this.store.loadRegistrationRequests();
     this.formValidSignal.set(this.detailsForm.valid);
     this.detailsForm.statusChanges.subscribe((status) => {
       this.formValidSignal.set(status === 'VALID');
@@ -173,12 +188,55 @@ export class UserPermissionsEditComponent {
         if (!isExistingUser) {
           this.store.loadKeycloakUsers();
         }
+        // If this creation fulfilled a registration request, remove it now that
+        // the account exists. Left untouched on failure so nothing is lost.
+        const registrationId = this.pendingRegistrationId();
+        if (registrationId) {
+          this.store.deleteRegistrationRequest(registrationId);
+        }
       }
+      this.pendingRegistrationId.set(null);
     });
   }
 
   onDelete(userId: string): void {
     if (!userId) return;
     this.store.deleteUserPermissions(userId);
+  }
+
+  // Prefills the creation form with the requester's email and a role derived
+  // from the institution type; the admin then completes affiliation before
+  // submitting. The request is deleted on success.
+  onCreateUserFromRequest(request: {
+    id?: string;
+    email?: string;
+    kindOfInstitution?: string;
+  }): void {
+    if (!request.email) return;
+    this.pendingRegistrationId.set(request.id ?? null);
+    this.detailsForm.reset();
+    this.detailsForm.controls.userId.setValue(request.email);
+    const role = this.roleForInstitution(request.kindOfInstitution);
+    if (role) {
+      this.detailsForm.controls.roles.setValue([role]);
+    }
+  }
+
+  // Maps the institution type captured on the request to a default role.
+  // 'Other' (and anything unrecognised) is left for the admin to choose.
+  private roleForInstitution(kindOfInstitution?: string): string | null {
+    switch ((kindOfInstitution ?? '').trim().toLowerCase()) {
+      case 'funder':
+        return 'FUNDER';
+      case 'research institute':
+        return 'ANNOTATOR';
+      default:
+        return null;
+    }
+  }
+
+  onRejectRequest(id: string | undefined): void {
+    if (!id) return;
+    this.store.deleteRegistrationRequest(id);
   }
 }

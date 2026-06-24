@@ -1,0 +1,146 @@
+import {
+  ComponentFixture,
+  TestBed,
+  fakeAsync,
+  flushMicrotasks,
+  tick,
+} from '@angular/core/testing';
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { UserPermissionsEditComponent } from './user-permissions-edit.component';
+import { UsersStore } from '../../signal/users-store';
+import { NotificationService } from '../../../shared/services/notification-service.service';
+
+describe('UserPermissionsEditComponent - registration requests', () => {
+  let fixture: ComponentFixture<UserPermissionsEditComponent>;
+  let component: UserPermissionsEditComponent;
+  let storeMock: {
+    registrationRequests: () => unknown[];
+    keycloakUsers: () => unknown[];
+    userPermissions: () => unknown[];
+    loadKeycloakUsers: jasmine.Spy;
+    loadUserPermissions: jasmine.Spy;
+    loadRegistrationRequests: jasmine.Spy;
+    createUserAndUpdatePermissions: jasmine.Spy;
+    updateUserPermissions: jasmine.Spy;
+    deleteUserPermissions: jasmine.Spy;
+    deleteRegistrationRequest: jasmine.Spy;
+  };
+
+  beforeEach(async () => {
+    storeMock = {
+      registrationRequests: () => [],
+      keycloakUsers: () => [],
+      userPermissions: () => [],
+      loadKeycloakUsers: jasmine.createSpy('loadKeycloakUsers'),
+      loadUserPermissions: jasmine.createSpy('loadUserPermissions'),
+      loadRegistrationRequests: jasmine.createSpy('loadRegistrationRequests'),
+      createUserAndUpdatePermissions: jasmine
+        .createSpy('createUserAndUpdatePermissions')
+        .and.returnValue(Promise.resolve(true)),
+      updateUserPermissions: jasmine
+        .createSpy('updateUserPermissions')
+        .and.returnValue(Promise.resolve(true)),
+      deleteUserPermissions: jasmine.createSpy('deleteUserPermissions'),
+      deleteRegistrationRequest: jasmine
+        .createSpy('deleteRegistrationRequest')
+        .and.returnValue(Promise.resolve(true)),
+    };
+
+    await TestBed.configureTestingModule({
+      imports: [UserPermissionsEditComponent],
+      providers: [
+        { provide: UsersStore, useValue: storeMock },
+        {
+          provide: NotificationService,
+          useValue: jasmine.createSpyObj('NotificationService', [
+            'success',
+            'error',
+          ]),
+        },
+      ],
+    })
+      // Strip the template so the test does not depend on child components.
+      .overrideComponent(UserPermissionsEditComponent, {
+        set: { template: '', imports: [], schemas: [CUSTOM_ELEMENTS_SCHEMA] },
+      })
+      .compileComponents();
+
+    fixture = TestBed.createComponent(UserPermissionsEditComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('loads registration requests on init', () => {
+    expect(storeMock.loadRegistrationRequests).toHaveBeenCalled();
+  });
+
+  it('prefills email and maps Funder -> FUNDER role', () => {
+    component.onCreateUserFromRequest({
+      id: 'req-1',
+      email: 'jane@funder.org',
+      kindOfInstitution: 'Funder',
+    });
+
+    expect(component['detailsForm'].controls.userId.value).toBe('jane@funder.org');
+    expect(component['detailsForm'].controls.roles.value).toEqual(['FUNDER']);
+  });
+
+  it('maps Research Institute -> ANNOTATOR role (case insensitive)', () => {
+    component.onCreateUserFromRequest({
+      id: 'req-2',
+      email: 'john@uni.org',
+      kindOfInstitution: 'research institute',
+    });
+
+    expect(component['detailsForm'].controls.roles.value).toEqual(['ANNOTATOR']);
+  });
+
+  it('leaves roles empty for Other / unknown institution', () => {
+    component.onCreateUserFromRequest({
+      id: 'req-3',
+      email: 'x@other.org',
+      kindOfInstitution: 'Other',
+    });
+
+    expect(component['detailsForm'].controls.userId.value).toBe('x@other.org');
+    expect(component['detailsForm'].controls.roles.value).toBeNull();
+  });
+
+  it('reject delegates to the store', () => {
+    component.onRejectRequest('req-1');
+    expect(storeMock.deleteRegistrationRequest).toHaveBeenCalledWith('req-1');
+  });
+
+  it('creating a user from a request deletes the request on success', fakeAsync(() => {
+    component.onCreateUserFromRequest({
+      id: 'req-1',
+      email: 'jane@funder.org',
+      kindOfInstitution: 'Funder',
+    });
+    component['detailsForm'].controls.affiliationId.setValue('andamp');
+
+    component.onSave();
+    flushMicrotasks();
+    tick();
+
+    expect(storeMock.createUserAndUpdatePermissions).toHaveBeenCalledWith(
+      'jane@funder.org',
+      ['FUNDER'],
+      'andamp'
+    );
+    expect(storeMock.deleteRegistrationRequest).toHaveBeenCalledWith('req-1');
+  }));
+
+  it('a plain create (no request) does not delete any request', fakeAsync(() => {
+    component['detailsForm'].controls.userId.setValue('manual@x.org');
+    component['detailsForm'].controls.roles.setValue(['ANNOTATOR']);
+    component['detailsForm'].controls.affiliationId.setValue('andamp');
+
+    component.onSave();
+    flushMicrotasks();
+    tick();
+
+    expect(storeMock.createUserAndUpdatePermissions).toHaveBeenCalled();
+    expect(storeMock.deleteRegistrationRequest).not.toHaveBeenCalled();
+  }));
+});

@@ -3,6 +3,81 @@
     <mat-card-title>{{ USER_PERMISSIONS_CONSTANTS.TITLE }}</mat-card-title>
   </container-header>
   <container-content>
+    <div class="user-permissions-table-section">
+      <h3 class="user-permissions-table-title">
+        {{ REGISTRATION_REQUESTS_CONSTANTS.TABLE_TITLE }}
+      </h3>
+      @if (registrationRows().length) {
+        <mat-table
+          [dataSource]="registrationRows()"
+          class="user-permissions-table"
+        >
+          <ng-container matColumnDef="name">
+            <mat-header-cell *matHeaderCellDef>
+              {{ REGISTRATION_REQUESTS_CONSTANTS.NAME_LABEL }}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{ row.name }}</mat-cell>
+          </ng-container>
+          <ng-container matColumnDef="email">
+            <mat-header-cell *matHeaderCellDef>
+              {{ REGISTRATION_REQUESTS_CONSTANTS.EMAIL_LABEL }}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{ row.email }}</mat-cell>
+          </ng-container>
+          <ng-container matColumnDef="kindOfInstitution">
+            <mat-header-cell *matHeaderCellDef>
+              {{ REGISTRATION_REQUESTS_CONSTANTS.INSTITUTION_LABEL }}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{ row.kindOfInstitution }}</mat-cell>
+          </ng-container>
+          <ng-container matColumnDef="message">
+            <mat-header-cell *matHeaderCellDef>
+              {{ REGISTRATION_REQUESTS_CONSTANTS.MESSAGE_LABEL }}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{ row.message }}</mat-cell>
+          </ng-container>
+          <ng-container matColumnDef="createdAt">
+            <mat-header-cell *matHeaderCellDef>
+              {{ REGISTRATION_REQUESTS_CONSTANTS.CREATED_AT_LABEL }}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">
+              {{ row.createdAt | date: 'short' }}
+            </mat-cell>
+          </ng-container>
+          <ng-container matColumnDef="actions">
+            <mat-header-cell *matHeaderCellDef></mat-header-cell>
+            <mat-cell *matCellDef="let row">
+              <button
+                mat-icon-button
+                color="primary"
+                (click)="onCreateUserFromRequest(row)"
+              >
+                  <mat-icon>check</mat-icon>
+              </button>
+              <button
+                mat-icon-button
+                color="warn"
+                [attr.aria-label]="REGISTRATION_REQUESTS_CONSTANTS.REJECT_LABEL"
+                (click)="onRejectRequest(row.id)"
+              >
+                <mat-icon>delete</mat-icon>
+              </button>
+            </mat-cell>
+          </ng-container>
+          <mat-header-row
+            *matHeaderRowDef="displayedRegistrationColumns"
+          ></mat-header-row>
+          <mat-row
+            *matRowDef="let row; columns: displayedRegistrationColumns"
+          ></mat-row>
+        </mat-table>
+      } @else {
+        <p class="registration-requests-empty">
+          {{ REGISTRATION_REQUESTS_CONSTANTS.EMPTY }}
+        </p>
+      }
+    </div>
+
     @if (formVisible()) {
       <form [formGroup]="detailsForm">
           <h3 class="user-permissions-table-title">

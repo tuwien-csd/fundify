@@ -2,7 +2,7 @@ package at.ac.tuwien.fundify.adapters.in.rest.resources;
 
 import at.ac.tuwien.fundify.adapters.in.rest.dto.TicketCreateWebModel;
 import at.ac.tuwien.fundify.adapters.in.rest.mapper.TicketWebModelMapper;
-import at.ac.tuwien.fundify.application.port.out.ticketing.TicketingService;
+import at.ac.tuwien.fundify.application.port.in.contact.ContactSubmissionUseCase;
 import at.ac.tuwien.fundify.domain.common.exceptions.FundifyException;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.validation.Valid;
@@ -22,12 +22,12 @@ import lombok.extern.jbosslog.JBossLog;
 @RequiredArgsConstructor
 public class ContactResource {
 
-  private final TicketingService ticketingService;
+  private final ContactSubmissionUseCase contactSubmissionUseCase;
 
   @POST
   public void create(@Valid TicketCreateWebModel createInput) throws FundifyException {
-    log.info("Creating a ticket for user with email: " + createInput.email());
-    this.ticketingService.createTicket(TicketWebModelMapper.INSTANCE.toDomain(createInput));
+    log.info("Handling contact submission for user with email: " + createInput.email());
+    this.contactSubmissionUseCase.submit(TicketWebModelMapper.INSTANCE.toDomain(createInput));
   }
 
 }

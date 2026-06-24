@@ -7,12 +7,14 @@ import { components } from '../../../generated/refop-be';
 
 type KeycloakUser = components['schemas']['KeycloakUser'];
 type UserPermissionHolder = components['schemas']['UserPermissionHolder'];
+type RegistrationRequest = components['schemas']['RegistrationRequest'];
 
 export const UsersStore = signalStore(
   { providedIn: 'root' },
   withState({
     keycloakUsers: [] as KeycloakUser[],
     userPermissions: [] as UserPermissionHolder[],
+    registrationRequests: [] as RegistrationRequest[],
   }),
   withProps(() => ({
     backendService: inject(BackendServiceV2),
@@ -39,6 +41,47 @@ export const UsersStore = signalStore(
         }
       } catch (error) {
         console.error('Error loading user permissions:', error);
+      }
+    },
+    async loadRegistrationRequests(): Promise<void> {
+      try {
+        const response = await backendService.client.GET(
+          '/api/registration-requests'
+        );
+        if (response.data) {
+          patchState(store, { registrationRequests: response.data });
+        }
+      } catch (error) {
+        console.error('Error loading registration requests:', error);
+      }
+    },
+    async deleteRegistrationRequest(id: string): Promise<boolean> {
+      try {
+        const response = await backendService.client.DELETE(
+          '/api/registration-requests/{id}',
+          {
+            params: { path: { id } },
+          }
+        );
+        if (response.response.status === 204) {
+          patchState(store, {
+            registrationRequests: store
+              .registrationRequests()
+              .filter((request) => request.id !== id),
+          });
+          return true;
+        } else {
+          notificationService.error(
+            USER_PERMISSIONS_CONSTANTS.ERRORS.REGISTRATION_DELETE_ERROR
+          );
+          return false;
+        }
+      } catch (error) {
+        console.error('Error deleting registration request:', error);
+        notificationService.error(
+          USER_PERMISSIONS_CONSTANTS.ERRORS.REGISTRATION_DELETE_ERROR
+        );
+        return false;
       }
     },
     async updateUserPermissions(

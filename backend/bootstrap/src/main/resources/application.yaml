@@ -70,8 +70,6 @@ fundify:
     admin:
       server-url: http://localhost:8083
       realm: refop-dev
-      account-setup:
-        client-id: refop-fe
 
 frontend:
   auth:

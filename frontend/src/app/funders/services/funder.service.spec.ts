@@ -41,6 +41,7 @@ describe('FunderService', () => {
         {
           id: '1',
           risId: 'id',
+          acronym: 'F1',
           name: [
             {
               text: 'Funder 1',
@@ -53,6 +54,7 @@ describe('FunderService', () => {
         {
           id: '1',
           risId: 'id',
+          acronym: 'F1',
           name: [
             {
               text: 'Funder 1',
@@ -102,6 +104,7 @@ describe('FunderService', () => {
         id: '1',
         name: [],
         risId: '',
+        acronym: '',
         website: '',
       };
       backendServiceSpy.get.and.returnValue(of(mockFunder));
@@ -122,6 +125,7 @@ describe('FunderService', () => {
       const mockFunder: FunderWebModel = {
         id: '1',
         risId: 'id',
+        acronym: 'F1',
         name: [
           {
             text: 'Funder 1',
@@ -150,6 +154,7 @@ describe('FunderService', () => {
       const mockFunder: FunderWebModel = {
         id: '1',
         risId: 'id',
+        acronym: 'F1',
         name: [
           {
             text: 'Funder 1',
@@ -179,6 +184,7 @@ describe('FunderService', () => {
       const mockFunder: FunderWebModel = {
         id: '1',
         risId: 'id',
+        acronym: 'F1',
         name: [
           {
             text: 'Funder 1',
