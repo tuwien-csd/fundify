@@ -30,3 +30,28 @@ app-sidebar {
   max-width: 100%;
   overflow-x: auto;
 }
+
+.missing-permissions-banner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.75rem;
+  padding: 2rem 1.5rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--mat-sys-outline, #f0c36d);
+  background: var(--mat-sys-secondary-container, #fff8e1);
+  color: var(--mat-sys-on-secondary-container, #5f4b00);
+
+  mat-icon {
+    flex-shrink: 0;
+    width: 2.5rem;
+    height: 2.5rem;
+    font-size: 2.5rem;
+  }
+
+  a {
+    color: inherit;
+    font-weight: 600;
+  }
+}

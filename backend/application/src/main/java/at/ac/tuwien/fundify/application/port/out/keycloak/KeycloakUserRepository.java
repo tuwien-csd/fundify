@@ -9,4 +9,13 @@ public interface KeycloakUserRepository {
   List<KeycloakUser> findAll();
 
   Optional<KeycloakUser> findById(String id);
+
+  Optional<KeycloakUser> findByEmail(String email);
+
+  /**
+   * Creates a new (enabled) Keycloak user for the given email.
+   * Used to provision accounts that an admin grants permissions
+   * to before the person has ever logged in.
+   */
+  KeycloakUser create(String email, final String affiliationId);
 }

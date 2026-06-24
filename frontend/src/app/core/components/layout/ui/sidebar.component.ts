@@ -1,6 +1,7 @@
-import { Component, Input } from '@angular/core';
+import { Component, inject, Input } from '@angular/core';
 import { ROUTER_LINKS } from '../../../router-links.constants';
 import { UserRoleEnum } from '../../../auth/models/user-role.enum';
+import { AuthService } from '../../../auth/services/auth.service';
 import {
   MatNavList,
   MatListItem,
@@ -21,45 +22,47 @@ import { MatIcon } from '@angular/material/icon';
         <mat-icon matListItemIcon>home</mat-icon>
         <span class="menu-text">Home</span>
       </a>
-      @if (userRoles.includes(UserRoleEnum.ANNOTATOR)) {
+      @if (!authService.missingPermissions()) {
+        @if (userRoles.includes(UserRoleEnum.ANNOTATOR)) {
+          <a
+            mat-list-item
+            [routerLink]="[
+              ROUTER_LINKS.ANNOTATIONS,
+              'overview',
+              ROUTER_LINKS.CALLS,
+            ]"
+            routerLinkActive="active"
+          >
+            <mat-icon matListItemIcon>edit_note</mat-icon>
+            <span class="menu-text">Annotations</span>
+          </a>
+        }
         <a
           mat-list-item
-          [routerLink]="[
-            ROUTER_LINKS.ANNOTATIONS,
-            'overview',
-            ROUTER_LINKS.CALLS,
-          ]"
+          [routerLink]="ROUTER_LINKS.FUNDINGS"
           routerLinkActive="active"
         >
-          <mat-icon matListItemIcon>edit_note</mat-icon>
-          <span class="menu-text">Annotations</span>
+          <mat-icon matListItemIcon>payments</mat-icon>
+          <span class="menu-text">Fundings</span>
         </a>
-      }
-      <a
-        mat-list-item
-        [routerLink]="ROUTER_LINKS.FUNDINGS"
-        routerLinkActive="active"
-      >
-        <mat-icon matListItemIcon>payments</mat-icon>
-        <span class="menu-text">Fundings</span>
-      </a>
-      <a
-        mat-list-item
-        [routerLink]="ROUTER_LINKS.INSTITUTIONS"
-        routerLinkActive="active"
-      >
-        <mat-icon matListItemIcon>account_balance</mat-icon>
-        <span class="menu-text">Institutions</span>
-      </a>
-      @if (userRoles.includes(UserRoleEnum.ADMIN)) {
         <a
           mat-list-item
-          [routerLink]="[ROUTER_LINKS.USERS, ROUTER_LINKS.USER_PERMISSIONS]"
+          [routerLink]="ROUTER_LINKS.INSTITUTIONS"
           routerLinkActive="active"
         >
-          <mat-icon matListItemIcon>manage_accounts</mat-icon>
-          <span class="menu-text">Users</span>
+          <mat-icon matListItemIcon>account_balance</mat-icon>
+          <span class="menu-text">Institutions</span>
         </a>
+        @if (authService.isAdmin()) {
+          <a
+            mat-list-item
+            [routerLink]="[ROUTER_LINKS.USERS, ROUTER_LINKS.USER_PERMISSIONS]"
+            routerLinkActive="active"
+          >
+            <mat-icon matListItemIcon>manage_accounts</mat-icon>
+            <span class="menu-text">Users</span>
+          </a>
+        }
       }
       <!-- TODO: re-enable settings link when needed
       <mat-divider></mat-divider>
@@ -85,6 +88,7 @@ import { MatIcon } from '@angular/material/icon';
   ],
 })
 export class SidebarComponent {
+  protected readonly authService = inject(AuthService);
   protected readonly ROUTER_LINKS = ROUTER_LINKS;
   protected readonly UserRoleEnum = UserRoleEnum;
   @Input() userRoles!: string[];

@@ -128,7 +128,7 @@ export class UniversityDetailEditComponent {
     return {
       // form is already validated
       name: form.name,
-      acronym: form.acronym ?? undefined,
+      acronym: form.acronym ?? '',
       emailDomain: form.emailDomain ?? undefined,
       website: form.website ?? '',
       risId: form.risId ?? undefined,

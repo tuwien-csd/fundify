@@ -81,6 +81,12 @@ export class SearchSelectComponent
   required = input<boolean>(false);
   label = input<string>('');
   multiSelect = input<boolean>(true);
+  /**
+   * When true, a search term that does not match any existing option can be
+   * picked as-is (its raw text becomes the stored value). Used e.g. to let an
+   * admin enter an email of a not-yet-existing user.
+   */
+  allowCustomValues = input<boolean>(false);
 
   private fb = inject(UntypedFormBuilder);
   private validationService = inject(ValidationService);
@@ -117,7 +123,7 @@ export class SearchSelectComponent
     const opts = this.options();
 
     if (opts) {
-      return opts
+      const matches = opts
         .filter(
           (o) =>
             !searchValue ||
@@ -125,6 +131,18 @@ export class SearchSelectComponent
         )
         .sort((a, b) => a.label.localeCompare(b.label))
         .map((o) => o.label);
+
+      // Offer the raw search term as a pickable option when it matches no
+      // existing label, so a custom value (e.g. a new email) can be entered.
+      const term = searchValue.trim();
+      if (
+        this.allowCustomValues() &&
+        term &&
+        !matches.some((label) => label.toLowerCase() === term.toLowerCase())
+      ) {
+        return [term, ...matches];
+      }
+      return matches;
     }
 
     const filtered = this.choices.filter((item) => {
@@ -250,6 +268,17 @@ export class SearchSelectComponent
       this.selectionsFormArray.push(this.fb.control(storedValue));
       this.search.setValue('');
     }
+  }
+
+  /**
+   * True when the item is a freshly typed custom value (e.g. a new user email)
+   * rather than one of the existing options. Used to flag it with a "new" tag.
+   */
+  protected isNewValue(item: string): boolean {
+    if (!this.allowCustomValues()) return false;
+    const opts = this.options();
+    if (!opts) return true;
+    return !opts.some((o) => o.label.toLowerCase() === item.toLowerCase());
   }
 
   protected getChipLabel(value: string): string {

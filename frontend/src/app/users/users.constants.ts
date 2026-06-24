@@ -18,6 +18,7 @@ export const USER_PERMISSIONS_CONSTANTS = {
   ERRORS: {
     GENERIC_ERROR: 'Failed to update user permissions',
     DELETE_ERROR: 'Failed to delete user permissions',
+    INVALID_EMAIL: 'Please select an existing user or enter a valid email',
   },
 };
 

@@ -1,5 +1,6 @@
 package at.ac.tuwien.fundify.adapters.in.rest.resources;
 
+import at.ac.tuwien.fundify.adapters.in.rest.dto.UserCreationWebModel;
 import at.ac.tuwien.fundify.adapters.in.rest.dto.UserPermissionsUpdateWebModel;
 import at.ac.tuwien.fundify.adapters.in.rest.mapper.UserPermissionsWebModelMapper;
 import at.ac.tuwien.fundify.application.port.common.UserService;
@@ -14,6 +15,7 @@ import jakarta.validation.Valid;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
@@ -61,6 +63,14 @@ public class UserResource {
     public UserPermissionHolder updateUser(@PathParam("id") String id, @Valid UserPermissionsUpdateWebModel updateInput) {
       var updateObject = UserPermissionsWebModelMapper.INSTANCE.toDomain(updateInput, id);
       return userPermissionManagementUseCase.updatePermissions(updateObject);
+    }
+
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @RolesAllowed(UserRole.Names.ADMIN)
+    public UserPermissionHolder createUser(@Valid UserCreationWebModel createInput) {
+      return userPermissionManagementUseCase.createUserWithPermissions(
+          createInput.email(), createInput.roles(), createInput.affiliationId());
     }
 
     @DELETE

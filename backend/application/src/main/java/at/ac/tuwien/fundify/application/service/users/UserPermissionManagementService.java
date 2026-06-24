@@ -2,8 +2,10 @@ package at.ac.tuwien.fundify.application.service.users;
 
 import at.ac.tuwien.fundify.application.port.common.UserService;
 import at.ac.tuwien.fundify.application.port.in.users.UserPermissionManagementUseCase;
+import at.ac.tuwien.fundify.application.port.out.keycloak.KeycloakUserRepository;
 import at.ac.tuwien.fundify.application.port.out.persistence.UserPermissionRepository;
 import at.ac.tuwien.fundify.domain.common.UserPermissionHolder;
+import at.ac.tuwien.fundify.domain.common.UserRole;
 import io.quarkus.cache.CacheInvalidateAll;
 import io.quarkus.cache.CacheResult;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -18,6 +20,7 @@ import lombok.extern.jbosslog.JBossLog;
 public class UserPermissionManagementService implements UserPermissionManagementUseCase {
 
   private final UserPermissionRepository userPermissionRepository;
+  private final KeycloakUserRepository keycloakUserRepository;
   private final UserService userService;
 
   @Override
@@ -26,6 +29,19 @@ public class UserPermissionManagementService implements UserPermissionManagement
     log.infof("Update for user %s initiated by %s", update.userId(),
         userService.getCurrentUserIdAndName());
     return userPermissionRepository.upsert(update);
+  }
+
+  @Override
+  @CacheInvalidateAll(cacheName = "user-permissions")
+  public UserPermissionHolder createUserWithPermissions(String email, List<UserRole> roles,
+      String affiliationId) {
+    var user = keycloakUserRepository.findByEmail(email)
+        .orElseGet(() -> {
+          log.infof("No Keycloak user for email %s, provisioning a new account (initiated by %s)",
+              email, userService.getCurrentUserIdAndName());
+          return keycloakUserRepository.create(email, affiliationId);
+        });
+    return updatePermissions(new UserPermissionHolder(user.id(), roles, affiliationId));
   }
 
   @Override

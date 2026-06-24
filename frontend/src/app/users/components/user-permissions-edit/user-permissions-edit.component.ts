@@ -33,10 +33,14 @@ import { SelectFieldComponent } from '../../../shared/components/select-field/se
 import { SearchSelectComponent } from '../../../shared/components/search-select/search-select.component';
 import { TextFieldComponent } from '../../../shared/components/text-field/text-field.component';
 import { UsersStore } from '../../signal/users-store';
+import { NotificationService } from '../../../shared/services/notification-service.service';
 import {
   USER_PERMISSIONS_CONSTANTS,
   USER_ROLE_OPTIONS,
 } from '../../users.constants';
+
+// Pragmatic email shape check; the backend (@Email) is the source of truth.
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 type UserPermissionsForm = {
   userId: FormControl<string | null>;
   roles: FormControl<string[] | null>;
@@ -74,6 +78,7 @@ type UserPermissionsForm = {
 export class UserPermissionsEditComponent {
   private fb = new FormBuilder();
   protected store = inject(UsersStore);
+  private notificationService = inject(NotificationService);
 
   protected readonly USER_PERMISSIONS_CONSTANTS = USER_PERMISSIONS_CONSTANTS;
   protected readonly USER_ROLE_OPTIONS = USER_ROLE_OPTIONS;
@@ -84,6 +89,12 @@ export class UserPermissionsEditComponent {
       value: u.id ?? '',
       label: u.email ?? u.username ?? u.id ?? '',
     }))
+  );
+
+  // Ids of users that already exist in Keycloak. Used to tell apart an existing
+  // selection (the control holds a Keycloak id) from a freshly typed email.
+  private knownUserIds = computed(
+    () => new Set(this.store.keycloakUsers().map((u) => u.id ?? ''))
   );
 
   protected readonly displayedColumns =
@@ -131,16 +142,39 @@ export class UserPermissionsEditComponent {
   onSave(): void {
     if (!this.detailsForm.valid) return;
     const { userId, roles, affiliationId } = this.detailsForm.value;
-    this.store
-      .updateUserPermissions(userId!, roles ?? [], affiliationId!)
-      .then((success) => {
-        if (success) {
-          this.detailsForm.reset();
-          this.formVisible.set(false);
-          setTimeout(() => this.formVisible.set(true));
-          this.store.loadUserPermissions();
+    const selected = userId!;
+
+    // An existing selection carries a Keycloak user id; anything else is a
+    // freshly typed email for which the backend provisions a new account.
+    const isExistingUser = this.knownUserIds().has(selected);
+
+    if (!isExistingUser && !EMAIL_PATTERN.test(selected)) {
+      this.notificationService.error(
+        USER_PERMISSIONS_CONSTANTS.ERRORS.INVALID_EMAIL
+      );
+      return;
+    }
+
+    const save = isExistingUser
+      ? this.store.updateUserPermissions(selected, roles ?? [], affiliationId!)
+      : this.store.createUserAndUpdatePermissions(
+          selected,
+          roles ?? [],
+          affiliationId!
+        );
+
+    save.then((success) => {
+      if (success) {
+        this.detailsForm.reset();
+        this.formVisible.set(false);
+        setTimeout(() => this.formVisible.set(true));
+        this.store.loadUserPermissions();
+        // A new email may have provisioned an account: refresh the picker list.
+        if (!isExistingUser) {
+          this.store.loadKeycloakUsers();
         }
-      });
+      }
+    });
   }
 
   onDelete(userId: string): void {

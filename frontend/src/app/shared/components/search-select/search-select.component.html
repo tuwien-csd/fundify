@@ -30,6 +30,9 @@
               [class.selected-item]="isItemSelected(item)"
             >
               {{ displayFn(item) }}
+              @if (isNewValue(item)) {
+                <span class="new-value-tag">new</span>
+              }
             </mat-option>
           }
         </mat-autocomplete>

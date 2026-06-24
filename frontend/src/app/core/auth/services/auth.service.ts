@@ -34,13 +34,37 @@ export class AuthService {
   user = computed(() => this.state().user);
   token = computed(() => this.state().token);
 
-  username = computed(() => this.user()?.name ?? null);
+  username = computed(() => this.user()?.name || null);
 
   roles = computed(() => this.userPermissions()?.roles ?? []);
 
+  // Realm roles carried in the Keycloak token, independent of the permissions
+  // configured in the DB. Used to recognize admins that have no DB permissions
+  // yet (e.g. on first login) so they keep full access.
+  private keycloakRoles = computed(() =>
+    (this.user()?.roles ?? []).map((role) => role.toLowerCase())
+  );
+
   isAuthenticated = computed(() => !!this.token());
-  isAdmin = computed(() => this.roles().includes(UserRoleEnum.ADMIN));
+  isAdmin = computed(
+    () =>
+      this.keycloakRoles().includes(UserRoleEnum.ADMIN) ||
+      this.roles().includes(UserRoleEnum.ADMIN)
+  );
   isFunder = computed(() => this.roles().includes(UserRoleEnum.FUNDER));
+
+  /**
+   * True once auth has resolved for a logged-in, non-admin user that has no
+   * permissions configured in the DB. Such users are restricted to the start
+   * page until an admin grants them permissions.
+   */
+  readonly missingPermissions = computed(
+    () =>
+      this.isAuthenticated() &&
+      this.authResolved() &&
+      !this.userPermissions() &&
+      !this.isAdmin()
+  );
 
   private userDetailsResource = resource({
     params: () => ({ token: this.token() }),
@@ -175,9 +199,22 @@ export class AuthService {
     if (!claims) return null;
 
     const id = String(claims['sub'] ?? '');
-    const name = String(claims['preferred_username'] ?? '');
     const email = String(claims['email'] ?? '');
     const roles = claims['roles'] ?? [];
+
+    // `preferred_username` is the primary display name, but it is not guaranteed
+    // to be present in every token (depends on the IdP's claim mappers). Fall
+    // back through the other standard OIDC name claims and finally the email so
+    // the user widget never renders blank for an authenticated user.
+    const fullName = [claims['given_name'], claims['family_name']]
+      .filter(Boolean)
+      .join(' ')
+      .trim();
+    const name =
+      String(claims['preferred_username'] ?? '') ||
+      String(claims['name'] ?? '') ||
+      fullName ||
+      email;
 
     if (!id || !email) return null;
 

@@ -10,11 +10,13 @@
           </h3>
         <div class="flex flex-row gap-4 items-center">
           <app-search-select
+            class="user-search-select"
             formControlName="userId"
             [options]="userOptions()"
             [required]="true"
             [multiSelect]="false"
-            placeholder="User (Search by email)*"
+            [allowCustomValues]="true"
+            placeholder="User (Search or enter a new email)*"
           />
           <app-select-field
             formControlName="roles"
