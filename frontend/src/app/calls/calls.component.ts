@@ -222,6 +222,6 @@ export class CallsComponent {
     const funderNames: string[] = [];
     call.name?.forEach((name) => names.push(name.text));
     call.funder?.name?.forEach((name) => funderNames.push(name.text));
-    return names.join('') + funderNames.join('') + call.acronym;
+    return names.join('') + funderNames.join('') + call.acronym + (call.id ?? '');
   }
 }
