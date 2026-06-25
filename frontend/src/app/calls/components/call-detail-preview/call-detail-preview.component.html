@@ -16,7 +16,11 @@
         <div class="detail-item">
           <div class="detail-content">
             <span class="detail-label">{{ detail.label }}</span>
-            <span class="detail-value">{{ detail.value }}</span>
+            @if (detail.href) {
+              <a class="detail-value" [href]="detail.href" target="_blank" rel="noopener">{{ detail.value }}</a>
+            } @else {
+              <span class="detail-value">{{ detail.value }}</span>
+            }
           </div>
         </div>
       }
