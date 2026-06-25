@@ -4,6 +4,47 @@
   </container-header>
   <container-content>
     <div class="user-permissions-table-section">
+        @if (formVisible()) {
+            <form [formGroup]="detailsForm">
+                <h3 class="user-permissions-table-title">
+                    {{ USER_PERMISSIONS_CONSTANTS.TABLE_TITLE_NEW }}
+                </h3>
+                <div class="flex flex-row gap-4 items-center">
+                    <app-search-select
+                            class="user-search-select"
+                            formControlName="userId"
+                            [options]="userOptions()"
+                            [required]="true"
+                            [multiSelect]="false"
+                            [allowCustomValues]="true"
+                            placeholder="User (Search or enter a new email)*"
+                    />
+                    <app-select-field
+                            formControlName="roles"
+                            [textLabel]="USER_PERMISSIONS_CONSTANTS.ROLES_LABEL"
+                            [options]="USER_ROLE_OPTIONS"
+                            [required]="true"
+                            [multiple]="true"
+                    />
+                    <app-select-field
+                            formControlName="affiliationId"
+                            [textLabel]="USER_PERMISSIONS_CONSTANTS.AFFILIATION_LABEL"
+                            [options]="affiliationOptions()"
+                            [required]="true"
+                    />
+                    <button
+                            mat-raised-button
+                            class="submit-button form-item-button"
+                            color="primary"
+                            type="submit"
+                            [disabled]="!formValidSignal()"
+                            (click)="onSave()"
+                    >
+                        {{ BUTTON_LABELS.SUBMIT }}
+                    </button>
+                </div>
+            </form>
+        }
       <h3 class="user-permissions-table-title">
         {{ REGISTRATION_REQUESTS_CONSTANTS.TABLE_TITLE }}
       </h3>
@@ -41,7 +82,7 @@
               {{ REGISTRATION_REQUESTS_CONSTANTS.CREATED_AT_LABEL }}
             </mat-header-cell>
             <mat-cell *matCellDef="let row">
-              {{ row.createdAt | date: 'short' }}
+              {{ row.createdAt | date: 'dd.MM.yyyy, HH:mm' }}
             </mat-cell>
           </ng-container>
           <ng-container matColumnDef="actions">
@@ -78,48 +119,6 @@
       }
     </div>
 
-    @if (formVisible()) {
-      <form [formGroup]="detailsForm">
-          <h3 class="user-permissions-table-title">
-              {{ USER_PERMISSIONS_CONSTANTS.TABLE_TITLE_NEW }}
-          </h3>
-        <div class="flex flex-row gap-4 items-center">
-          <app-search-select
-            class="user-search-select"
-            formControlName="userId"
-            [options]="userOptions()"
-            [required]="true"
-            [multiSelect]="false"
-            [allowCustomValues]="true"
-            placeholder="User (Search or enter a new email)*"
-          />
-          <app-select-field
-            formControlName="roles"
-            [textLabel]="USER_PERMISSIONS_CONSTANTS.ROLES_LABEL"
-            [options]="USER_ROLE_OPTIONS"
-            [required]="true"
-            [multiple]="true"
-          />
-          <app-text-field
-            formControlName="affiliationId"
-            [textLabel]="USER_PERMISSIONS_CONSTANTS.AFFILIATION_ID_LABEL"
-            [placeholder]="USER_PERMISSIONS_CONSTANTS.AFFILIATION_ID_PLACEHOLDER"
-            [required]="true"
-          />
-          <button
-            mat-raised-button
-            class="submit-button form-item-button"
-            color="primary"
-            type="submit"
-            [disabled]="!formValidSignal()"
-            (click)="onSave()"
-          >
-            {{ BUTTON_LABELS.SUBMIT }}
-          </button>
-        </div>
-      </form>
-    }
-
     <div class="user-permissions-table-section">
       <h3 class="user-permissions-table-title">
         {{ USER_PERMISSIONS_CONSTANTS.TABLE_TITLE_EXISTING }}
@@ -139,7 +138,7 @@
         </ng-container>
         <ng-container matColumnDef="affiliationId">
           <mat-header-cell *matHeaderCellDef>
-            {{ USER_PERMISSIONS_CONSTANTS.AFFILIATION_ID_LABEL }}
+            {{ USER_PERMISSIONS_CONSTANTS.AFFILIATION_LABEL }}
           </mat-header-cell>
           <mat-cell *matCellDef="let row">{{ row.affiliationId }}</mat-cell>
         </ng-container>

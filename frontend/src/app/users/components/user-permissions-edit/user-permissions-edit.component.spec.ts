@@ -6,8 +6,11 @@ import {
   tick,
 } from '@angular/core/testing';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+import { of } from 'rxjs';
 import { UserPermissionsEditComponent } from './user-permissions-edit.component';
 import { UsersStore } from '../../signal/users-store';
+import { UniversitiesStore } from '../../../universities/signal/universities-store';
 import { NotificationService } from '../../../shared/services/notification-service.service';
 
 describe('UserPermissionsEditComponent - registration requests', () => {
@@ -25,8 +28,18 @@ describe('UserPermissionsEditComponent - registration requests', () => {
     deleteUserPermissions: jasmine.Spy;
     deleteRegistrationRequest: jasmine.Spy;
   };
+  let dialogMock: { open: jasmine.Spy };
+  // Controls what the confirmation dialog resolves to when closed.
+  let dialogResult: boolean;
 
   beforeEach(async () => {
+    dialogResult = true;
+    dialogMock = {
+      open: jasmine
+        .createSpy('open')
+        .and.callFake(() => ({ afterClosed: () => of(dialogResult) })),
+    };
+
     storeMock = {
       registrationRequests: () => [],
       keycloakUsers: () => [],
@@ -50,6 +63,8 @@ describe('UserPermissionsEditComponent - registration requests', () => {
       imports: [UserPermissionsEditComponent],
       providers: [
         { provide: UsersStore, useValue: storeMock },
+        { provide: UniversitiesStore, useValue: { entities: () => [] } },
+        { provide: MatDialog, useValue: dialogMock },
         {
           provide: NotificationService,
           useValue: jasmine.createSpyObj('NotificationService', [
@@ -106,9 +121,50 @@ describe('UserPermissionsEditComponent - registration requests', () => {
     expect(component['detailsForm'].controls.roles.value).toBeNull();
   });
 
-  it('reject delegates to the store', () => {
+  it('reject delegates to the store after the dialog is confirmed', () => {
+    dialogResult = true;
     component.onRejectRequest('req-1');
+
+    expect(dialogMock.open).toHaveBeenCalled();
     expect(storeMock.deleteRegistrationRequest).toHaveBeenCalledWith('req-1');
+  });
+
+  it('reject does nothing when the dialog is cancelled', () => {
+    dialogResult = false;
+    component.onRejectRequest('req-1');
+
+    expect(dialogMock.open).toHaveBeenCalled();
+    expect(storeMock.deleteRegistrationRequest).not.toHaveBeenCalled();
+  });
+
+  it('reject is a no-op without an id (no dialog opened)', () => {
+    component.onRejectRequest(undefined);
+
+    expect(dialogMock.open).not.toHaveBeenCalled();
+    expect(storeMock.deleteRegistrationRequest).not.toHaveBeenCalled();
+  });
+
+  it('delete deletes the user after the dialog is confirmed', () => {
+    dialogResult = true;
+    component.onDelete('user-1');
+
+    expect(dialogMock.open).toHaveBeenCalled();
+    expect(storeMock.deleteUserPermissions).toHaveBeenCalledWith('user-1');
+  });
+
+  it('delete does nothing when the dialog is cancelled', () => {
+    dialogResult = false;
+    component.onDelete('user-1');
+
+    expect(dialogMock.open).toHaveBeenCalled();
+    expect(storeMock.deleteUserPermissions).not.toHaveBeenCalled();
+  });
+
+  it('delete is a no-op without a userId (no dialog opened)', () => {
+    component.onDelete('');
+
+    expect(dialogMock.open).not.toHaveBeenCalled();
+    expect(storeMock.deleteUserPermissions).not.toHaveBeenCalled();
   });
 
   it('creating a user from a request deletes the request on success', fakeAsync(() => {

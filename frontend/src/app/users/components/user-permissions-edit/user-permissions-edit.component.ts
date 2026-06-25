@@ -18,6 +18,11 @@ import { GenericDetailsContainerComponent } from '../../../shared/components/gen
 import { MatButton, MatIconButton } from '@angular/material/button';
 import { MatCardTitle } from '@angular/material/card';
 import { MatIcon } from '@angular/material/icon';
+import { MatDialog } from '@angular/material/dialog';
+import {
+  ConfirmDialogComponent,
+  ConfirmDialogData,
+} from '../../../shared/components/confirm-dialog/confirm-dialog.component';
 import {
   MatCell,
   MatCellDef,
@@ -32,8 +37,8 @@ import {
 } from '@angular/material/table';
 import { SelectFieldComponent } from '../../../shared/components/select-field/select-field.component';
 import { SearchSelectComponent } from '../../../shared/components/search-select/search-select.component';
-import { TextFieldComponent } from '../../../shared/components/text-field/text-field.component';
 import { UsersStore } from '../../signal/users-store';
+import { UniversitiesStore } from '../../../universities/signal/universities-store';
 import { NotificationService } from '../../../shared/services/notification-service.service';
 import {
   REGISTRATION_REQUESTS_CONSTANTS,
@@ -64,7 +69,6 @@ type UserPermissionsForm = {
     MatCardTitle,
     SelectFieldComponent,
     SearchSelectComponent,
-    TextFieldComponent,
     MatTable,
     MatColumnDef,
     MatHeaderCell,
@@ -81,7 +85,9 @@ type UserPermissionsForm = {
 export class UserPermissionsEditComponent {
   private fb = new FormBuilder();
   protected store = inject(UsersStore);
+  private universitiesStore = inject(UniversitiesStore);
   private notificationService = inject(NotificationService);
+  private dialog = inject(MatDialog);
 
   protected readonly USER_PERMISSIONS_CONSTANTS = USER_PERMISSIONS_CONSTANTS;
   protected readonly REGISTRATION_REQUESTS_CONSTANTS =
@@ -94,6 +100,21 @@ export class UserPermissionsEditComponent {
       value: u.id ?? '',
       label: u.email ?? u.username ?? u.id ?? '',
     }))
+  );
+
+  // Affiliation is stored as the university acronym (see getUniversityByAcronym).
+  // Universities without an acronym cannot be a valid affiliation, so skip them.
+  protected affiliationOptions = computed(() =>
+    this.universitiesStore
+      .entities()
+      .filter((u) => !!u.acronym)
+      .map((u) => {
+        const name = u.name?.[0]?.text;
+        return {
+          value: u.acronym!,
+          label: name ? `${u.acronym} — ${name}` : u.acronym!,
+        };
+      })
   );
 
   // Ids of users that already exist in Keycloak. Used to tell apart an existing
@@ -201,7 +222,19 @@ export class UserPermissionsEditComponent {
 
   onDelete(userId: string): void {
     if (!userId) return;
-    this.store.deleteUserPermissions(userId);
+    const data: ConfirmDialogData = {
+      title: USER_PERMISSIONS_CONSTANTS.DELETE_CONFIRM.TITLE,
+      message: USER_PERMISSIONS_CONSTANTS.DELETE_CONFIRM.MESSAGE,
+      confirmLabel: USER_PERMISSIONS_CONSTANTS.DELETE_CONFIRM.CONFIRM_LABEL,
+    };
+    this.dialog
+      .open(ConfirmDialogComponent, { width: '400px', data })
+      .afterClosed()
+      .subscribe((confirmed) => {
+        if (confirmed) {
+          this.store.deleteUserPermissions(userId);
+        }
+      });
   }
 
   // Prefills the creation form with the requester's email and a role derived
@@ -237,6 +270,18 @@ export class UserPermissionsEditComponent {
 
   onRejectRequest(id: string | undefined): void {
     if (!id) return;
-    this.store.deleteRegistrationRequest(id);
+    const data: ConfirmDialogData = {
+      title: REGISTRATION_REQUESTS_CONSTANTS.REJECT_CONFIRM.TITLE,
+      message: REGISTRATION_REQUESTS_CONSTANTS.REJECT_CONFIRM.MESSAGE,
+      confirmLabel: REGISTRATION_REQUESTS_CONSTANTS.REJECT_CONFIRM.CONFIRM_LABEL,
+    };
+    this.dialog
+      .open(ConfirmDialogComponent, { width: '400px', data })
+      .afterClosed()
+      .subscribe((confirmed) => {
+        if (confirmed) {
+          this.store.deleteRegistrationRequest(id);
+        }
+      });
   }
 }

@@ -2,10 +2,15 @@ export const USER_PERMISSIONS_CONSTANTS = {
   TITLE: 'User Permissions',
   USER_LABEL: 'User',
   ROLES_LABEL: 'Roles',
-  AFFILIATION_ID_LABEL: 'Affiliation ID',
-  AFFILIATION_ID_PLACEHOLDER: 'Enter Affiliation ID',
+  AFFILIATION_LABEL: 'Affiliation',
   UPDATE_SUCCESS: 'User permissions updated',
   DELETE_SUCCESS: 'User permissions deleted',
+  DELETE_CONFIRM: {
+    TITLE: 'Delete user?',
+    MESSAGE:
+      'Are you sure you want to delete this user? This action cannot be undone.',
+    CONFIRM_LABEL: 'Delete',
+  },
   TABLE_TITLE_EXISTING: 'Existing',
   TABLE_TITLE_NEW: 'Create new or change',
   EMAIL_LABEL: 'Email',
@@ -33,6 +38,12 @@ export const REGISTRATION_REQUESTS_CONSTANTS = {
   CREATED_AT_LABEL: 'Received',
   CREATE_USER_LABEL: 'Create user',
   REJECT_LABEL: 'Reject',
+  REJECT_CONFIRM: {
+    TITLE: 'Reject registration request?',
+    MESSAGE:
+      'Are you sure you want to reject this registration request? This action cannot be undone.',
+    CONFIRM_LABEL: 'Reject',
+  },
   TABLE_COLUMNS: [
     { field: 'name', header: 'Name' },
     { field: 'email', header: 'Email' },
