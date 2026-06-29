@@ -215,7 +215,7 @@ export class CallDetailPreviewComponent implements OnInit {
         label: this.CALL_DETAILS_CONSTANTS.WEBSITE_LABEL,
         value:
           this.call.website?.join(', ') ?? CALL_DETAILS_CONSTANTS.PLACEHOLDER,
-        href: this.call.website?.[0]?.toString(),
+        href: this.formatHref(this.call.website?.[0]),
       },
       {
         label: this.CALL_DETAILS_CONSTANTS.CONTACTS_LABEL,
@@ -357,6 +357,14 @@ export class CallDetailPreviewComponent implements OnInit {
       return this.CALL_DETAILS_CONSTANTS.PLACEHOLDER;
     }
     return `${this.CALL_DETAILS_CONSTANTS.DURATION_SUB_LABELS[0]}: ${duration.months || 0}, ${this.CALL_DETAILS_CONSTANTS.DURATION_SUB_LABELS[1]}: ${duration.days || 0}`;
+  }
+
+  private formatHref(url: URL | string | undefined): string | undefined {
+    const value = url?.toString().trim();
+    if (!value) {
+      return undefined;
+    }
+    return /^https?:\/\//i.test(value) ? value : `https://${value}`;
   }
 
   private formatMonetaryNumber(
