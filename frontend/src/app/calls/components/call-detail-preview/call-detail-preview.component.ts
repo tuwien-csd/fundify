@@ -75,7 +75,7 @@ export class CallDetailPreviewComponent implements OnInit {
 
   permissions!: ActionPermissions;
 
-  callDetails: { label: string; value: string }[] = [];
+  callDetails: { label: string; value: string; href?: string }[] = [];
   isValid!: boolean;
 
   ngOnInit(): void {
@@ -215,6 +215,7 @@ export class CallDetailPreviewComponent implements OnInit {
         label: this.CALL_DETAILS_CONSTANTS.WEBSITE_LABEL,
         value:
           this.call.website?.join(', ') ?? CALL_DETAILS_CONSTANTS.PLACEHOLDER,
+        href: this.formatHref(this.call.website?.[0]),
       },
       {
         label: this.CALL_DETAILS_CONSTANTS.CONTACTS_LABEL,
@@ -358,13 +359,21 @@ export class CallDetailPreviewComponent implements OnInit {
     return `${this.CALL_DETAILS_CONSTANTS.DURATION_SUB_LABELS[0]}: ${duration.months || 0}, ${this.CALL_DETAILS_CONSTANTS.DURATION_SUB_LABELS[1]}: ${duration.days || 0}`;
   }
 
+  private formatHref(url: URL | string | undefined): string | undefined {
+    const value = url?.toString().trim();
+    if (!value) {
+      return undefined;
+    }
+    return /^https?:\/\//i.test(value) ? value : `https://${value}`;
+  }
+
   private formatMonetaryNumber(
     monetaryNumber: MonetaryNumber | undefined
   ): string {
-    if (!monetaryNumber) {
+    if (!monetaryNumber || monetaryNumber.amount == null) {
       return this.CALL_DETAILS_CONSTANTS.PLACEHOLDER;
     }
-    return monetaryNumber.amount + ' ' + monetaryNumber.currency;
+    return monetaryNumber.amount.toLocaleString('de-DE') + ' ' + monetaryNumber.currency;
   }
 
   private formatTranslatedTextList(
@@ -424,7 +433,7 @@ export class CallDetailPreviewComponent implements OnInit {
 
   private formatFundingRef(funderRef: FundingEntityRef | undefined): string {
     return funderRef
-      ? `${this.formatTranslatedText(funderRef.name)} (${funderRef.id})`
+      ? `${this.formatTranslatedText(funderRef.name)}`
       : CALL_DETAILS_CONSTANTS.PLACEHOLDER;
   }
 
