@@ -1,0 +1,163 @@
+<app-generic-details-container>
+  <container-header>
+    <mat-card-title>{{ USER_PERMISSIONS_CONSTANTS.TITLE }}</mat-card-title>
+  </container-header>
+  <container-content>
+    <div class="user-permissions-table-section">
+        @if (formVisible()) {
+            <form [formGroup]="detailsForm">
+                <h3 class="user-permissions-table-title">
+                    {{ USER_PERMISSIONS_CONSTANTS.TABLE_TITLE_NEW }}
+                </h3>
+                <div class="flex flex-row gap-4 items-center">
+                    <app-search-select
+                            class="user-search-select"
+                            formControlName="userId"
+                            [options]="userOptions()"
+                            [required]="true"
+                            [multiSelect]="false"
+                            [allowCustomValues]="true"
+                            placeholder="User (Search or enter a new email)*"
+                    />
+                    <app-select-field
+                            formControlName="roles"
+                            [textLabel]="USER_PERMISSIONS_CONSTANTS.ROLES_LABEL"
+                            [options]="USER_ROLE_OPTIONS"
+                            [required]="true"
+                            [multiple]="true"
+                    />
+                    <app-select-field
+                            formControlName="affiliationId"
+                            [textLabel]="USER_PERMISSIONS_CONSTANTS.AFFILIATION_LABEL"
+                            [options]="affiliationOptions()"
+                            [required]="true"
+                    />
+                    <button
+                            mat-raised-button
+                            class="submit-button form-item-button"
+                            color="primary"
+                            type="submit"
+                            [disabled]="!formValidSignal()"
+                            (click)="onSave()"
+                    >
+                        {{ BUTTON_LABELS.SUBMIT }}
+                    </button>
+                </div>
+            </form>
+        }
+      <h3 class="user-permissions-table-title">
+        {{ REGISTRATION_REQUESTS_CONSTANTS.TABLE_TITLE }}
+      </h3>
+      @if (registrationRows().length) {
+        <mat-table
+          [dataSource]="registrationRows()"
+          class="user-permissions-table"
+        >
+          <ng-container matColumnDef="name">
+            <mat-header-cell *matHeaderCellDef>
+              {{ REGISTRATION_REQUESTS_CONSTANTS.NAME_LABEL }}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{ row.name }}</mat-cell>
+          </ng-container>
+          <ng-container matColumnDef="email">
+            <mat-header-cell *matHeaderCellDef>
+              {{ REGISTRATION_REQUESTS_CONSTANTS.EMAIL_LABEL }}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{ row.email }}</mat-cell>
+          </ng-container>
+          <ng-container matColumnDef="kindOfInstitution">
+            <mat-header-cell *matHeaderCellDef>
+              {{ REGISTRATION_REQUESTS_CONSTANTS.INSTITUTION_LABEL }}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{ row.kindOfInstitution }}</mat-cell>
+          </ng-container>
+          <ng-container matColumnDef="message">
+            <mat-header-cell *matHeaderCellDef>
+              {{ REGISTRATION_REQUESTS_CONSTANTS.MESSAGE_LABEL }}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{ row.message }}</mat-cell>
+          </ng-container>
+          <ng-container matColumnDef="createdAt">
+            <mat-header-cell *matHeaderCellDef>
+              {{ REGISTRATION_REQUESTS_CONSTANTS.CREATED_AT_LABEL }}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">
+              {{ row.createdAt | date: 'dd.MM.yyyy, HH:mm' }}
+            </mat-cell>
+          </ng-container>
+          <ng-container matColumnDef="actions">
+            <mat-header-cell *matHeaderCellDef></mat-header-cell>
+            <mat-cell *matCellDef="let row">
+              <button
+                mat-icon-button
+                color="primary"
+                (click)="onCreateUserFromRequest(row)"
+              >
+                  <mat-icon>check</mat-icon>
+              </button>
+              <button
+                mat-icon-button
+                color="warn"
+                [attr.aria-label]="REGISTRATION_REQUESTS_CONSTANTS.REJECT_LABEL"
+                (click)="onRejectRequest(row.id)"
+              >
+                <mat-icon>delete</mat-icon>
+              </button>
+            </mat-cell>
+          </ng-container>
+          <mat-header-row
+            *matHeaderRowDef="displayedRegistrationColumns"
+          ></mat-header-row>
+          <mat-row
+            *matRowDef="let row; columns: displayedRegistrationColumns"
+          ></mat-row>
+        </mat-table>
+      } @else {
+        <p class="registration-requests-empty">
+          {{ REGISTRATION_REQUESTS_CONSTANTS.EMPTY }}
+        </p>
+      }
+    </div>
+
+    <div class="user-permissions-table-section">
+      <h3 class="user-permissions-table-title">
+        {{ USER_PERMISSIONS_CONSTANTS.TABLE_TITLE_EXISTING }}
+      </h3>
+      <mat-table [dataSource]="permissionRows()" class="user-permissions-table">
+        <ng-container matColumnDef="email">
+          <mat-header-cell *matHeaderCellDef>
+            {{ USER_PERMISSIONS_CONSTANTS.EMAIL_LABEL }}
+          </mat-header-cell>
+          <mat-cell *matCellDef="let row">{{ row.email }}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="roles">
+          <mat-header-cell *matHeaderCellDef>
+            {{ USER_PERMISSIONS_CONSTANTS.ROLES_LABEL }}
+          </mat-header-cell>
+          <mat-cell *matCellDef="let row">{{ row.roles }}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="affiliationId">
+          <mat-header-cell *matHeaderCellDef>
+            {{ USER_PERMISSIONS_CONSTANTS.AFFILIATION_LABEL }}
+          </mat-header-cell>
+          <mat-cell *matCellDef="let row">{{ row.affiliationId }}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="actions">
+          <mat-header-cell *matHeaderCellDef></mat-header-cell>
+          <mat-cell *matCellDef="let row">
+            <button
+              mat-icon-button
+              color="warn"
+              [attr.aria-label]="BUTTON_LABELS.DELETE"
+              (click)="onDelete(row.userId)"
+            >
+              <mat-icon>delete</mat-icon>
+            </button>
+          </mat-cell>
+        </ng-container>
+        <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
+      </mat-table>
+    </div>
+  </container-content>
+</app-generic-details-container>

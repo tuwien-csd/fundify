@@ -8,13 +8,13 @@ grant_type=password&client_id=fundify&username= {{admin.username}}&password={{ad
 
 
 ### Update permissions of user
-@userId = changeme
+@userId = e5bb35a2-7825-4c57-ac3b-dea484c3e26c
 PUT {{baseUrl}}/api/users/{{userId}}/permissions
 Content-Type: application/json
 Authorization: Bearer {{auth_token}}
 
 # Roles: oneOf: FUNDER | ADMIN | ANNOTATOR | EXTERNAL_API_CLIENT
 {
-  "roles": ["FUNDER"],
-  "affiliationId": "andamp"
+  "roles": ["ANNOTATOR"],
+  "affiliationId": "univie"
 }

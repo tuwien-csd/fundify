@@ -33,8 +33,10 @@ services:
     image: changemakerstudiosus/papercut-smtp:latest
     container_name: papercut_smtp
     ports:
-      - "8084:80"
-      - "25:25"
+      - "8084:8080"
+      - "25:2525"
+    networks:
+      - refop-network
 
   refop-fe:
     container_name: refop-fe
