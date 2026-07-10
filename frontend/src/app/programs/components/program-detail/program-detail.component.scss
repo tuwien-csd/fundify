@@ -6,6 +6,16 @@ mat-chip {
   margin-top: 1rem;
 }
 
+.card-header {
+  display: flex;
+  align-items: center;
+  margin-right: 2rem;
+}
+
+.header-spacer {
+  flex: 1;
+}
+
 .mat-mdc-card {
   margin: 2rem;
   padding: 1rem;

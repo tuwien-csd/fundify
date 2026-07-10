@@ -1,5 +1,5 @@
 <mat-card appearance="outlined">
-  <mat-card-header>
+  <mat-card-header class="card-header">
     <mat-card-title
       >{{ program().name[0].text || program().name[1].text }}
     </mat-card-title>
@@ -7,6 +7,13 @@
       <mat-chip>
         {{ program().status }}
       </mat-chip>
+    }
+    <span class="header-spacer"></span>
+    @if (program().id) {
+      <button mat-stroked-button class="form-item-button" (click)="onShowHistory()">
+        <mat-icon>history</mat-icon>
+        {{ BUTTON_LABELS.HISTORY }}
+      </button>
     }
   </mat-card-header>
 

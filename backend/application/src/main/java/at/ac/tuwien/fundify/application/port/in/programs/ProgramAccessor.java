@@ -7,7 +7,7 @@ import at.ac.tuwien.fundify.domain.common.ProgramId;
 import at.ac.tuwien.fundify.domain.common.RisId;
 import at.ac.tuwien.fundify.domain.common.exceptions.EntityNotFoundException;
 import at.ac.tuwien.fundify.domain.funding.Program;
-import at.ac.tuwien.fundify.domain.funding.ProgramReference;
+import at.ac.tuwien.fundify.domain.funding.ProgramVersion;
 import at.ac.tuwien.fundify.domain.funding.vo.enums.EAustrianState;
 import at.ac.tuwien.fundify.domain.funding.vo.enums.ERegionalScope;
 import java.util.List;
@@ -15,17 +15,9 @@ import java.util.List;
 
 public interface ProgramAccessor {
 
-  //TODO: Introduce filter object to get rid of all these methods
-
     Program getById(ProgramId id) throws EntityNotFoundException;
 
     List<Program> getAll();
-
-    List<Program> getByStatus(EPublicationStatus status);
-
-    List<ProgramReference> getPublishedReferences();
-
-    List<Program> getByFunderAndStatus(FunderId funderId, EPublicationStatus status);
 
     Program getProgramByRisIdAndStatus(RisId risId, EPublicationStatus status)
         throws EntityNotFoundException;
@@ -37,7 +29,5 @@ public interface ProgramAccessor {
       ERegionalScope scope
   );
 
-    ProgramReference getReference(ProgramId programId) throws EntityNotFoundException;
-
-    List<ProgramReference> getReferenceByFunder(FunderId funderId);
+    List<ProgramVersion> getVersionsByProgramId(ProgramId programId);
 }

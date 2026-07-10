@@ -1,17 +1,18 @@
 export const BUTTON_LABELS = {
-  BACK: 'go back',
-  EDIT: 'edit',
-  VIEW: 'view',
-  CANCEL: 'cancel',
-  ANNOTATE: 'annotate',
-  DELETE: 'delete',
-  PREVIEW: 'preview',
-  VALIDATE: 'validate',
-  SAVE_AS_DRAFT: 'save as draft',
-  PUBLISH: 'publish',
-  SUBMIT: 'submit',
-  SUBSCRIBE: 'subscribe',
-  UNSUBSCRIBE: 'unsubscribe',
+  BACK: 'Go back',
+  EDIT: 'Edit',
+  VIEW: 'View',
+  CANCEL: 'Cancel',
+  ANNOTATE: 'Annotate',
+  DELETE: 'Delete',
+  PREVIEW: 'Preview',
+  VALIDATE: 'Validate',
+  SAVE_AS_DRAFT: 'Save as draft',
+  PUBLISH: 'Publish',
+  SUBMIT: 'Submit',
+  SUBSCRIBE: 'Subscribe',
+  UNSUBSCRIBE: 'Unsubscribe',
+  HISTORY: 'History',
 };
 
 export const CONTACT_LABELS = {
@@ -25,8 +26,8 @@ export const CONTACT_LABELS = {
 };
 
 export const DATE_RANGE_INFO_LABELS = {
-  ADD_BUTTON_LABEL: 'add callstage',
-  REMOVE_BUTTON_LABEL: 'remove callstage',
+  ADD_BUTTON_LABEL: 'Add callstage',
+  REMOVE_BUTTON_LABEL: 'Remove callstage',
 };
 
 export const DURATION_LABELS = {
@@ -37,7 +38,7 @@ export const DURATION_LABELS = {
 
 export const FUNDING_SEARCH_LABELS = {
   SEARCH_LABEL: 'Search...',
-  NEW_BUTTON_LABEL: 'new',
+  NEW_BUTTON_LABEL: 'New',
 };
 
 export const MONETARY_LABELS = {
@@ -54,13 +55,13 @@ export const SUBJECT_LABELS = {
 export const TRANSLATED_TEXT_LABELS = {
   LANGUAGE_LABEL: 'Language',
   SELECT_PLACEHOLDER: 'Select Language',
-  ADD_BUTTON_LABEL: 'add translation',
-  REMOVE_BUTTON_LABEL: 'remove translation',
+  ADD_BUTTON_LABEL: 'Add translation',
+  REMOVE_BUTTON_LABEL: 'Remove translation',
 };
 
 export const TRANSLATED_TEXTS_LABELS = {
-  ADD_BUTTON_LABEL: 'add more',
-  REMOVE_BUTTON_LABEL: 'remove',
+  ADD_BUTTON_LABEL: 'Add more',
+  REMOVE_BUTTON_LABEL: 'Remove',
 };
 
 export const POST_ADDRESS_LABELS = {

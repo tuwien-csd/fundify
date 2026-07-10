@@ -2,6 +2,7 @@ package at.ac.tuwien.fundify.bootstrap.e2e;
 
 import static at.ac.tuwien.fundify.adapters.in.rest.constants.FundingEntityMethodPath.BY_ID;
 import static at.ac.tuwien.fundify.adapters.in.rest.constants.FundingEntityMethodPath.ENTITY_UPDATE_SUBSCRIPTIONS;
+import static at.ac.tuwien.fundify.adapters.in.rest.constants.FundingEntityMethodPath.ENTITY_VERSIONS;
 import static at.ac.tuwien.fundify.adapters.in.rest.constants.FundingEntityMethodPath.QUERY_PARAM_STATUS;
 import static at.ac.tuwien.fundify.bootstrap.utils.TestConstants.*;
 import static io.restassured.RestAssured.given;
@@ -12,6 +13,7 @@ import at.ac.tuwien.fundify.adapters.in.rest.resources.CallResource;
 import at.ac.tuwien.fundify.adapters.out.fundify.EmailService;
 import at.ac.tuwien.fundify.adapters.out.persistence.mongo.annotating.UniversityMongoEntity;
 import at.ac.tuwien.fundify.adapters.out.persistence.mongo.funding.CallMongoEntity;
+import at.ac.tuwien.fundify.adapters.out.persistence.mongo.funding.CallVersionMongoEntity;
 import at.ac.tuwien.fundify.adapters.out.persistence.mongo.funding.FunderMongoEntity;
 import at.ac.tuwien.fundify.bootstrap.utils.users.WithAdminUser;
 import at.ac.tuwien.fundify.bootstrap.utils.users.WithFFGFunderUser;
@@ -30,6 +32,7 @@ import io.quarkus.mailer.MockMailbox;
 import io.quarkus.test.common.http.TestHTTPEndpoint;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.security.TestSecurity;
+import io.restassured.common.mapper.TypeRef;
 import io.restassured.http.ContentType;
 import jakarta.inject.Inject;
 
@@ -96,6 +99,8 @@ class CallTest {
 
   @BeforeEach
   void setup() {
+    CallVersionMongoEntity.deleteAll();
+
     FunderMongoEntity existingFunder = new FunderMongoEntity();
     existingFunder.id = new ObjectId(funderId);
     existingFunder.acronym = FFG_FUNDER_AFFILIATION;
@@ -629,6 +634,38 @@ class CallTest {
         .statusCode(204);
 
       Assertions.assertNull(CallMongoEntity.findById(new ObjectId(callIdExternal)));
+  }
+
+  @Test
+  @WithFFGFunderUser
+  void givenNoVersions_whenGetVersions_thenReturnsEmptyList() {
+    List<CallVersionWebModel> versions = given()
+        .when()
+        .get(ENTITY_VERSIONS, callId)
+        .then()
+        .statusCode(200)
+        .extract()
+        .as(new TypeRef<>() {});
+
+    Assertions.assertEquals(0, versions.size());
+  }
+
+  @Test
+  @WithFFGFunderUser
+  void givenExistingVersion_whenGetVersions_thenReturnsList() {
+    CallVersionMongoEntity version = new CallVersionMongoEntity();
+    version.callId = new ObjectId(callId);
+    version.persist();
+
+    List<CallVersionWebModel> versions = given()
+        .when()
+        .get(ENTITY_VERSIONS, callId)
+        .then()
+        .statusCode(200)
+        .extract()
+        .as(new TypeRef<>() {});
+
+    Assertions.assertEquals(1, versions.size());
   }
 
   @Nested

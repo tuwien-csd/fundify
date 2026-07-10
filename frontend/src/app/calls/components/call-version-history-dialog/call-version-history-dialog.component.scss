@@ -1,0 +1,141 @@
+.spinner-container {
+  display: flex;
+  justify-content: center;
+  padding: 32px;
+}
+
+.no-versions {
+  color: var(--mat-sys-on-surface-variant);
+  text-align: center;
+  padding: 24px 0;
+}
+
+.version-viewer {
+  min-width: 520px;
+}
+
+.nav-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  padding: 4px 0;
+  border-bottom: 1px solid var(--mat-sys-outline-variant);
+}
+
+.nav-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--mat-sys-on-surface);
+}
+
+.latest-badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 12px;
+  background: #fff3e0;
+  color: #e65100;
+}
+
+.version-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.source-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+
+  &.sync { color: #1976d2; }
+  &.manual { color: #388e3c; }
+}
+
+.source-label {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 12px;
+
+  &.sync {
+    background: #e3f2fd;
+    color: #1565c0;
+  }
+
+  &.manual {
+    background: #e8f5e9;
+    color: #2e7d32;
+  }
+}
+
+.version-date {
+  font-size: 13px;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.version-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.field-row {
+  display: grid;
+  grid-template-columns: 148px 1fr;
+  gap: 8px;
+  font-size: 13px;
+  padding: 4px 6px;
+  border-radius: 4px;
+}
+
+.field-label {
+  color: var(--mat-sys-on-surface-variant);
+  font-weight: 500;
+}
+
+.field-value {
+  color: var(--mat-sys-on-surface);
+  word-break: break-word;
+}
+
+.field-row.changed {
+  background: #fff8e1;
+
+  .field-label {
+    color: #e65100;
+    font-weight: 600;
+  }
+
+  .field-value {
+    color: #bf360c;
+  }
+}
+
+.field-value-diff {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.old-value {
+  text-decoration: line-through;
+  opacity: 0.6;
+}
+
+.new-value {
+  font-weight: 600;
+}
+
+.diff-arrow {
+  font-size: 14px;
+  width: 14px;
+  height: 14px;
+  color: #e65100;
+  opacity: 0.7;
+}
