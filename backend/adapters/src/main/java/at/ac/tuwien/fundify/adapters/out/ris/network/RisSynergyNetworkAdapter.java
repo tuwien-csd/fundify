@@ -8,11 +8,14 @@ import at.ac.tuwien.fundify.adapters.common.ris.model.v1.RisFundingType;
 import at.ac.tuwien.fundify.adapters.common.ris.model.v1.RisProgramme;
 import at.ac.tuwien.fundify.adapters.out.ris.network.client.GenericRisFundingRestClient;
 import at.ac.tuwien.fundify.adapters.out.ris.network.config.RisClientConfiguration;
+import at.ac.tuwien.fundify.application.port.out.notification.SyncErrorNotificationService;
 import at.ac.tuwien.fundify.application.port.out.ris.network.FundingRemoteRepository;
 import at.ac.tuwien.fundify.application.port.out.ticketing.TicketingService;
 import at.ac.tuwien.fundify.domain.funding.Call;
 import at.ac.tuwien.fundify.domain.funding.Program;
 import at.ac.tuwien.fundify.domain.ticketing.AppendableTicketCreate;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.ProcessingException;
@@ -21,6 +24,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 import lombok.extern.jbosslog.JBossLog;
 import org.eclipse.microprofile.faulttolerance.Fallback;
 import org.eclipse.microprofile.faulttolerance.Retry;
@@ -33,11 +38,16 @@ public class RisSynergyNetworkAdapter implements FundingRemoteRepository {
   private static final String SYNC_ERROR_STANDARD_DESCRIPTION = "Could not process data provided by the RIS funding data provider.";
   private final static String SYNC_ERROR_KEY_TEMPLATE = "[SYNC_ERROR_%s] Invalid RIS Format";
   private final TicketingService ticketingService;
+  private final SyncErrorNotificationService syncErrorNotificationService;
+  private final Map<String, String> contactEmails;
 
   @Inject
-  RisSynergyNetworkAdapter(RisClientConfiguration config, TicketingService ticketingService) {
+  RisSynergyNetworkAdapter(RisClientConfiguration config, TicketingService ticketingService,
+      SyncErrorNotificationService syncErrorNotificationService) {
     this.registeredRestClients = config.getRegisteredRestClients();
     this.ticketingService = ticketingService;
+    this.syncErrorNotificationService = syncErrorNotificationService;
+    this.contactEmails = config.getContactEmails();
   }
 
 
@@ -66,7 +76,7 @@ public class RisSynergyNetworkAdapter implements FundingRemoteRepository {
   }
 
 
-  @Retry(maxRetries = 3, delay = 5000)
+  @Retry(maxRetries = 3, delay = 5000, abortOn = ProcessingException.class)
   @Fallback(fallbackMethod = "fetchCallsFallback")
   List<Call> fetchCalls(GenericRisFundingRestClient client, String memberId) {
     try {
@@ -77,6 +87,13 @@ public class RisSynergyNetworkAdapter implements FundingRemoteRepository {
           .map(RisCall.class::cast)
           .map(f -> RisCallMapper.INSTANCE.toDomain(f, memberId))
           .toList();
+    } catch (ProcessingException e) {
+      String readableMessage = extractReadableErrorMessage(e);
+      log.errorf("Failed to deserialize RisFunding (call) response from provider '%s': %s", client.getMemberId(), readableMessage);
+      createOrAppendSyncError(client, List.of(
+          String.format("A new error occurred at: %s", OffsetDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)),
+          "Failed to deserialize RisFunding (call) response: ", readableMessage));
+      throw e;
     } catch (Exception e) {
       log.error(
           String.format("Error fetching calls from client '%s' (will retry)", client.getMemberId()),
@@ -93,7 +110,7 @@ public class RisSynergyNetworkAdapter implements FundingRemoteRepository {
   }
 
   // no test data available for ongoing calls from external API providers
-  @Retry(maxRetries = 3, delay = 5000)
+  @Retry(maxRetries = 3, delay = 5000, abortOn = ProcessingException.class)
   @Fallback(fallbackMethod = "fetchOnGoingCallsFallback")
   List<Call> fetchOnGoingCalls(GenericRisFundingRestClient client, String memberId) {
     try {
@@ -104,6 +121,13 @@ public class RisSynergyNetworkAdapter implements FundingRemoteRepository {
           .map(RisCall.class::cast)
           .map(f -> RisCallMapper.INSTANCE.toDomain(f, memberId))
           .toList();
+    } catch (ProcessingException e) {
+      String readableMessage = extractReadableErrorMessage(e);
+      log.errorf("Failed to deserialize RisFunding (ongoing call) response from provider '%s': %s", client.getMemberId(), readableMessage);
+      createOrAppendSyncError(client, List.of(
+          String.format("A new error occurred at: %s", OffsetDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)),
+          "Failed to deserialize RisFunding (ongoing call) response: ", readableMessage));
+      throw e;
     } catch (Exception e) {
       log.error(String.format("Error fetching ongoing calls from client '%s' (will retry)",
           client.getMemberId()), e);
@@ -132,11 +156,11 @@ public class RisSynergyNetworkAdapter implements FundingRemoteRepository {
           .map(f -> RisProgramMapper.INSTANCE.toDomain(f, memberId))
           .toList();
     } catch (ProcessingException e) {
-      //Trigger notification
-      createOrAppendSyncError(client, List.of(String.format("A new error occurred at: %s",
-              OffsetDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)),
-          "Detailed processing error: ", e.getMessage()));
-      //Rethrow to let the fallback method handle it
+      String readableMessage = extractReadableErrorMessage(e);
+      log.errorf("Failed to deserialize RisProgramme response from provider '%s': %s", client.getMemberId(), readableMessage);
+      createOrAppendSyncError(client, List.of(
+          String.format("A new error occurred at: %s", OffsetDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)),
+          "Failed to deserialize RisProgramme response: ", readableMessage));
       throw e;
     } catch (Exception e) {
       log.error(String.format("Error fetching programs from client %s (will retry)",
@@ -153,12 +177,44 @@ public class RisSynergyNetworkAdapter implements FundingRemoteRepository {
     return new ArrayList<>();
   }
 
-  private void createOrAppendSyncError(GenericRisFundingRestClient client, List<String> texts) {
-    var payload = new AppendableTicketCreate(
-        String.format(SYNC_ERROR_KEY_TEMPLATE, client.getMemberId().toUpperCase()),
-        SYNC_ERROR_STANDARD_DESCRIPTION, texts);
-    ticketingService.createOrAppend(payload);
+  private String extractReadableErrorMessage(ProcessingException e) {
+    Throwable cause = e.getCause();
+    if (cause instanceof JsonMappingException jme) {
+      String fieldPath = jme.getPath().stream()
+          .map(ref -> ref.getFieldName() != null ? ref.getFieldName() : "[" + ref.getIndex() + "]")
+          .collect(Collectors.joining("."));
+      String reason = jme.getOriginalMessage();
+      return fieldPath.isEmpty()
+          ? String.format("Cannot map JSON response: %s", reason)
+          : String.format("Cannot map JSON field '%s': %s", fieldPath, reason);
+    }
+    if (cause instanceof JsonParseException jpe) {
+      var loc = jpe.getLocation();
+      if (loc != null) {
+        return String.format("Invalid JSON at line %d, column %d: %s",
+            loc.getLineNr(), loc.getColumnNr(), jpe.getOriginalMessage());
+      }
+      return "Invalid JSON: " + jpe.getOriginalMessage();
+    }
+    return "JSON processing error: " + Objects.requireNonNullElse(cause, e).getMessage();
   }
 
-  ;
+  private void createOrAppendSyncError(GenericRisFundingRestClient client, List<String> texts) {
+    try {
+      var payload = new AppendableTicketCreate(
+          String.format(SYNC_ERROR_KEY_TEMPLATE, client.getMemberId().toUpperCase()),
+          SYNC_ERROR_STANDARD_DESCRIPTION, texts);
+      ticketingService.createOrAppend(payload);
+    } catch (Exception e) {
+      log.error(String.format("Error creating or appending sync error ticket for client %s, continue with trying to send mail", client.getMemberId()), e);
+    }
+
+    String contactEmail = contactEmails.get(client.getMemberId());
+    if (contactEmail != null) {
+      syncErrorNotificationService.sendSyncErrorNotification(client.getMemberId(), contactEmail, texts);
+    } else {
+      log.warnf("No contact email configured for provider '%s', skipping sync error email notification", client.getMemberId());
+    }
+  }
+
 }
