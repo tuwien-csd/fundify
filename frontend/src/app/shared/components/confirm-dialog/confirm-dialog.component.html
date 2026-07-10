@@ -1,0 +1,14 @@
+<div class="confirmation-modal">
+  <h2 mat-dialog-title>{{ data.title }}</h2>
+  <mat-dialog-content>
+    <p>{{ data.message }}</p>
+  </mat-dialog-content>
+  <mat-dialog-actions align="end">
+    <button mat-stroked-button (click)="onAbort()">
+      {{ data.cancelLabel ?? 'Cancel' }}
+    </button>
+    <button mat-raised-button color="warn" (click)="onConfirm()">
+      {{ data.confirmLabel ?? 'Delete' }}
+    </button>
+  </mat-dialog-actions>
+</div>

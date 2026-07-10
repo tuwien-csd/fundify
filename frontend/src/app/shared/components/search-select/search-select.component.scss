@@ -32,6 +32,18 @@
   }
 }
 
+.new-value-tag {
+  margin-left: 0.5rem;
+  padding: 0.05rem 0.4rem;
+  border-radius: 0.75rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: mat.m2-get-contrast-color-from-palette(col.$custom-primary-color, 500);
+  background-color: mat.m2-get-color-from-palette(col.$custom-primary-color, 500);
+}
+
 
 @media (max-width: 600px) {
   .search-select-container {
