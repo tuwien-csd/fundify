@@ -1,8 +1,11 @@
 package at.ac.tuwien.fundify.adapters.in.rest.resources;
 
+import static at.ac.tuwien.fundify.adapters.in.rest.constants.FundingEntityMethodPath.ENTITY_VERSIONS;
 import static at.ac.tuwien.fundify.adapters.in.rest.constants.FundingEntityMethodPath.PATH_PARAM_ID;
 
+import at.ac.tuwien.fundify.adapters.in.rest.dto.ProgramVersionWebModel;
 import at.ac.tuwien.fundify.adapters.in.rest.dto.ProgramWebModel;
+import at.ac.tuwien.fundify.adapters.in.rest.mapper.ProgramVersionWebModelMapper;
 import at.ac.tuwien.fundify.adapters.in.rest.dto.ValidationGroups;
 import at.ac.tuwien.fundify.adapters.in.rest.mapper.ProgramWebModelMapper;
 import at.ac.tuwien.fundify.application.port.in.programs.ProgramAccessor;
@@ -84,5 +87,12 @@ public class ProgramResource {
       throws EntityNotFoundException {
     return ProgramWebModelMapper.INSTANCE.fromDomain(
         programAccessor.getById(new ProgramId(programId)));
+  }
+
+  @GET
+  @Path(ENTITY_VERSIONS)
+  public List<ProgramVersionWebModel> getVersions(@PathParam(PATH_PARAM_ID) String programId) {
+    return ProgramVersionWebModelMapper.fromDomain(
+        programAccessor.getVersionsByProgramId(new ProgramId(programId)));
   }
 }

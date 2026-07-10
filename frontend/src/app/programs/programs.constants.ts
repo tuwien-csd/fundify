@@ -44,6 +44,8 @@ export const PROGRAM_DETAILS_CONSTANTS = {
   ERRORS: {
     FETCH_ALL_ERROR:
       'An unexpected error occurred when retrieving all programs.',
+    VERSION_HISTORY_ERROR:
+      'An unexpected error occurred when retrieving the version history.',
   },
   MESSAGES: {
     CREATE: {

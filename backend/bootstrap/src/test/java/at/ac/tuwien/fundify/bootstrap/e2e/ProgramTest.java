@@ -1,10 +1,12 @@
 package at.ac.tuwien.fundify.bootstrap.e2e;
 
+import static at.ac.tuwien.fundify.adapters.in.rest.constants.FundingEntityMethodPath.ENTITY_VERSIONS;
 import static at.ac.tuwien.fundify.adapters.in.rest.constants.FundingEntityMethodPath.QUERY_PARAM_STATUS;
 import static at.ac.tuwien.fundify.bootstrap.utils.TestConstants.FFG_FUNDER_AFFILIATION;
 import static io.restassured.RestAssured.given;
 
 import at.ac.tuwien.fundify.adapters.in.rest.dto.FunderRefWebModel;
+import at.ac.tuwien.fundify.adapters.in.rest.dto.ProgramVersionWebModel;
 import at.ac.tuwien.fundify.adapters.in.rest.dto.ProgramWebModel;
 import at.ac.tuwien.fundify.adapters.in.rest.dto.StandardizedSubjectWebModel;
 import at.ac.tuwien.fundify.adapters.in.rest.dto.TranslatedTextWebModel;
@@ -13,6 +15,7 @@ import at.ac.tuwien.fundify.adapters.in.rest.resources.ProgramResource;
 import at.ac.tuwien.fundify.adapters.out.persistence.mongo.funding.FunderMongoEntity;
 import at.ac.tuwien.fundify.adapters.out.persistence.mongo.funding.ProgramMongoEntity;
 import at.ac.tuwien.fundify.adapters.out.persistence.mongo.funding.ProgramMongoRepository;
+import at.ac.tuwien.fundify.adapters.out.persistence.mongo.funding.ProgramVersionMongoEntity;
 import at.ac.tuwien.fundify.bootstrap.utils.users.WithAdminUser;
 import at.ac.tuwien.fundify.bootstrap.utils.users.WithFFGFunderUser;
 import at.ac.tuwien.fundify.bootstrap.utils.users.WithXYZFunderUser;
@@ -25,6 +28,7 @@ import at.ac.tuwien.fundify.domain.funding.vo.enums.EEntryOrigin;
 import io.quarkus.test.common.http.TestHTTPEndpoint;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.security.TestSecurity;
+import io.restassured.common.mapper.TypeRef;
 import io.restassured.http.ContentType;
 import jakarta.inject.Inject;
 import java.time.LocalDateTime;
@@ -66,6 +70,8 @@ class ProgramTest {
 
     @BeforeEach
     void setUp() {
+        ProgramVersionMongoEntity.deleteAll();
+
         FunderMongoEntity existingFunder = new FunderMongoEntity();
         existingFunder.id = new ObjectId(funderId);
         existingFunder.acronym = FFG_FUNDER_AFFILIATION;
@@ -369,6 +375,38 @@ class ProgramTest {
                 .statusCode(404);
     }
 
+
+  @Test
+  @WithFFGFunderUser
+  void givenNoVersions_whenGetVersions_thenReturnsEmptyList() {
+      List<ProgramVersionWebModel> versions = given()
+              .when()
+              .get(ENTITY_VERSIONS, programId)
+              .then()
+              .statusCode(200)
+              .extract()
+              .as(new TypeRef<>() {});
+
+      Assertions.assertEquals(0, versions.size());
+  }
+
+  @Test
+  @WithFFGFunderUser
+  void givenExistingVersion_whenGetVersions_thenReturnsList() {
+      ProgramVersionMongoEntity version = new ProgramVersionMongoEntity();
+      version.programId = new ObjectId(programId);
+      version.persist();
+
+      List<ProgramVersionWebModel> versions = given()
+              .when()
+              .get(ENTITY_VERSIONS, programId)
+              .then()
+              .statusCode(200)
+              .extract()
+              .as(new TypeRef<>() {});
+
+      Assertions.assertEquals(1, versions.size());
+  }
 
   @Nested
   @QuarkusTest

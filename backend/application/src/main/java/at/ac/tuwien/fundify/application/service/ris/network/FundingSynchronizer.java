@@ -14,8 +14,11 @@ import at.ac.tuwien.fundify.domain.funding.FunderReference;
 import at.ac.tuwien.fundify.domain.funding.Program;
 import at.ac.tuwien.fundify.domain.funding.ProgramReference;
 import at.ac.tuwien.fundify.domain.funding.vo.Identifier;
+import at.ac.tuwien.fundify.application.service.calls.CallVersioningService;
+import at.ac.tuwien.fundify.application.service.programs.ProgramVersioningService;
 import at.ac.tuwien.fundify.domain.funding.vo.enums.EEntryOrigin;
 import at.ac.tuwien.fundify.domain.funding.vo.enums.EIdentifierType;
+import at.ac.tuwien.fundify.domain.funding.vo.enums.EUpdateSource;
 import jakarta.enterprise.context.ApplicationScoped;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -32,7 +35,9 @@ public class FundingSynchronizer implements SyncExternalFundingsUseCase {
 
   private final FundingRemoteRepository fundingRemoteRepository;
   private final CallRepository callRepository;
+  private final CallVersioningService callVersioningService;
   private final ProgramRepository programRepository;
+  private final ProgramVersioningService programVersioningService;
   private final ProgramQuery programQuery;
   private final FunderRepository funderRepository;
 
@@ -81,6 +86,7 @@ public class FundingSynchronizer implements SyncExternalFundingsUseCase {
   }
 
   private void updateExistingProgram(Program program, Program existing) {
+    programVersioningService.createVersionIfChanged(existing, program, EUpdateSource.SYNC);
     program.setRegistrationDate(existing.getRegistrationDate());
     program.setId(existing.getId());
     programRepository.update(program);
@@ -115,6 +121,7 @@ public class FundingSynchronizer implements SyncExternalFundingsUseCase {
   }
 
   private void updateExistingCall(Call call, Call existing) {
+    callVersioningService.createVersionIfChanged(existing, call, EUpdateSource.SYNC);
     call.setRegistrationDate(existing.getRegistrationDate());
     call.setId(existing.getId());
     callRepository.update(call);

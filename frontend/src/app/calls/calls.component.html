@@ -103,6 +103,10 @@
                   </button>
                 }
               }
+            <button mat-menu-item (click)="onShowHistory(call)">
+                <mat-icon>history</mat-icon>
+                <span>{{ BUTTON_LABELS.HISTORY }}</span>
+            </button>
             </mat-menu>
           </mat-cell>
         </ng-container>

@@ -41,6 +41,8 @@ import { MatChip } from '@angular/material/chips';
 import { MatButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { MatTooltip } from '@angular/material/tooltip';
+import { MatDialog } from '@angular/material/dialog';
+import { CallVersionHistoryDialogComponent, CallVersionHistoryDialogData } from '../call-version-history-dialog/call-version-history-dialog.component';
 
 @Component({
   selector: 'app-call-detail-preview',
@@ -62,6 +64,7 @@ export class CallDetailPreviewComponent implements OnInit {
   private localStorageService = inject(LocalStorageService);
   private permissionService = inject(PermissionService);
   private validationService = inject(CallValidationService);
+  private dialog = inject(MatDialog);
 
   protected readonly CALL_DETAILS_CONSTANTS = CALL_DETAILS_CONSTANTS;
   protected readonly BUTTON_LABELS = BUTTON_LABELS;
@@ -95,6 +98,21 @@ export class CallDetailPreviewComponent implements OnInit {
 
   onPublish(): void {
     this.publish.emit(this.call);
+  }
+
+  onShowHistory(): void {
+    const data: CallVersionHistoryDialogData = {
+      callId: this.call.id!,
+      currentFields: {
+        name: this.call.name,
+        description: this.call.description,
+        eligibleApplicants: this.call.eligibleApplicants,
+        callStages: this.call.callStages,
+        callVolumeAmount: this.call.callVolumeAmount,
+        website: this.call.website,
+      },
+    };
+    this.dialog.open(CallVersionHistoryDialogComponent, { width: '680px', data });
   }
 
   private initPermissions(): void {

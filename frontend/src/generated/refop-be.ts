@@ -967,6 +967,58 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/calls/{id}/versions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Versions */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["CallVersionWebModel"][];
+                    };
+                };
+                /** @description Not Authorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Not Allowed */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/calls/{id}/subscriptions": {
         parameters: {
             query?: never;
@@ -1795,6 +1847,58 @@ export interface paths {
                 };
             };
         };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/programs/{id}/versions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Versions */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProgramVersionWebModel"][];
+                    };
+                };
+                /** @description Not Authorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Not Allowed */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -3287,6 +3391,27 @@ export interface components {
     WebLinkWebModel: {
       url?: string;
       description?: string;
+    };
+    EUpdateSourceWebModel: 'SYNC' | 'MANUAL';
+    CallVersionWebModel: {
+      id?: string;
+      callId?: string;
+      versionedAt?: components['schemas']['LocalDateTime'];
+      updateSource?: components['schemas']['EUpdateSourceWebModel'];
+      name?: components['schemas']['TranslatedTextWebModel'][];
+      description?: components['schemas']['TranslatedTextWebModel'][];
+      eligibleApplicants?: components['schemas']['TranslatedTextWebModel'][];
+      callStages?: components['schemas']['CallStageWebModel'][];
+      callVolumeAmount?: components['schemas']['MonetaryNumberWebModel'];
+      website?: string[];
+    };
+    ProgramVersionWebModel: {
+      id?: string;
+      programId?: string;
+      versionedAt?: components['schemas']['LocalDateTime'];
+      updateSource?: components['schemas']['EUpdateSourceWebModel'];
+      description?: components['schemas']['TranslatedTextWebModel'][];
+      duration?: components['schemas']['DateRangeWebModel'];
     };
   };
   responses: never;

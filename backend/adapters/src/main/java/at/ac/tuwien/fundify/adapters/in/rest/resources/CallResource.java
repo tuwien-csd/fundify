@@ -2,14 +2,17 @@ package at.ac.tuwien.fundify.adapters.in.rest.resources;
 
 import static at.ac.tuwien.fundify.adapters.in.rest.constants.FundingEntityMethodPath.BY_ID;
 import static at.ac.tuwien.fundify.adapters.in.rest.constants.FundingEntityMethodPath.ENTITY_UPDATE_SUBSCRIPTIONS;
+import static at.ac.tuwien.fundify.adapters.in.rest.constants.FundingEntityMethodPath.ENTITY_VERSIONS;
 import static at.ac.tuwien.fundify.adapters.in.rest.constants.FundingEntityMethodPath.PATH_PARAM_ID;
 import static at.ac.tuwien.fundify.adapters.in.rest.constants.FundingEntityMethodPath.QUERY_PARAM_STATUS;
 
 import at.ac.tuwien.fundify.adapters.in.rest.dto.CallCreateWebModel;
 import at.ac.tuwien.fundify.adapters.in.rest.dto.CallUpdateWebModel;
+import at.ac.tuwien.fundify.adapters.in.rest.dto.CallVersionWebModel;
 import at.ac.tuwien.fundify.adapters.in.rest.dto.enums.ESubscriptionStatusWebModel;
 import at.ac.tuwien.fundify.adapters.in.rest.dto.CallWebModel;
 import at.ac.tuwien.fundify.adapters.in.rest.exceptions.CallExceptionMapper;
+import at.ac.tuwien.fundify.adapters.in.rest.mapper.CallVersionWebModelMapper;
 import at.ac.tuwien.fundify.adapters.in.rest.mapper.CallWebModelMapper;
 import at.ac.tuwien.fundify.application.port.common.UserService;
 import at.ac.tuwien.fundify.application.port.in.calls.CallAccessor;
@@ -103,6 +106,12 @@ public class CallResource {
       throws EntityNotFoundException {
     String userId = userService.getCurrentUserId();
     return CallWebModelMapper.INSTANCE.fromDomain(callAccessor.getById(new CallId(callId)), userId);
+  }
+
+  @GET
+  @Path(ENTITY_VERSIONS)
+  public List<CallVersionWebModel> getVersions(@PathParam(PATH_PARAM_ID) String callId) {
+    return CallVersionWebModelMapper.fromDomain(callAccessor.getVersionsByCallId(new CallId(callId)));
   }
 
   @PATCH

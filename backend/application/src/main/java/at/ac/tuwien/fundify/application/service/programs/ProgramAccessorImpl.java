@@ -2,6 +2,7 @@ package at.ac.tuwien.fundify.application.service.programs;
 
 import at.ac.tuwien.fundify.application.port.in.programs.ProgramAccessor;
 import at.ac.tuwien.fundify.application.port.out.persistence.ProgramQuery;
+import at.ac.tuwien.fundify.application.port.out.persistence.ProgramVersionRepository;
 import at.ac.tuwien.fundify.application.service.common.BasePermissionService;
 import at.ac.tuwien.fundify.domain.common.EPublicationStatus;
 import at.ac.tuwien.fundify.domain.common.ETargetGroup;
@@ -10,7 +11,7 @@ import at.ac.tuwien.fundify.domain.common.ProgramId;
 import at.ac.tuwien.fundify.domain.common.RisId;
 import at.ac.tuwien.fundify.domain.common.exceptions.EntityNotFoundException;
 import at.ac.tuwien.fundify.domain.funding.Program;
-import at.ac.tuwien.fundify.domain.funding.ProgramReference;
+import at.ac.tuwien.fundify.domain.funding.ProgramVersion;
 import at.ac.tuwien.fundify.domain.funding.vo.enums.EAustrianState;
 import at.ac.tuwien.fundify.domain.funding.vo.enums.ERegionalScope;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -23,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 public class ProgramAccessorImpl implements ProgramAccessor {
 
     private final ProgramQuery programQuery;
+    private final ProgramVersionRepository programVersionRepository;
     private final BasePermissionService basePermissionService;
 
     @Override
@@ -40,21 +42,6 @@ public class ProgramAccessorImpl implements ProgramAccessor {
     }
 
     @Override
-    public List<Program> getByStatus(EPublicationStatus status) {
-        return programQuery.find(status);
-    }
-
-    @Override
-    public List<ProgramReference> getPublishedReferences() {
-        return programQuery.findReference(EPublicationStatus.PUBLISHED);
-    }
-
-    @Override
-    public List<Program> getByFunderAndStatus(FunderId funderId, EPublicationStatus status) {
-        return programQuery.find(funderId, status);
-    }
-
-    @Override
     public Program getProgramByRisIdAndStatus(RisId risId, EPublicationStatus status)
         throws EntityNotFoundException {
       final var program = programQuery.find(risId, EPublicationStatus.PUBLISHED);
@@ -69,14 +56,8 @@ public class ProgramAccessorImpl implements ProgramAccessor {
     }
 
     @Override
-    public ProgramReference getReference(ProgramId programId) throws EntityNotFoundException {
-        return programQuery.findReference(programId).orElseThrow(() -> EntityNotFoundException.programNotFound(
-            programId.value()));
-    }
-
-    @Override
-    public List<ProgramReference> getReferenceByFunder(FunderId funderId) {
-        return programQuery.findReference(funderId);
+    public List<ProgramVersion> getVersionsByProgramId(ProgramId programId) {
+        return programVersionRepository.findByProgramId(programId);
     }
 
     /**
