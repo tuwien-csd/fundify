@@ -40,7 +40,7 @@ fundify:
         id: "fwf-test"
         enabled: false
         base-url: "https://risapi.test.fwf.ac.at"
-        contact-email: "TODO TBD"
+        contact-email: ""
         credentials:
           id: "<set this in your .env in the bootstrap module>"
           secret: "<set this in your .env in the bootstrap module>"
@@ -49,7 +49,7 @@ fundify:
         id: "fwf"
         enabled: false
         base-url: "https://risapi.prod.fwf.ac.at"
-        contact-email: "TODO TBD"
+        contact-email: ""
         credentials:
           id: "<set this in your .env in the bootstrap module>"
           secret: "<set this in your .env in the bootstrap module>"
@@ -59,13 +59,13 @@ fundify:
         id: "wwtf"
         enabled: true
         base-url: "https://fundingportal.wwtf.at"
-        contact-email: "TODO TBD"
+        contact-email: ""
       eutender:
         # No auth needed, API is public
         id: "eutender"
         enabled: true
         base-url: "https://api.tech.ec.europa.eu/search-api/prod/rest/search?apiKey=SEDIA&text=***"
-        contact-email: "TODO TBD"
+        contact-email: ""
 frontend:
   auth:
     url: http://localhost:8083/realms/refop-dev
