@@ -72,11 +72,6 @@ public class KeycloakAdminUserRepository implements KeycloakUserRepository {
                 .formatted(email, response.getStatus()));
       }
       var id = CreatedResponseUtil.getCreatedId(response);
-
-      // email the user a link to perform the required actions (set their password)
-      keycloak.realm(realm).users().get(id)
-          .executeActionsEmail(List.of(UPDATE_PASSWORD_ACTION));
-
       return findById(id).orElseThrow(() -> new UnexpectedErrorException(
           "Created Keycloak user %s could not be read back".formatted(id)));
     }
