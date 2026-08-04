@@ -17,6 +17,11 @@ export class BackendServiceV2 {
     client.use({
       // Pass the authentication token in the Authorization header for every request if the user is authenticated
       onRequest: async ({ request }) => {
+        // Wait for the OAuth flow to initialize first: on a hard page reload the
+        // token is not available yet for the first few hundred ms, and requests
+        // fired in that window (e.g. by a root store's init hook) would go out
+        // anonymously and fail with a 401.
+        await this.authService.authInitialized;
         if (this.authService.isAuthenticated()) {
           request.headers.set(
             'Authorization',

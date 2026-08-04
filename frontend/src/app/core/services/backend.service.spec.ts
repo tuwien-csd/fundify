@@ -12,6 +12,8 @@ describe('BackendService', () => {
   beforeEach(() => {
     const authSpy = jasmine.createSpyObj('AuthService', [], {
       token: jasmine.createSpy(),
+      // Requests are deferred until the OAuth flow has initialized.
+      authInitialized: Promise.resolve(),
     });
     const httpRequestSpy = jasmine.createSpyObj('HttpRequestService', [
       'getBackendBaseUrl',
@@ -44,7 +46,7 @@ describe('BackendService', () => {
   });
 
   describe('get', () => {
-    it('should call httpRequestService.get with correct parameters', () => {
+    it('should call httpRequestService.get with correct parameters', async () => {
       const path = '/api/data';
       const mockResponse = { data: 'test' };
       // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: This was disabled during the proper setup of eslint. If you touch this code, fix it properly.
@@ -61,9 +63,8 @@ describe('BackendService', () => {
       httpRequestServiceMock.getBasicOptions.and.returnValue(mockBasicOptions);
       httpRequestServiceMock.get.and.returnValue(of(mockResponse));
 
-      service.get(path, mockOptions).subscribe((response) => {
-        expect(response).toEqual(mockResponse);
-      });
+      const response = await service.get(path, mockOptions).toPromise();
+      expect(response).toEqual(mockResponse);
 
       expect(httpRequestServiceMock.getBackendBaseUrl).toHaveBeenCalled();
       expect(httpRequestServiceMock.getBasicOptions).toHaveBeenCalledWith(
@@ -77,7 +78,7 @@ describe('BackendService', () => {
   });
 
   describe('post', () => {
-    it('should call httpRequestService.post with correct parameters', () => {
+    it('should call httpRequestService.post with correct parameters', async () => {
       const path = '/api/create';
       const body = { name: 'Test' };
       const mockResponse = { id: 1, name: 'Test' };
@@ -95,9 +96,8 @@ describe('BackendService', () => {
       httpRequestServiceMock.getBasicOptions.and.returnValue(mockBasicOptions);
       httpRequestServiceMock.post.and.returnValue(of(mockResponse));
 
-      service.post(path, body, mockOptions).subscribe((response) => {
-        expect(response).toEqual(mockResponse);
-      });
+      const response = await service.post(path, body, mockOptions).toPromise();
+      expect(response).toEqual(mockResponse);
 
       expect(httpRequestServiceMock.getBackendBaseUrl).toHaveBeenCalled();
       expect(httpRequestServiceMock.getBasicOptions).toHaveBeenCalledWith(
@@ -112,7 +112,7 @@ describe('BackendService', () => {
   });
 
   describe('put', () => {
-    it('should call httpRequestService.put with correct parameters', () => {
+    it('should call httpRequestService.put with correct parameters', async () => {
       const path = '/api/update/1';
       const body = { name: 'Updated Test' };
       const mockResponse = { id: 1, name: 'Updated Test' };
@@ -130,9 +130,8 @@ describe('BackendService', () => {
       httpRequestServiceMock.getBasicOptions.and.returnValue(mockBasicOptions);
       httpRequestServiceMock.put.and.returnValue(of(mockResponse));
 
-      service.put(path, body, mockOptions).subscribe((response) => {
-        expect(response).toEqual(mockResponse);
-      });
+      const response = await service.put(path, body, mockOptions).toPromise();
+      expect(response).toEqual(mockResponse);
 
       expect(httpRequestServiceMock.getBackendBaseUrl).toHaveBeenCalled();
       expect(httpRequestServiceMock.getBasicOptions).toHaveBeenCalledWith(
@@ -147,7 +146,7 @@ describe('BackendService', () => {
   });
 
   describe('delete', () => {
-    it('should call httpRequestService.delete with correct parameters', () => {
+    it('should call httpRequestService.delete with correct parameters', async () => {
       const path = '/api/delete/1';
       const mockResponse = { success: true };
       // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: This was disabled during the proper setup of eslint. If you touch this code, fix it properly.
@@ -164,9 +163,8 @@ describe('BackendService', () => {
       httpRequestServiceMock.getBasicOptions.and.returnValue(mockBasicOptions);
       httpRequestServiceMock.delete.and.returnValue(of(mockResponse));
 
-      service.delete(path, mockOptions).subscribe((response) => {
-        expect(response).toEqual(mockResponse);
-      });
+      const response = await service.delete(path, mockOptions).toPromise();
+      expect(response).toEqual(mockResponse);
 
       expect(httpRequestServiceMock.getBackendBaseUrl).toHaveBeenCalled();
       expect(httpRequestServiceMock.getBasicOptions).toHaveBeenCalledWith(
