@@ -6,6 +6,7 @@ import { UserRoleEnum } from '../models/user-role.enum';
 import { environment } from '../../../../environments/environment';
 import { filter, take } from 'rxjs/operators';
 import { ConfigService } from '../../services/config.service';
+import { Config } from '../../models/config.interface';
 
 export interface AuthState {
   user: User | null;
@@ -29,6 +30,20 @@ export class AuthService {
   // True once the OAuth flow has finished initializing (discovery doc loaded
   // and any persisted session restored). Used to know when token() is reliable.
   private oauthInitialized = signal(false);
+
+  private resolveAuthInitialized!: () => void;
+
+  /**
+   * Resolves once the OAuth flow has finished initializing, i.e. once `token()`
+   * is reliable. Backend requests must await this before reading the token:
+   * initialization is asynchronous (config + discovery document are fetched over
+   * the network), so anything firing a request during app startup - e.g. a
+   * root-provided store fetching in its init hook - would otherwise send an
+   * anonymous request and get a 401.
+   */
+  readonly authInitialized: Promise<void> = new Promise<void>((resolve) => {
+    this.resolveAuthInitialized = resolve;
+  });
 
   // selectors
   user = computed(() => this.state().user);
@@ -123,62 +138,72 @@ export class AuthService {
   private async init() {
     //Service is set up once the config service emits a loaded config
     this.configService.$config.pipe(take(1)).subscribe(async (config) => {
-      const authConfig: AuthConfig = {
-        issuer: config.authUrl,
-        clientId: config.authClient,
-        redirectUri: window.location.origin,
-        oidc: true,
-        scope: config.authScope,
-        responseType: 'code',
-        requireHttps: environment.production,
-        showDebugInformation: false,
-      };
-      this.oAuthService.configure(authConfig);
-      // Let OAuthService manage refresh by itself
-      this.oAuthService.setupAutomaticSilentRefresh();
-      await this.oAuthService.loadDiscoveryDocumentAndTryLogin();
-
-      this.oAuthService.events
-        .pipe(
-          filter(
-            (event) =>
-              event.type === 'token_received' ||
-              event.type === 'token_refreshed' ||
-              event.type === 'token_error' ||
-              event.type === 'session_terminated' ||
-              event.type === 'session_error'
-          )
-        )
-        .subscribe((event) => {
-          if (
-            event.type === 'token_received' ||
-            event.type === 'token_refreshed'
-          ) {
-            this.updateFromOAuth();
-          } else {
-            // Record the error/status and clear if session is terminated
-            this.state.update((s) => ({ ...s, error: event }));
-            if (
-              event.type === 'session_terminated' ||
-              event.type === 'session_error'
-            ) {
-              this.state.set({ user: null, token: null });
-            }
-          }
-        });
-
-      // Initialize state if tokens are already present (e.g., after app reload)
-      if (
-        this.oAuthService.hasValidAccessToken() &&
-        this.oAuthService.hasValidIdToken()
-      ) {
-        this.updateFromOAuth();
+      try {
+        await this.setupOAuth(config);
+      } catch (error) {
+        console.error('Error while initializing the OAuth flow: ', error);
+      } finally {
+        // Signal that auth init is done (token() is now reliable) so route guards
+        // and backend requests can stop waiting. Also runs on failure, otherwise
+        // everything waiting on auth would hang forever.
+        this.oauthInitialized.set(true);
+        this.resolveAuthInitialized();
       }
-
-      // Signal that auth init is done (token() is now reliable) so route guards
-      // can stop waiting and evaluate access.
-      this.oauthInitialized.set(true);
     });
+  }
+
+  private async setupOAuth(config: Config) {
+    const authConfig: AuthConfig = {
+      issuer: config.authUrl,
+      clientId: config.authClient,
+      redirectUri: window.location.origin,
+      oidc: true,
+      scope: config.authScope,
+      responseType: 'code',
+      requireHttps: environment.production,
+      showDebugInformation: false,
+    };
+    this.oAuthService.configure(authConfig);
+    // Let OAuthService manage refresh by itself
+    this.oAuthService.setupAutomaticSilentRefresh();
+    await this.oAuthService.loadDiscoveryDocumentAndTryLogin();
+
+    this.oAuthService.events
+      .pipe(
+        filter(
+          (event) =>
+            event.type === 'token_received' ||
+            event.type === 'token_refreshed' ||
+            event.type === 'token_error' ||
+            event.type === 'session_terminated' ||
+            event.type === 'session_error'
+        )
+      )
+      .subscribe((event) => {
+        if (
+          event.type === 'token_received' ||
+          event.type === 'token_refreshed'
+        ) {
+          this.updateFromOAuth();
+        } else {
+          // Record the error/status and clear if session is terminated
+          this.state.update((s) => ({ ...s, error: event }));
+          if (
+            event.type === 'session_terminated' ||
+            event.type === 'session_error'
+          ) {
+            this.state.set({ user: null, token: null });
+          }
+        }
+      });
+
+    // Initialize state if tokens are already present (e.g., after app reload)
+    if (
+      this.oAuthService.hasValidAccessToken() &&
+      this.oAuthService.hasValidIdToken()
+    ) {
+      this.updateFromOAuth();
+    }
   }
 
   private updateFromOAuth(): void {
