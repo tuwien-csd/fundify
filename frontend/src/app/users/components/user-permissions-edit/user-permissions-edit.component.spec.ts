@@ -32,6 +32,11 @@ describe('UserPermissionsEditComponent - registration requests', () => {
   // Controls what the confirmation dialog resolves to when closed.
   let dialogResult: boolean;
 
+  const KEYCLOAK_USERS = [{ id: 'user-1', email: 'existing@uni.org' }];
+  const USER_PERMISSIONS = [
+    { userId: 'user-1', roles: ['ANNOTATOR', 'FUNDER'], affiliationId: 'TUW' },
+  ];
+
   beforeEach(async () => {
     dialogResult = true;
     dialogMock = {
@@ -42,8 +47,8 @@ describe('UserPermissionsEditComponent - registration requests', () => {
 
     storeMock = {
       registrationRequests: () => [],
-      keycloakUsers: () => [],
-      userPermissions: () => [],
+      keycloakUsers: () => KEYCLOAK_USERS,
+      userPermissions: () => USER_PERMISSIONS,
       loadKeycloakUsers: jasmine.createSpy('loadKeycloakUsers'),
       loadUserPermissions: jasmine.createSpy('loadUserPermissions'),
       loadRegistrationRequests: jasmine.createSpy('loadRegistrationRequests'),
@@ -199,4 +204,22 @@ describe('UserPermissionsEditComponent - registration requests', () => {
     expect(storeMock.createUserAndUpdatePermissions).toHaveBeenCalled();
     expect(storeMock.deleteRegistrationRequest).not.toHaveBeenCalled();
   }));
+
+  it('prefills roles and affiliation when an existing user is selected', () => {
+    component['detailsForm'].controls.userId.setValue('user-1');
+
+    expect(component['detailsForm'].controls.roles.value).toEqual([
+      'ANNOTATOR',
+      'FUNDER',
+    ]);
+    expect(component['detailsForm'].controls.affiliationId.value).toBe('TUW');
+  });
+
+  it('clears the prefill when the selection changes to a new email', () => {
+    component['detailsForm'].controls.userId.setValue('user-1');
+    component['detailsForm'].controls.userId.setValue('new@uni.org');
+
+    expect(component['detailsForm'].controls.roles.value).toBeNull();
+    expect(component['detailsForm'].controls.affiliationId.value).toBe('');
+  });
 });
