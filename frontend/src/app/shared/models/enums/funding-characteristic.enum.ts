@@ -11,4 +11,5 @@ export enum FundingCharacteristicEnum {
   INFRASTRUCTURE = 'Infrastructure',
   NETWORKING = 'Networking',
   MOBILITY_PROGRAMME = 'Mobility Programme',
+  EU_FUNDING = 'EU-Funding',
 }

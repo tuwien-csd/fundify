@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { signal } from '@angular/core';
 
 import { CallAnnotationListComponent } from './call-annotation-list.component';
 import { Store } from '@ngrx/store';
@@ -16,8 +17,16 @@ import { PublicationStatusEnum } from '../../../shared/models/enums/publication-
 describe('CallAnnotationListComponent', () => {
   let component: CallAnnotationListComponent;
   let fixture: ComponentFixture<CallAnnotationListComponent>;
+  let isLoading: ReturnType<typeof signal<boolean>>;
+
+  const spinner = () =>
+    fixture.nativeElement.querySelector('.spinner-container');
+  const tableContainer = (): HTMLElement =>
+    fixture.nativeElement.querySelector('.table-wrapper');
 
   beforeEach(async () => {
+    isLoading = signal(true);
+
     const authSpy = jasmine.createSpyObj('AuthService', [], {
       userAffiliationId: jasmine.createSpy(),
     });
@@ -27,7 +36,12 @@ describe('CallAnnotationListComponent', () => {
         { provide: FormBuilder },
         {
           provide: Store,
-          useValue: { select: () => of(), dispatch: () => {} },
+          useValue: {
+            select: () => of(),
+            dispatch: () => {},
+            // the component only selects the loading flag as a signal
+            selectSignal: () => isLoading,
+          },
         },
         { provide: AuthService, useValue: authSpy },
         {
@@ -55,6 +69,19 @@ describe('CallAnnotationListComponent', () => {
     expect(component).toBeTruthy();
   });
 
+  it('should show the spinner and hide the table while the calls are loading', () => {
+    expect(spinner()).toBeTruthy();
+    expect(tableContainer().hidden).toBeTrue();
+  });
+
+  it('should hide the spinner and show the table once the calls are loaded', () => {
+    isLoading.set(false);
+    fixture.detectChanges();
+
+    expect(spinner()).toBeFalsy();
+    expect(tableContainer().hidden).toBeFalse();
+  });
+
   it('should exclude draft calls from the annotation list view', () => {
     const calls: Call[] = [
       { id: 'published-1', status: PublicationStatusEnum.PUBLISHED },
@@ -62,8 +89,16 @@ describe('CallAnnotationListComponent', () => {
       { id: 'published-2', status: PublicationStatusEnum.PUBLISHED },
     ];
 
-    type WithMerge = { mergeToListViewElements: (calls: Call[], annotatedCalls: AnnotatedCall[]) => CallAnnotationListViewElement[] };
-    const result = (component as unknown as WithMerge).mergeToListViewElements(calls, []);
+    type WithMerge = {
+      mergeToListViewElements: (
+        calls: Call[],
+        annotatedCalls: AnnotatedCall[]
+      ) => CallAnnotationListViewElement[];
+    };
+    const result = (component as unknown as WithMerge).mergeToListViewElements(
+      calls,
+      []
+    );
 
     expect(result.length).toBe(2);
     expect(result.map((e) => e.callId)).toEqual(['published-1', 'published-2']);

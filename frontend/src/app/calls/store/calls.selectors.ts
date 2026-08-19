@@ -5,6 +5,7 @@ import {
   callsAdapter,
 } from './calls.state';
 import { VocabularyTypeEnum } from '../models/vocabulary-type.enum';
+import { AsyncState } from '../../core/models/enums/async-state.enum';
 
 export const selectCallModuleState =
   createFeatureSelector<CallModuleState>('callsModule');
@@ -59,6 +60,15 @@ export const selectAnnotatedCallByCallId = (callId: string) =>
     selectAllAnnotatedCallEntities,
     (entities) => entities[callId]
   );
+
+/** True while either of the two lists the annotation list is built from is still loading. */
+export const selectCallAnnotationListLoading = createSelector(
+  selectCallsState,
+  selectAnnotatedCallsState,
+  (calls, annotatedCalls) =>
+    calls.state === AsyncState.LOADING ||
+    annotatedCalls.state === AsyncState.LOADING
+);
 
 // Vocabularies
 export const selectVocabularies = createSelector(

@@ -54,6 +54,7 @@ import { MatInput } from '@angular/material/input';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton, MatIconButton } from '@angular/material/button';
 import { MatSlideToggle } from '@angular/material/slide-toggle';
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { MatOption, MatSelect } from '@angular/material/select';
 import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
 import { RouterLink } from '@angular/router';
@@ -120,6 +121,7 @@ export type CallAnnotationListViewElement = {
     MatRow,
     MatPaginator,
     AnnotatedCallDisplayPipe,
+    MatProgressSpinner,
   ],
 })
 export class CallAnnotationListComponent
@@ -128,6 +130,10 @@ export class CallAnnotationListComponent
   private store = inject(Store);
   private fundersStore = inject(FundersStore);
   private fb = inject(FormBuilder);
+
+  protected isLoading = this.store.selectSignal(
+    fromCalls.selectCallAnnotationListLoading
+  );
 
   protected readonly BUTTON_LABELS = BUTTON_LABELS;
   protected readonly ROUTER_LINKS = ROUTER_LINKS;
@@ -309,30 +315,32 @@ export class CallAnnotationListComponent
     calls: Call[],
     annotatedCalls: AnnotatedCall[]
   ): CallAnnotationListViewElement[] {
-    return calls.filter((call) => call.status !== PublicationStatusEnum.DRAFT).map((call) => {
-      const annotatedCall = annotatedCalls.find(
-        (aCall) => aCall.callPreview?.id === call.id
-      );
-      return {
-        callId: call.id,
-        callScope: call.eligibleApplicantsScope,
-        callRegions: call.eligibleApplicantsRegions ?? [],
-        callStatus: call.status,
-        callStartDate: call.callStages?.[0].duration?.start,
-        callEndDate:
-          call.callStages?.[call.callStages.length - 1]?.duration?.end,
-        callFunderId: call.funder?.id,
-        annotatedCallId: annotatedCall?.id ?? '',
-        registrationDate: call.registrationDate,
-        lastSync: call.lastSync,
-        name: call.name ?? [],
-        partOf: call.partOf?.name ?? [],
-        funder: call.funder?.name ?? [],
-        status: annotatedCall?.status,
-        lastUpdatedAt: annotatedCall?.lastUpdatedAt ?? '',
-        lastUpdatedBy: annotatedCall?.lastUpdatedBy,
-      } as CallAnnotationListViewElement;
-    });
+    return calls
+      .filter((call) => call.status !== PublicationStatusEnum.DRAFT)
+      .map((call) => {
+        const annotatedCall = annotatedCalls.find(
+          (aCall) => aCall.callPreview?.id === call.id
+        );
+        return {
+          callId: call.id,
+          callScope: call.eligibleApplicantsScope,
+          callRegions: call.eligibleApplicantsRegions ?? [],
+          callStatus: call.status,
+          callStartDate: call.callStages?.[0].duration?.start,
+          callEndDate:
+            call.callStages?.[call.callStages.length - 1]?.duration?.end,
+          callFunderId: call.funder?.id,
+          annotatedCallId: annotatedCall?.id ?? '',
+          registrationDate: call.registrationDate,
+          lastSync: call.lastSync,
+          name: call.name ?? [],
+          partOf: call.partOf?.name ?? [],
+          funder: call.funder?.name ?? [],
+          status: annotatedCall?.status,
+          lastUpdatedAt: annotatedCall?.lastUpdatedAt ?? '',
+          lastUpdatedBy: annotatedCall?.lastUpdatedBy,
+        } as CallAnnotationListViewElement;
+      });
   }
 
   private filterPredicate(

@@ -66,67 +66,79 @@
           }
         </div>
       </form>
-      <mat-table [dataSource]="dataSource" matSort class="calls-table">
-        @for (
-          column of CALL_ANNOTATION_LIST_CONSTANTS.TABLE_COLUMNS;
-          track column
-        ) {
-          <ng-container [matColumnDef]="column.field">
-            <mat-header-cell *matHeaderCellDef mat-sort-header>
-              {{ column.header }}</mat-header-cell
-            >
+      @if (isLoading()) {
+        <div class="spinner-container">
+          <mat-spinner diameter="40"></mat-spinner>
+        </div>
+      }
+      <!-- kept in the DOM while loading, so the static sort/paginator queries still resolve -->
+      <div class="table-wrapper" [hidden]="isLoading()">
+        <mat-table [dataSource]="dataSource" matSort class="calls-table">
+          @for (
+            column of CALL_ANNOTATION_LIST_CONSTANTS.TABLE_COLUMNS;
+            track column
+          ) {
+            <ng-container [matColumnDef]="column.field">
+              <mat-header-cell *matHeaderCellDef mat-sort-header>
+                {{ column.header }}</mat-header-cell
+              >
+              <mat-cell *matCellDef="let listViewEl">
+                {{
+                  listViewEl
+                    | displayCallAnnotationListViewElement: column.field
+                }}
+              </mat-cell>
+            </ng-container>
+          }
+          <ng-container matColumnDef="menu">
+            <mat-header-cell *matHeaderCellDef></mat-header-cell>
             <mat-cell *matCellDef="let listViewEl">
-              {{
-                listViewEl | displayCallAnnotationListViewElement: column.field
-              }}
+              <button
+                mat-icon-button
+                [matMenuTriggerFor]="menu"
+                (click)="$event.stopPropagation()"
+              >
+                <mat-icon>more_vert</mat-icon>
+              </button>
+              <mat-menu #menu="matMenu">
+                <button mat-menu-item [routerLink]="[listViewEl.callId]">
+                  <mat-icon>edit</mat-icon>
+                  <span>{{
+                    listViewEl?.status
+                      ? BUTTON_LABELS.EDIT
+                      : BUTTON_LABELS.ANNOTATE
+                  }}</span>
+                </button>
+                @if (listViewEl?.annotatedCallId) {
+                  <button
+                    mat-menu-item
+                    (click)="
+                      this.onDelete(
+                        listViewEl.annotatedCallId,
+                        listViewEl.callId
+                      )
+                    "
+                  >
+                    <mat-icon>delete</mat-icon>
+                    <span>{{ BUTTON_LABELS.DELETE }}</span>
+                  </button>
+                }
+              </mat-menu>
             </mat-cell>
           </ng-container>
-        }
-        <ng-container matColumnDef="menu">
-          <mat-header-cell *matHeaderCellDef></mat-header-cell>
-          <mat-cell *matCellDef="let listViewEl">
-            <button
-              mat-icon-button
-              [matMenuTriggerFor]="menu"
-              (click)="$event.stopPropagation()"
-            >
-              <mat-icon>more_vert</mat-icon>
-            </button>
-            <mat-menu #menu="matMenu">
-              <button mat-menu-item [routerLink]="[listViewEl.callId]">
-                <mat-icon>edit</mat-icon>
-                <span>{{
-                  listViewEl?.status
-                    ? BUTTON_LABELS.EDIT
-                    : BUTTON_LABELS.ANNOTATE
-                }}</span>
-              </button>
-              @if (listViewEl?.annotatedCallId) {
-                <button
-                  mat-menu-item
-                  (click)="
-                    this.onDelete(listViewEl.annotatedCallId, listViewEl.callId)
-                  "
-                >
-                  <mat-icon>delete</mat-icon>
-                  <span>{{ BUTTON_LABELS.DELETE }}</span>
-                </button>
-              }
-            </mat-menu>
-          </mat-cell>
-        </ng-container>
-        <mat-header-row
-          *matHeaderRowDef="displayedColumnsWithMenu"
-        ></mat-header-row>
-        <mat-row
-          *matRowDef="let row; columns: displayedColumnsWithMenu"
-          [routerLink]="[row.callId]"
-        ></mat-row>
-      </mat-table>
-      <mat-paginator
-        [pageSizeOptions]="[10, 20, 30]"
-        [showFirstLastButtons]="true"
-      ></mat-paginator>
+          <mat-header-row
+            *matHeaderRowDef="displayedColumnsWithMenu"
+          ></mat-header-row>
+          <mat-row
+            *matRowDef="let row; columns: displayedColumnsWithMenu"
+            [routerLink]="[row.callId]"
+          ></mat-row>
+        </mat-table>
+        <mat-paginator
+          [pageSizeOptions]="[10, 20, 30]"
+          [showFirstLastButtons]="true"
+        ></mat-paginator>
+      </div>
     </mat-card-content>
   </mat-card>
 </div>

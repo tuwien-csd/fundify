@@ -6,6 +6,7 @@ export class FundingCharacteristicUtil {
       FundingCharacteristicEnum.INTERNATIONAL_PROGRAMME,
       FundingCharacteristicEnum.BILATERAL_PROGRAMME,
       FundingCharacteristicEnum.NATIONAL_PROGRAMME,
+      FundingCharacteristicEnum.EU_FUNDING,
     ];
   }
   public static typeCharacteristics(): FundingCharacteristicEnum[] {
