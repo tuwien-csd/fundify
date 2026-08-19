@@ -42,7 +42,10 @@ import { MatButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { MatTooltip } from '@angular/material/tooltip';
 import { MatDialog } from '@angular/material/dialog';
-import { CallVersionHistoryDialogComponent, CallVersionHistoryDialogData } from '../call-version-history-dialog/call-version-history-dialog.component';
+import {
+  CallVersionHistoryDialogComponent,
+  CallVersionHistoryDialogData,
+} from '../call-version-history-dialog/call-version-history-dialog.component';
 
 @Component({
   selector: 'app-call-detail-preview',
@@ -112,7 +115,10 @@ export class CallDetailPreviewComponent implements OnInit {
         website: this.call.website,
       },
     };
-    this.dialog.open(CallVersionHistoryDialogComponent, { width: '680px', data });
+    this.dialog.open(CallVersionHistoryDialogComponent, {
+      width: '680px',
+      data,
+    });
   }
 
   private initPermissions(): void {
@@ -151,10 +157,14 @@ export class CallDetailPreviewComponent implements OnInit {
         label: this.CALL_DETAILS_CONSTANTS.RIS_ID_LABEL,
         value: this.call.risId ?? CALL_DETAILS_CONSTANTS.PLACEHOLDER,
       },
-      ...(this.getEuId() ? [{
-        label: this.CALL_DETAILS_CONSTANTS.EU_ID_LABEL,
-        value: this.getEuId()!,
-      }] : []),
+      ...(this.getEuId()
+        ? [
+            {
+              label: this.CALL_DETAILS_CONSTANTS.EU_ID_LABEL,
+              value: this.getEuId()!,
+            },
+          ]
+        : []),
       {
         label: this.CALL_DETAILS_CONSTANTS.PART_OF_LABEL,
         value: this.formatFundingRef(this.call.partOf),
@@ -257,30 +267,30 @@ export class CallDetailPreviewComponent implements OnInit {
           this.call.eligibleApplicantsScope ??
           CALL_DETAILS_CONSTANTS.PLACEHOLDER,
       },
-       {
-         label: this.CALL_DETAILS_CONSTANTS.ELIGIBLE_APPLICANTS_REGION_LABEL,
-         value:
-           this.call.eligibleApplicantsRegions?.join(', ') ??
-           CALL_DETAILS_CONSTANTS.PLACEHOLDER,
-       },
-       {
-         label: this.CALL_DETAILS_CONSTANTS.ELIGIBLE_TARGET_REGIONS_LABEL,
-         value:
-           this.call.eligibleTargetRegions?.join(', ') ??
-           CALL_DETAILS_CONSTANTS.PLACEHOLDER,
-       },
-       {
-         label: this.CALL_DETAILS_CONSTANTS.ELIGIBLE_SOURCE_REGIONS_LABEL,
-         value:
-           this.call.eligibleSourceRegions?.join(', ') ??
-           CALL_DETAILS_CONSTANTS.PLACEHOLDER,
-       },
-       {
-         label: this.CALL_DETAILS_CONSTANTS.MODE_OF_SUBMISSION_LABEL,
-         value:
-           this.call.submissionModes?.join(', ') ??
-           CALL_DETAILS_CONSTANTS.PLACEHOLDER,
-       },
+      {
+        label: this.CALL_DETAILS_CONSTANTS.ELIGIBLE_APPLICANTS_REGION_LABEL,
+        value:
+          this.call.eligibleApplicantsRegions?.join(', ') ??
+          CALL_DETAILS_CONSTANTS.PLACEHOLDER,
+      },
+      {
+        label: this.CALL_DETAILS_CONSTANTS.ELIGIBLE_TARGET_REGIONS_LABEL,
+        value:
+          this.call.eligibleTargetRegions?.join(', ') ??
+          CALL_DETAILS_CONSTANTS.PLACEHOLDER,
+      },
+      {
+        label: this.CALL_DETAILS_CONSTANTS.ELIGIBLE_SOURCE_REGIONS_LABEL,
+        value:
+          this.call.eligibleSourceRegions?.join(', ') ??
+          CALL_DETAILS_CONSTANTS.PLACEHOLDER,
+      },
+      {
+        label: this.CALL_DETAILS_CONSTANTS.MODE_OF_SUBMISSION_LABEL,
+        value:
+          this.call.submissionModes?.join(', ') ??
+          CALL_DETAILS_CONSTANTS.PLACEHOLDER,
+      },
       {
         label: this.CALL_DETAILS_CONSTANTS.CHARACTERISTICS_LABEL,
         value:
@@ -349,10 +359,15 @@ export class CallDetailPreviewComponent implements OnInit {
     ];
   }
 
+  /**
+   * The stored EU ID carries the internal ccm2 id of the call as a suffix
+   * (e.g. 'HORIZON-CL5-2027-07-D3-17-[50161357]') to stay unique for syncing.
+   * Only the topic identifier is of interest for the user, so the suffix is hidden.
+   */
   private getEuId(): string | undefined {
-    return this.call.identifiers?.find(
-      (i) => i.type === IdentifierTypeEnum.EU_ID
-    )?.value;
+    return this.call.identifiers
+      ?.find((i) => i.type === IdentifierTypeEnum.EU_ID)
+      ?.value?.replace(/-\[[^\]]*]$/, '');
   }
 
   private formatDateRange(
@@ -391,7 +406,11 @@ export class CallDetailPreviewComponent implements OnInit {
     if (!monetaryNumber || monetaryNumber.amount == null) {
       return this.CALL_DETAILS_CONSTANTS.PLACEHOLDER;
     }
-    return monetaryNumber.amount.toLocaleString('de-DE') + ' ' + monetaryNumber.currency;
+    return (
+      monetaryNumber.amount.toLocaleString('de-DE') +
+      ' ' +
+      monetaryNumber.currency
+    );
   }
 
   private formatTranslatedTextList(

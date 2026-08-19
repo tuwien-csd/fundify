@@ -43,7 +43,11 @@ import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
 import { CallDisplayPipe } from './pipes/call-display.pipe';
 import { CallsStore } from './signal/calls-store';
 import { MatDialog } from '@angular/material/dialog';
-import { CallVersionHistoryDialogComponent, CallVersionHistoryDialogData } from './components/call-version-history-dialog/call-version-history-dialog.component';
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
+import {
+  CallVersionHistoryDialogComponent,
+  CallVersionHistoryDialogData,
+} from './components/call-version-history-dialog/call-version-history-dialog.component';
 
 @Component({
   selector: 'app-calls',
@@ -79,11 +83,14 @@ import { CallVersionHistoryDialogComponent, CallVersionHistoryDialogData } from 
     MatRow,
     MatPaginator,
     CallDisplayPipe,
+    MatProgressSpinner,
   ],
 })
 export class CallsComponent {
   private callsStore = inject(CallsStore);
   private dialog = inject(MatDialog);
+
+  protected isLoading = this.callsStore.isLoading;
 
   protected readonly CALL_CONSTANTS = CALLS_CONSTANTS;
   protected readonly BUTTON_LABELS = BUTTON_LABELS;
@@ -171,7 +178,10 @@ export class CallsComponent {
         website: call.website,
       },
     };
-    this.dialog.open(CallVersionHistoryDialogComponent, { width: '680px', data });
+    this.dialog.open(CallVersionHistoryDialogComponent, {
+      width: '680px',
+      data,
+    });
   }
 
   private applyFilters() {
@@ -240,6 +250,8 @@ export class CallsComponent {
     const funderNames: string[] = [];
     call.name?.forEach((name) => names.push(name.text));
     call.funder?.name?.forEach((name) => funderNames.push(name.text));
-    return names.join('') + funderNames.join('') + call.acronym + (call.id ?? '');
+    return (
+      names.join('') + funderNames.join('') + call.acronym + (call.id ?? '')
+    );
   }
 }

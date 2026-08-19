@@ -17,7 +17,6 @@ import at.ac.tuwien.fundify.adapters.common.ris.model.v1.RisOrganisationFundingR
 import at.ac.tuwien.fundify.adapters.common.ris.model.v1.RisSubject;
 import at.ac.tuwien.fundify.adapters.common.ris.model.v1.RisSubmissionMode;
 import at.ac.tuwien.fundify.adapters.common.ris.model.v1.RisText;
-import at.ac.tuwien.fundify.adapters.common.ris.model.v1.RisTimeSpan;
 import at.ac.tuwien.fundify.adapters.common.ris.model.v1.RisTranslationEnum;
 import at.ac.tuwien.fundify.adapters.common.ris.model.v1.RisVolume;
 import at.ac.tuwien.fundify.adapters.in.rest.constants.SubjectStore;
@@ -30,6 +29,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import lombok.extern.jbosslog.JBossLog;
@@ -79,7 +80,7 @@ public class EuTenderToRisMapper {
 
         call.setFunder(List.of(europeanCommissionFunder()));
 
-        call.setCharacteristics(List.of(RisFundingCharacteristic.INTERNATIONAL_PROGRAMME));
+        call.setCharacteristics(List.of(RisFundingCharacteristic.EU_FUNDING));
 
         call.setTargetGroups(new ArrayList<>());
 
@@ -88,35 +89,97 @@ public class EuTenderToRisMapper {
 
         call.setLegalType(RisLegalType.PROJECT27);
         call.setApplicationLanguages(List.of("en"));
-        call.setFullyFunded(false);
+        call.setFullyFunded(null);
         call.setSubmissionModes(List.of(RisSubmissionMode.ONLINE_FULL));
 
-        RisTimeSpan minDuration = new RisTimeSpan();
-        minDuration.setMonths(12);
-        call.setMinProjectDuration(minDuration);
+        call.setMinProjectDuration(null);
+        call.setMaxProjectDuration(null);
 
-        RisTimeSpan maxDuration = new RisTimeSpan();
-        maxDuration.setMonths(60);
-        call.setMaxProjectDuration(maxDuration);
+        call.setAmount(topicVolume(parseBudget(meta), meta));
 
-        EuTenderBudgetOverview budget = parseBudget(meta);
-        if (budget != null && budget.getBudgetTopicActionMap() != null) {
-            long total = budget.getBudgetTopicActionMap().values().stream()
-                .flatMap(List::stream)
-                .filter(a -> a.getBudgetYearMap() != null)
-                .flatMap(a -> a.getBudgetYearMap().values().stream())
-                .mapToLong(Long::longValue)
-                .sum();
-            if (total > 0) {
-                RisVolume volume = new RisVolume();
-                volume.setCurrency("EUR");
-                volume.setAmount(BigDecimal.valueOf(total));
-                call.setAmount(volume);
-            }
+        call.setDmpRequired(true);
+        call.setDmpGuidelines("DMP required for submission");
+         return call;
+    }
 
+    /**
+     * Relevant is the budget available for this topic (project), not the total volume of the call,
+     * so only the budget entry belonging to this topic is summed up.
+     */
+    private RisVolume topicVolume(EuTenderBudgetOverview budget, EuTenderMetadata meta) {
+        if (budget == null || budget.getBudgetTopicActionMap() == null || budget.getBudgetTopicActionMap().isEmpty()) {
+            return null;
         }
 
-        return call;
+        List<EuTenderBudgetOverview.BudgetTopicAction> topicActions =
+            findTopicActions(budget.getBudgetTopicActionMap(), meta);
+
+        long total = sumBudget(topicActions);
+        if (total > 0) {
+            return null;
+        }
+
+        RisVolume volume = new RisVolume();
+        volume.setCurrency("EUR");
+        volume.setAmount(BigDecimal.valueOf(total));
+        return volume;
+    }
+
+    /**
+     * The budget overview covers the whole call, keyed by topic ccm2 id. Falls back to matching the
+     * action prefix against the topic identifier, and to the single entry if the call has only one topic.
+     */
+    private List<EuTenderBudgetOverview.BudgetTopicAction> findTopicActions(
+        Map<String, List<EuTenderBudgetOverview.BudgetTopicAction>> budgetTopicActionMap, EuTenderMetadata meta) {
+
+        String topicId = first(meta != null ? meta.getCcm2Id() : null);
+        if (topicId != null && budgetTopicActionMap.containsKey(topicId)) {
+            return budgetTopicActionMap.get(topicId);
+        }
+
+        String identifier = first(meta != null ? meta.getIdentifier() : null);
+        if (identifier != null) {
+            List<EuTenderBudgetOverview.BudgetTopicAction> byAction = budgetTopicActionMap.values().stream()
+                .filter(Objects::nonNull)
+                .flatMap(List::stream)
+                .filter(Objects::nonNull)
+                .filter(a -> a.getAction() != null
+                    && (a.getAction().equals(identifier) || a.getAction().startsWith(identifier + " ")))
+                .toList();
+            if (!byAction.isEmpty()) {
+                return byAction;
+            }
+        }
+
+        if (budgetTopicActionMap.size() == 1) {
+            return budgetTopicActionMap.values().iterator().next();
+        }
+
+        return null;
+    }
+
+    private long sumBudget(List<EuTenderBudgetOverview.BudgetTopicAction> actions) {
+        if (actions == null) {
+            return 0;
+        }
+        long sum = 0;
+        for (EuTenderBudgetOverview.BudgetTopicAction action : actions) {
+            if (action == null) {
+                continue;
+            }
+            if (action.getBudgetYearMap() != null && !action.getBudgetYearMap().isEmpty()) {
+                sum += action.getBudgetYearMap().values().stream()
+                    .filter(Objects::nonNull)
+                    .mapToLong(Long::longValue)
+                    .sum();
+            } else if (action.getBudgetTopicActionMap() != null) {
+                // only descend when the action itself carries no budget, otherwise sub-actions are counted twice
+                for (List<EuTenderBudgetOverview.BudgetTopicAction> nested : action.getBudgetTopicActionMap().values()) {
+                    sum += sumBudget(nested);
+                }
+            }
+        }
+        return sum;
     }
 
     private List<EuTenderAction> parseActions(EuTenderMetadata meta) {

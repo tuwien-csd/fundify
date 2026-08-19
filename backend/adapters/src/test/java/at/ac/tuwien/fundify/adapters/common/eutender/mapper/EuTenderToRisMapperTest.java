@@ -4,6 +4,7 @@ import at.ac.tuwien.fundify.adapters.common.eutender.model.EuTenderMetadata;
 import at.ac.tuwien.fundify.adapters.common.eutender.model.EuTenderResult;
 import at.ac.tuwien.fundify.adapters.common.ris.model.v1.RisCall;
 import at.ac.tuwien.fundify.adapters.common.ris.model.v1.RisFunding;
+import at.ac.tuwien.fundify.adapters.common.ris.model.v1.RisFundingCharacteristic;
 import at.ac.tuwien.fundify.adapters.common.ris.model.v1.RisFundingType;
 import org.junit.jupiter.api.Test;
 
@@ -66,6 +67,13 @@ class EuTenderToRisMapperTest {
         assertNotNull(call.getFunder());
         assertEquals(1, call.getFunder().size());
         assertEquals("ec-european-commission", call.getFunder().getFirst().getFunder().getId());
+    }
+
+    @Test
+    void toRisCall_setsEuFundingCharacteristic() {
+        RisCall call = (RisCall) mapper.toRisCall(resultWith(metaWithTitle("Test")));
+
+        assertEquals(List.of(RisFundingCharacteristic.EU_FUNDING), call.getCharacteristics());
     }
 
     @Test
@@ -157,8 +165,66 @@ class EuTenderToRisMapperTest {
     }
 
     @Test
-    void toRisCall_withBudgetAcrossMultipleTopics_sumsTotalAmount() {
+    void toRisCall_withBudgetAcrossMultipleTopics_usesOwnTopicBudgetOnly() {
         EuTenderMetadata meta = metaWithTitle("Budget Test");
+        meta.setCcm2Id(List.of("topic2"));
+        meta.setBudgetOverview(List.of("""
+            {
+              "budgetTopicActionMap": {
+                "topic1": [{"budgetYearMap": {"2023": 3000000}}],
+                "topic2": [{"budgetYearMap": {"2023": 2000000, "2024": 500000}}]
+              }
+            }
+            """));
+
+        RisCall call = (RisCall) mapper.toRisCall(resultWith(meta));
+
+        assertNotNull(call.getAmount());
+        assertEquals(0, BigDecimal.valueOf(2500000).compareTo(call.getAmount().getAmount()));
+        assertEquals("EUR", call.getAmount().getCurrency());
+    }
+
+    @Test
+    void toRisCall_withoutCcm2Id_matchesTopicByActionIdentifier() {
+        EuTenderMetadata meta = metaWithTitle("Budget Test");
+        meta.setIdentifier(List.of("HORIZON-CL4-2023-DIGITAL-01-02"));
+        meta.setBudgetOverview(List.of("""
+            {
+              "budgetTopicActionMap": {
+                "111": [{"action": "HORIZON-CL4-2023-DIGITAL-01-01 - RIA", "budgetYearMap": {"2023": 3000000}}],
+                "222": [{"action": "HORIZON-CL4-2023-DIGITAL-01-02 - RIA", "budgetYearMap": {"2023": 2000000}}]
+              }
+            }
+            """));
+
+        RisCall call = (RisCall) mapper.toRisCall(resultWith(meta));
+
+        assertNotNull(call.getAmount());
+        assertEquals(0, BigDecimal.valueOf(2000000).compareTo(call.getAmount().getAmount()));
+    }
+
+    @Test
+    void toRisCall_withSingleTopicBudget_usesThatTopic() {
+        EuTenderMetadata meta = metaWithTitle("Budget Test");
+        meta.setBudgetOverview(List.of("""
+            {
+              "budgetTopicActionMap": {
+                "topic1": [{"budgetYearMap": {"2023": 3000000}}]
+              }
+            }
+            """));
+
+        RisCall call = (RisCall) mapper.toRisCall(resultWith(meta));
+
+        assertNotNull(call.getAmount());
+        assertEquals(0, BigDecimal.valueOf(3000000).compareTo(call.getAmount().getAmount()));
+    }
+
+    @Test
+    void toRisCall_withUnmatchableTopicBudget_doesNotSetAmount() {
+        EuTenderMetadata meta = metaWithTitle("Budget Test");
+        meta.setCcm2Id(List.of("topic3"));
+        meta.setIdentifier(List.of("HORIZON-UNKNOWN"));
         meta.setBudgetOverview(List.of("""
             {
               "budgetTopicActionMap": {
@@ -171,12 +237,11 @@ class EuTenderToRisMapperTest {
         RisCall call = (RisCall) mapper.toRisCall(resultWith(meta));
 
         assertNotNull(call.getAmount());
-        assertEquals(0, BigDecimal.valueOf(5000000).compareTo(call.getAmount().getAmount()));
-        assertEquals("EUR", call.getAmount().getCurrency());
+        assertEquals(0, BigDecimal.ZERO.compareTo(call.getAmount().getAmount()));
     }
 
     @Test
-    void toRisCall_withZeroBudget_doesNotSetAmount() {
+    void toRisCall_withZeroBudget_setsZeroAmount() {
         EuTenderMetadata meta = metaWithTitle("Zero Budget");
         meta.setBudgetOverview(List.of("""
             {
@@ -188,7 +253,8 @@ class EuTenderToRisMapperTest {
 
         RisCall call = (RisCall) mapper.toRisCall(resultWith(meta));
 
-        assertNull(call.getAmount());
+        assertNotNull(call.getAmount());
+        assertEquals(0, BigDecimal.ZERO.compareTo(call.getAmount().getAmount()));
     }
 
     @Test

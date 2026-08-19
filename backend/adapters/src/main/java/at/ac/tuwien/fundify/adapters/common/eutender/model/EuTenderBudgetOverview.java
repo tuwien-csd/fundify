@@ -36,7 +36,7 @@ import lombok.Setter;
 public class EuTenderBudgetOverview {
 
     /**
-     * Keys are internal topic-action IDs.
+     * Keys are the topic ccm2 IDs of the call ({@code metadata.ccm2Id}).
      * Values are lists of {@link BudgetTopicAction} entries.
      */
     private Map<String, List<BudgetTopicAction>> budgetTopicActionMap;
