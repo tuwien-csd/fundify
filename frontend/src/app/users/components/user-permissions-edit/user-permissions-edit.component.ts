@@ -39,6 +39,7 @@ import { SelectFieldComponent } from '../../../shared/components/select-field/se
 import { SearchSelectComponent } from '../../../shared/components/search-select/search-select.component';
 import { UsersStore } from '../../signal/users-store';
 import { UniversitiesStore } from '../../../universities/signal/universities-store';
+import { FundersStore } from '../../../funders/signal/funders-store';
 import { NotificationService } from '../../../shared/services/notification-service.service';
 import {
   REGISTRATION_REQUESTS_CONSTANTS,
@@ -86,6 +87,7 @@ export class UserPermissionsEditComponent {
   private fb = new FormBuilder();
   protected store = inject(UsersStore);
   private universitiesStore = inject(UniversitiesStore);
+  private fundersStore = inject(FundersStore);
   private notificationService = inject(NotificationService);
   private dialog = inject(MatDialog);
 
@@ -102,20 +104,31 @@ export class UserPermissionsEditComponent {
     }))
   );
 
-  // Affiliation is stored as the university acronym (see getUniversityByAcronym).
-  // Universities without an acronym cannot be a valid affiliation, so skip them.
-  protected affiliationOptions = computed(() =>
-    this.universitiesStore
-      .entities()
-      .filter((u) => !!u.acronym)
-      .map((u) => {
-        const name = u.name?.[0]?.text;
-        return {
-          value: u.acronym!,
-          label: name ? `${u.acronym} — ${name}` : u.acronym!,
-        };
-      })
-  );
+  // Affiliation is stored as the institution acronym and matched case-insensitively
+  // against both universities and funders (see BasePermissionServiceImpl), so both
+  // are offered here. Institutions without an acronym cannot be a valid affiliation,
+  // so they are skipped; an acronym shared by a university and a funder is listed once.
+  protected affiliationOptions = computed(() => {
+    const institutions = [
+      ...this.universitiesStore.entities(),
+      ...this.fundersStore.entities(),
+    ];
+    const optionsByAcronym = new Map<string, { value: string; label: string }>();
+    for (const institution of institutions) {
+      const acronym = institution.acronym;
+      if (!acronym) continue;
+      const key = acronym.toLowerCase();
+      if (optionsByAcronym.has(key)) continue;
+      const name = institution.name?.[0]?.text;
+      optionsByAcronym.set(key, {
+        value: acronym,
+        label: name ? `${acronym} — ${name}` : acronym,
+      });
+    }
+    return [...optionsByAcronym.values()].sort((a, b) =>
+      a.label.localeCompare(b.label)
+    );
+  });
 
   // Ids of users that already exist in Keycloak. Used to tell apart an existing
   // selection (the control holds a Keycloak id) from a freshly typed email.
