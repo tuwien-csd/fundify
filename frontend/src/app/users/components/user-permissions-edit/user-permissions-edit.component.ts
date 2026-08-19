@@ -123,6 +123,17 @@ export class UserPermissionsEditComponent {
     () => new Set(this.store.keycloakUsers().map((u) => u.id ?? ''))
   );
 
+  // Current permissions per user id, used to prefill the form when an existing
+  // user is selected.
+  private permissionsByUserId = computed(
+    () =>
+      new Map(
+        this.store
+          .userPermissions()
+          .map((permission) => [permission.userId ?? '', permission])
+      )
+  );
+
   protected readonly displayedColumns =
     USER_PERMISSIONS_CONSTANTS.TABLE_COLUMNS.map((column) => column.field);
 
@@ -173,6 +184,24 @@ export class UserPermissionsEditComponent {
     this.detailsForm.statusChanges.subscribe((status) => {
       this.formValidSignal.set(status === 'VALID');
     });
+    this.detailsForm.controls.userId.valueChanges.subscribe((userId) =>
+      this.prefillFromExistingPermissions(userId)
+    );
+  }
+
+  // Selecting an existing user shows their current roles and affiliation as the
+  // starting point, so the admin edits from the actual state instead of a blank
+  // form. Anything else (a cleared field, a freshly typed email) starts empty.
+  private prefillFromExistingPermissions(userId: string | null): void {
+    const permission = userId
+      ? this.permissionsByUserId().get(userId)
+      : undefined;
+    this.detailsForm.controls.roles.setValue(
+      permission?.roles?.length ? [...permission.roles] : null
+    );
+    this.detailsForm.controls.affiliationId.setValue(
+      permission?.affiliationId ?? ''
+    );
   }
 
   onSave(): void {
