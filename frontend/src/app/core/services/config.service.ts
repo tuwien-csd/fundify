@@ -11,7 +11,7 @@ import { catchError, map } from 'rxjs/operators';
 export class ConfigService {
   http = inject(HttpClient);
 
-  private config!: Config;
+  private config?: Config;
   $config = new Subject<Config>();
 
   public initializeApp(): Observable<boolean> {
@@ -32,8 +32,8 @@ export class ConfigService {
     );
   }
 
-  public getEnvironment() {
-    return this.config.env;
+  public getEnvironment(): string | undefined {
+    return this.config?.env;
   }
 
   private loadConfig(): Observable<Config> {
