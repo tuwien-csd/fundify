@@ -11,6 +11,7 @@ import { of } from 'rxjs';
 import { UserPermissionsEditComponent } from './user-permissions-edit.component';
 import { UsersStore } from '../../signal/users-store';
 import { UniversitiesStore } from '../../../universities/signal/universities-store';
+import { FundersStore } from '../../../funders/signal/funders-store';
 import { NotificationService } from '../../../shared/services/notification-service.service';
 
 describe('UserPermissionsEditComponent - registration requests', () => {
@@ -35,6 +36,15 @@ describe('UserPermissionsEditComponent - registration requests', () => {
   const KEYCLOAK_USERS = [{ id: 'user-1', email: 'existing@uni.org' }];
   const USER_PERMISSIONS = [
     { userId: 'user-1', roles: ['ANNOTATOR', 'FUNDER'], affiliationId: 'TUW' },
+  ];
+  const UNIVERSITIES = [
+    { acronym: 'TUW', name: [{ text: 'TU Wien' }] },
+    { acronym: 'SHARED', name: [{ text: 'Shared University' }] },
+    { acronym: undefined, name: [{ text: 'No acronym' }] },
+  ];
+  const FUNDERS = [
+    { acronym: 'FWF', name: [{ text: 'Austrian Science Fund' }] },
+    { acronym: 'shared', name: [{ text: 'Shared Funder' }] },
   ];
 
   beforeEach(async () => {
@@ -68,7 +78,8 @@ describe('UserPermissionsEditComponent - registration requests', () => {
       imports: [UserPermissionsEditComponent],
       providers: [
         { provide: UsersStore, useValue: storeMock },
-        { provide: UniversitiesStore, useValue: { entities: () => [] } },
+        { provide: UniversitiesStore, useValue: { entities: () => UNIVERSITIES } },
+        { provide: FundersStore, useValue: { entities: () => FUNDERS } },
         { provide: MatDialog, useValue: dialogMock },
         {
           provide: NotificationService,
@@ -92,6 +103,15 @@ describe('UserPermissionsEditComponent - registration requests', () => {
 
   it('loads registration requests on init', () => {
     expect(storeMock.loadRegistrationRequests).toHaveBeenCalled();
+  });
+
+  it('offers universities and funders as affiliations, deduplicated by acronym', () => {
+    const values = component['affiliationOptions']().map((o) => o.value);
+
+    expect(values).toEqual(['FWF', 'SHARED', 'TUW']);
+    expect(component['affiliationOptions']()[0].label).toBe(
+      'FWF — Austrian Science Fund'
+    );
   });
 
   it('prefills email and maps Funder -> FUNDER role', () => {
