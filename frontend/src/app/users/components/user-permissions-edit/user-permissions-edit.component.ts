@@ -165,12 +165,19 @@ export class UserPermissionsEditComponent {
         .keycloakUsers()
         .map((u) => [u.id ?? '', u.email ?? u.username ?? u.id ?? ''])
     );
-    return this.store.userPermissions().map((permission) => ({
-      userId: permission.userId ?? '',
-      email: emailByUserId.get(permission.userId ?? '') ?? permission.userId,
-      roles: (permission.roles ?? []).join(', '),
-      affiliationId: permission.affiliationId ?? '',
-    }));
+    return this.store
+      .userPermissions()
+      .map((permission) => ({
+        userId: permission.userId ?? '',
+        email: emailByUserId.get(permission.userId ?? '') ?? permission.userId,
+        roles: (permission.roles ?? []).join(', '),
+        affiliationId: permission.affiliationId ?? '',
+      }))
+      .sort(
+        (a, b) =>
+          a.affiliationId.localeCompare(b.affiliationId) ||
+          (a.email ?? '').localeCompare(b.email ?? '')
+      );
   });
 
   formValidSignal = signal(false);
