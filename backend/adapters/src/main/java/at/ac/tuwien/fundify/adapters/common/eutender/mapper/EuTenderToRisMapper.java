@@ -115,9 +115,6 @@ public class EuTenderToRisMapper {
             findTopicActions(budget.getBudgetTopicActionMap(), meta);
 
         long total = sumBudget(topicActions);
-        if (total > 0) {
-            return null;
-        }
 
         RisVolume volume = new RisVolume();
         volume.setCurrency("EUR");

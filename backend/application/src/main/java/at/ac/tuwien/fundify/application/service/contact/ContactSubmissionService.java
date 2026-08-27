@@ -29,7 +29,6 @@ public class ContactSubmissionService implements ContactSubmissionUseCase {
           submission.email(),
           submission.kindOfInstitution(),
           submission.message());
-      return;
     }
     ticketingService.createTicket(submission);
   }
