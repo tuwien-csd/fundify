@@ -185,7 +185,7 @@ export class CallDetailPreviewComponent implements OnInit {
       },
       {
         label: this.CALL_DETAILS_CONSTANTS.TARGET_GROUP_SPECIFIED_LABEL,
-        value: this.formatTranslatedText(this.call.targetGroupDetails),
+        value: this.formatTranslatedText(this.call.targetGroupSpecified),
       },
       {
         label: this.CALL_DETAILS_CONSTANTS.CAREER_STAGE_LABEL,
