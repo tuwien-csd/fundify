@@ -28,7 +28,7 @@ class RegistrationRequestTest {
   void getAll_returnsPendingRequests() {
     // arrange
     when(registrationRequestUseCase.getAll()).thenReturn(List.of(
-        new RegistrationRequest("id-1", "Jane Doe", "jane@funder.org", "Funder", "Add me",
+        new RegistrationRequest("id-1", "Jane", "Doe", "jane@funder.org", "Funder", "Add me",
             Instant.parse("2026-06-24T08:00:00Z"))));
 
     // act & assert
@@ -38,6 +38,8 @@ class RegistrationRequestTest {
         .then()
         .statusCode(200)
         .body("[0].id", is("id-1"))
+        .body("[0].firstName", is("Jane"))
+        .body("[0].lastName", is("Doe"))
         .body("[0].email", is("jane@funder.org"))
         .body("[0].kindOfInstitution", is("Funder"));
   }

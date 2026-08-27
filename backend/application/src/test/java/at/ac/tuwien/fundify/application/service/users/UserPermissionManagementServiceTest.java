@@ -12,6 +12,7 @@ import at.ac.tuwien.fundify.application.port.out.keycloak.KeycloakUserRepository
 import at.ac.tuwien.fundify.application.port.out.persistence.UserPermissionRepository;
 import at.ac.tuwien.fundify.domain.common.KeycloakUser;
 import at.ac.tuwien.fundify.domain.common.UserPermissionHolder;
+import at.ac.tuwien.fundify.domain.common.UserProvisioning;
 import at.ac.tuwien.fundify.domain.common.UserRole;
 import java.util.List;
 import java.util.Optional;
@@ -71,12 +72,14 @@ class UserPermissionManagementServiceTest {
     when(userPermissionRepository.upsert(expected)).thenReturn(expected);
 
     // act
-    var result = service.createUserWithPermissions("known@univie.ac.at", roles, affiliationId);
+    var result = service.createUserWithPermissions(new UserProvisioning(
+        "known@univie.ac.at", "Known", "User", roles, affiliationId));
 
     // assert
     assertEquals(expected, result);
     verify(userPermissionRepository).upsert(expected);
-    verify(keycloakUserRepository, never()).create(any(), any());
+    // an existing account is reused as-is: its name is deliberately not overwritten
+    verify(keycloakUserRepository, never()).create(any());
   }
 
   @Test
@@ -84,19 +87,21 @@ class UserPermissionManagementServiceTest {
     // arrange
     var affiliationId = "univie";
     var roles = List.of(UserRole.FUNDER);
+    var provisioning = new UserProvisioning(
+        "new@univie.ac.at", "New", "User", roles, affiliationId);
     when(keycloakUserRepository.findByEmail("new@univie.ac.at")).thenReturn(Optional.empty());
-    when(keycloakUserRepository.create("new@univie.ac.at", affiliationId))
-        .thenReturn(new KeycloakUser("new-id", "new@univie.ac.at", "new@univie.ac.at", null, null,
+    when(keycloakUserRepository.create(provisioning))
+        .thenReturn(new KeycloakUser("new-id", "new@univie.ac.at", "new@univie.ac.at", "New", "User",
             true));
     var expected = new UserPermissionHolder("new-id", roles, affiliationId);
     when(userPermissionRepository.upsert(expected)).thenReturn(expected);
 
     // act
-    var result = service.createUserWithPermissions("new@univie.ac.at", roles, affiliationId);
+    var result = service.createUserWithPermissions(provisioning);
 
     // assert
     assertEquals(expected, result);
-    verify(keycloakUserRepository).create("new@univie.ac.at", affiliationId);
+    verify(keycloakUserRepository).create(provisioning);
     verify(userPermissionRepository).upsert(expected);
   }
 

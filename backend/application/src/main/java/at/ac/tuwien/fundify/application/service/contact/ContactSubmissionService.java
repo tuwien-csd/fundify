@@ -24,7 +24,8 @@ public class ContactSubmissionService implements ContactSubmissionUseCase {
   public void submit(TicketCreate submission) throws FundifyException {
     if (isRegistration(submission)) {
       registrationRequestUseCase.submit(
-          submission.name(),
+          submission.firstName(),
+          submission.lastName(),
           submission.email(),
           submission.kindOfInstitution(),
           submission.message());

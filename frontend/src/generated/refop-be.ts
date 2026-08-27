@@ -3294,7 +3294,8 @@ export interface components {
         };
         RegistrationRequest: {
             id?: string;
-            name?: string;
+            firstName?: string;
+            lastName?: string;
             email?: string;
             kindOfInstitution?: string;
             message?: string;
@@ -3307,7 +3308,8 @@ export interface components {
             title: string;
         };
         TicketCreateWebModel: {
-            name: string;
+            firstName: string;
+            lastName: string;
             subject: string;
             category: string;
             email: string;
@@ -3364,6 +3366,8 @@ export interface components {
         };
         UserCreationWebModel: {
             email: string;
+            firstName: string;
+            lastName: string;
             roles: components["schemas"]["UserRole"][];
             affiliationId: string;
         };

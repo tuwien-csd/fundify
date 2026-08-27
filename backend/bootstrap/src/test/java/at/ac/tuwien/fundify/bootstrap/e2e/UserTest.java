@@ -2,8 +2,10 @@ package at.ac.tuwien.fundify.bootstrap.e2e;
 
 import static io.restassured.RestAssured.given;
 
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import at.ac.tuwien.fundify.adapters.in.rest.dto.UserCreationWebModel;
 import at.ac.tuwien.fundify.adapters.in.rest.dto.UserPermissionsUpdateWebModel;
 import at.ac.tuwien.fundify.adapters.in.rest.resources.UserResource;
 import at.ac.tuwien.fundify.adapters.out.persistence.mongo.user.UserPermissionMongoRepository;
@@ -12,6 +14,7 @@ import at.ac.tuwien.fundify.bootstrap.utils.users.WithAdminUser;
 import at.ac.tuwien.fundify.bootstrap.utils.users.WithFFGFunderUser;
 import at.ac.tuwien.fundify.domain.common.KeycloakUser;
 import at.ac.tuwien.fundify.domain.common.UserPermissionHolder;
+import at.ac.tuwien.fundify.domain.common.UserProvisioning;
 import at.ac.tuwien.fundify.domain.common.UserRole;
 import io.quarkus.cache.Cache;
 import io.quarkus.cache.CacheName;
@@ -26,6 +29,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 @QuarkusTest
 @TestHTTPEndpoint(UserResource.class)
@@ -184,6 +188,92 @@ class UserTest {
       given()
           .when()
           .get()
+          .then()
+          .statusCode(403);
+    }
+  }
+
+  @Nested
+  @TestHTTPEndpoint(UserResource.class)
+  class CreateUser {
+
+    @Test
+    @WithAdminUser
+    void givenAdmin_whenCreateUnknownUser_thenProvisionsKeycloakUserWithName() {
+      when(keycloakUserRepository.findByEmail("new@univie.ac.at"))
+          .thenReturn(java.util.Optional.empty());
+      when(keycloakUserRepository.create(org.mockito.ArgumentMatchers.any()))
+          .thenReturn(new KeycloakUser(
+              "kc-new", "new@univie.ac.at", "new@univie.ac.at", "Jane", "Doe", true));
+
+      UserCreationWebModel createRequest = new UserCreationWebModel(
+          "new@univie.ac.at",
+          "Jane",
+          "Doe",
+          List.of(UserRole.ANNOTATOR),
+          "univie");
+
+      UserPermissionHolder created = given()
+          .contentType(ContentType.JSON)
+          .body(createRequest)
+          .when()
+          .post()
+          .then()
+          .statusCode(200)
+          .extract()
+          .as(UserPermissionHolder.class);
+
+      Assertions.assertEquals("kc-new", created.userId());
+      Assertions.assertEquals("univie", created.affiliationId());
+
+      // the given name and surname must reach Keycloak, otherwise the realm's
+      // full-name mapper cannot produce a `name` claim for the new account
+      ArgumentCaptor<UserProvisioning> captor = ArgumentCaptor.forClass(UserProvisioning.class);
+      verify(keycloakUserRepository).create(captor.capture());
+      var provisioning = captor.getValue();
+      Assertions.assertEquals("new@univie.ac.at", provisioning.email());
+      Assertions.assertEquals("Jane", provisioning.firstName());
+      Assertions.assertEquals("Doe", provisioning.lastName());
+
+      var fromDb = userPermissionRepository.findByUserId("kc-new").orElseThrow();
+      Assertions.assertEquals("univie", fromDb.affiliationId());
+      Assertions.assertTrue(fromDb.roles().contains(UserRole.ANNOTATOR));
+    }
+
+    @Test
+    @WithAdminUser
+    void givenAdmin_whenCreateWithBlankName_thenBadRequest() {
+      UserCreationWebModel createRequest = new UserCreationWebModel(
+          "new@univie.ac.at",
+          " ",
+          "",
+          List.of(UserRole.ANNOTATOR),
+          "univie");
+
+      given()
+          .contentType(ContentType.JSON)
+          .body(createRequest)
+          .when()
+          .post()
+          .then()
+          .statusCode(400);
+    }
+
+    @Test
+    @WithFFGFunderUser
+    void givenNonAdmin_whenCreateUser_thenForbidden() {
+      UserCreationWebModel createRequest = new UserCreationWebModel(
+          "new@univie.ac.at",
+          "Jane",
+          "Doe",
+          List.of(UserRole.ANNOTATOR),
+          "univie");
+
+      given()
+          .contentType(ContentType.JSON)
+          .body(createRequest)
+          .when()
+          .post()
           .then()
           .statusCode(403);
     }

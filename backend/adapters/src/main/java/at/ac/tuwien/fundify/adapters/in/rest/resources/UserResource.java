@@ -69,8 +69,8 @@ public class UserResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @RolesAllowed(UserRole.Names.ADMIN)
     public UserPermissionHolder createUser(@Valid UserCreationWebModel createInput) {
-      return userPermissionManagementUseCase.createUserWithPermissions(
-          createInput.email(), createInput.roles(), createInput.affiliationId());
+      var provisioning = UserPermissionsWebModelMapper.INSTANCE.toDomain(createInput);
+      return userPermissionManagementUseCase.createUserWithPermissions(provisioning);
     }
 
     @DELETE

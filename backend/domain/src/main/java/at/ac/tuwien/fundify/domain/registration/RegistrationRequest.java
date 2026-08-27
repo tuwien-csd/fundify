@@ -11,7 +11,8 @@ import java.time.Instant;
  */
 public record RegistrationRequest(
     String id,
-    String name,
+    String firstName,
+    String lastName,
     String email,
     String kindOfInstitution,
     String message,

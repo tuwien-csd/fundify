@@ -35,7 +35,7 @@ class RegistrationRequestServiceTest {
         .thenAnswer(invocation -> invocation.getArgument(0));
 
     // act
-    var result = service.submit("Jane Doe", "jane@funder.org", "Funder", "Please add me");
+    var result = service.submit("Jane", "Doe", "jane@funder.org", "Funder", "Please add me");
 
     // assert
     ArgumentCaptor<RegistrationRequest> captor =
@@ -44,7 +44,8 @@ class RegistrationRequestServiceTest {
     var saved = captor.getValue();
     assertNotNull(saved.id());
     assertNotNull(saved.createdAt());
-    assertEquals("Jane Doe", saved.name());
+    assertEquals("Jane", saved.firstName());
+    assertEquals("Doe", saved.lastName());
     assertEquals("jane@funder.org", saved.email());
     assertEquals("Funder", saved.kindOfInstitution());
     assertEquals("Please add me", saved.message());
@@ -55,7 +56,8 @@ class RegistrationRequestServiceTest {
   void getAll_delegatesToRepository() {
     // arrange
     List<RegistrationRequest> requests = List.of(
-        new RegistrationRequest("id-1", "A", "a@x.org", "Funder", "msg", java.time.Instant.now()));
+        new RegistrationRequest(
+            "id-1", "A", "B", "a@x.org", "Funder", "msg", java.time.Instant.now()));
     when(registrationRequestRepository.findAllRequests()).thenReturn(requests);
 
     // act

@@ -8,7 +8,8 @@ public interface RegistrationRequestUseCase {
   /**
    * Persists a new pending registration request submitted via the contact form.
    */
-  RegistrationRequest submit(String name, String email, String kindOfInstitution, String message);
+  RegistrationRequest submit(String firstName, String lastName, String email,
+      String kindOfInstitution, String message);
 
   /**
    * Returns all pending registration requests. Every stored request is pending by

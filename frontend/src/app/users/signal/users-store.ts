@@ -116,12 +116,14 @@ export const UsersStore = signalStore(
     },
     async createUserAndUpdatePermissions(
       email: string,
+      firstName: string,
+      lastName: string,
       roles: string[],
       affiliationId: string
     ): Promise<boolean> {
       try {
         const response = await backendService.client.POST('/api/users', {
-          body: { email, roles: roles as never, affiliationId },
+          body: { email, firstName, lastName, roles: roles as never, affiliationId },
         });
         if (response.data) {
           notificationService.success(USER_PERMISSIONS_CONSTANTS.UPDATE_SUCCESS);

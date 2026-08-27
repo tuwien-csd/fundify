@@ -29,7 +29,8 @@ import { MatProgressSpinner } from '@angular/material/progress-spinner';
 type ContactForm = {
   subject: FormControl<string>;
   category: FormControl<ContactFormCategories | null>;
-  name: FormControl<string>;
+  firstName: FormControl<string>;
+  lastName: FormControl<string>;
   email: FormControl<string>;
   kindOfInstitution: FormControl<typeof InstitutionKindEnum | null>;
   message: FormControl<string>;
@@ -85,10 +86,17 @@ type ContactForm = {
         />
 
         <app-text-field
-          formControlName="name"
-          [label]="CONTACT_FORM_CONSTANTS.NAME.LABEL"
-          [textLabel]="CONTACT_FORM_CONSTANTS.NAME.LABEL"
-          [placeholder]="CONTACT_FORM_CONSTANTS.NAME.PLACEHOLDER"
+          formControlName="firstName"
+          [label]="CONTACT_FORM_CONSTANTS.FIRST_NAME.LABEL"
+          [textLabel]="CONTACT_FORM_CONSTANTS.FIRST_NAME.LABEL"
+          [placeholder]="CONTACT_FORM_CONSTANTS.FIRST_NAME.PLACEHOLDER"
+          [required]="true"
+        />
+        <app-text-field
+          formControlName="lastName"
+          [label]="CONTACT_FORM_CONSTANTS.LAST_NAME.LABEL"
+          [textLabel]="CONTACT_FORM_CONSTANTS.LAST_NAME.LABEL"
+          [placeholder]="CONTACT_FORM_CONSTANTS.LAST_NAME.PLACEHOLDER"
           [required]="true"
         />
         <app-text-field
@@ -155,7 +163,11 @@ export class ContactFormComponent {
     category: new FormControl(null, {
       validators: [Validators.required],
     }),
-    name: new FormControl('', {
+    firstName: new FormControl('', {
+      validators: [Validators.required],
+      nonNullable: true,
+    }),
+    lastName: new FormControl('', {
       validators: [Validators.required],
       nonNullable: true,
     }),

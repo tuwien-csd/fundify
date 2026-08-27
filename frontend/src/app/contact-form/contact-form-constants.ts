@@ -11,11 +11,19 @@ export const CONTACT_FORM_CONSTANTS = {
       INVALID: 'Invalid input',
     },
   },
-  NAME: {
-    LABEL: 'Name',
-    PLACEHOLDER: 'Enter your name',
+  FIRST_NAME: {
+    LABEL: 'Given name',
+    PLACEHOLDER: 'Enter your given name',
     ERROR: {
-      REQUIRED: 'Name is required',
+      REQUIRED: 'Given name is required',
+      INVALID: 'Invalid input',
+    },
+  },
+  LAST_NAME: {
+    LABEL: 'Surname',
+    PLACEHOLDER: 'Enter your surname',
+    ERROR: {
+      REQUIRED: 'Surname is required',
       INVALID: 'Invalid input',
     },
   },

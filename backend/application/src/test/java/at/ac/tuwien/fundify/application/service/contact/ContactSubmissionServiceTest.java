@@ -33,13 +33,14 @@ class ContactSubmissionServiceTest {
   void submit_registrationCategory_capturesRequestAndSkipsTicketing() throws FundifyException {
     // arrange
     var submission = new TicketCreate(
-        "Jane Doe", "Account please", "registration", "jane@funder.org", "Add me", "Funder");
+        "Jane", "Doe", "Account please", "registration", "jane@funder.org", "Add me", "Funder");
 
     // act
     service.submit(submission);
 
     // assert
-    verify(registrationRequestUseCase).submit("Jane Doe", "jane@funder.org", "Funder", "Add me");
+    verify(registrationRequestUseCase)
+        .submit("Jane", "Doe", "jane@funder.org", "Funder", "Add me");
     verifyNoInteractions(ticketingService);
   }
 
@@ -47,13 +48,14 @@ class ContactSubmissionServiceTest {
   void submit_registrationCategory_isCaseInsensitive() throws FundifyException {
     // arrange
     var submission = new TicketCreate(
-        "Jane Doe", "Account please", "Registration", "jane@funder.org", "Add me", "Funder");
+        "Jane", "Doe", "Account please", "Registration", "jane@funder.org", "Add me", "Funder");
 
     // act
     service.submit(submission);
 
     // assert
-    verify(registrationRequestUseCase).submit("Jane Doe", "jane@funder.org", "Funder", "Add me");
+    verify(registrationRequestUseCase)
+        .submit("Jane", "Doe", "jane@funder.org", "Funder", "Add me");
     verifyNoInteractions(ticketingService);
   }
 
@@ -61,7 +63,7 @@ class ContactSubmissionServiceTest {
   void submit_nonRegistrationCategory_createsTicketAndSkipsRegistration() throws FundifyException {
     // arrange
     var submission = new TicketCreate(
-        "John Doe", "Bug", "error", "john@x.org", "Something broke", null);
+        "John", "Doe", "Bug", "error", "john@x.org", "Something broke", null);
 
     // act
     service.submit(submission);
