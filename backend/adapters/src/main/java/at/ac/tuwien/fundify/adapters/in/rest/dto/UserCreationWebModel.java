@@ -14,6 +14,12 @@ public record UserCreationWebModel(
     @Email
     String email,
     @Schema(required = true)
+    @NotBlank
+    String firstName,
+    @Schema(required = true)
+    @NotBlank
+    String lastName,
+    @Schema(required = true)
     @NotNull
     List<UserRole> roles,
     @Schema(required = true)

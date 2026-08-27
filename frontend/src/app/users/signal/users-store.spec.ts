@@ -7,18 +7,32 @@ import { components } from '../../../generated/refop-be';
 type RegistrationRequest = components['schemas']['RegistrationRequest'];
 
 const REQUESTS: RegistrationRequest[] = [
-  { id: 'req-1', name: 'Jane', email: 'jane@funder.org', kindOfInstitution: 'Funder' },
-  { id: 'req-2', name: 'John', email: 'john@uni.org', kindOfInstitution: 'Research Institute' },
+  {
+    id: 'req-1',
+    firstName: 'Jane',
+    lastName: 'Doe',
+    email: 'jane@funder.org',
+    kindOfInstitution: 'Funder',
+  },
+  {
+    id: 'req-2',
+    firstName: 'John',
+    lastName: 'Roe',
+    email: 'john@uni.org',
+    kindOfInstitution: 'Research Institute',
+  },
 ];
 
 describe('UsersStore - registration requests', () => {
   let getSpy: jasmine.Spy;
   let deleteSpy: jasmine.Spy;
+  let postSpy: jasmine.Spy;
   let notificationServiceSpy: jasmine.SpyObj<NotificationService>;
 
   function configure(): InstanceType<typeof UsersStore> {
     getSpy = jasmine.createSpy('GET');
     deleteSpy = jasmine.createSpy('DELETE');
+    postSpy = jasmine.createSpy('POST');
     notificationServiceSpy = jasmine.createSpyObj('NotificationService', [
       'success',
       'error',
@@ -26,7 +40,12 @@ describe('UsersStore - registration requests', () => {
 
     TestBed.configureTestingModule({
       providers: [
-        { provide: BackendServiceV2, useValue: { client: { GET: getSpy, DELETE: deleteSpy } } },
+        {
+          provide: BackendServiceV2,
+          useValue: {
+            client: { GET: getSpy, DELETE: deleteSpy, POST: postSpy },
+          },
+        },
         { provide: NotificationService, useValue: notificationServiceSpy },
       ],
     });
@@ -70,5 +89,29 @@ describe('UsersStore - registration requests', () => {
     expect(result).toBeFalse();
     expect(store.registrationRequests().length).toBe(2);
     expect(notificationServiceSpy.error).toHaveBeenCalled();
+  });
+
+  it('createUserAndUpdatePermissions posts the given name and surname', async () => {
+    const store = configure();
+    postSpy.and.returnValue(Promise.resolve({ data: { userId: 'kc-new' } }));
+
+    const result = await store.createUserAndUpdatePermissions(
+      'jane@funder.org',
+      'Jane',
+      'Doe',
+      ['FUNDER'],
+      'FFG'
+    );
+
+    expect(result).toBeTrue();
+    expect(postSpy).toHaveBeenCalledWith('/api/users', {
+      body: {
+        email: 'jane@funder.org',
+        firstName: 'Jane',
+        lastName: 'Doe',
+        roles: ['FUNDER'],
+        affiliationId: 'FFG',
+      },
+    });
   });
 });

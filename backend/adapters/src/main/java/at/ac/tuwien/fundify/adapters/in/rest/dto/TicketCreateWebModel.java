@@ -7,7 +7,10 @@ import org.eclipse.microprofile.openapi.annotations.media.Schema;
 public record TicketCreateWebModel(
     @Schema(required = true)
     @NotBlank
-    String name,
+    String firstName,
+    @Schema(required = true)
+    @NotBlank
+    String lastName,
     @Schema(required = true)
     @NotBlank
     String subject,

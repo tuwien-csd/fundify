@@ -19,6 +19,16 @@
                             [allowCustomValues]="true"
                             placeholder="User (Search or enter a new email)*"
                     />
+                    <app-text-field
+                            formControlName="firstName"
+                            [textLabel]="USER_PERMISSIONS_CONSTANTS.FIRST_NAME_LABEL"
+                            [required]="true"
+                    />
+                    <app-text-field
+                            formControlName="lastName"
+                            [textLabel]="USER_PERMISSIONS_CONSTANTS.LAST_NAME_LABEL"
+                            [required]="true"
+                    />
                     <app-select-field
                             formControlName="roles"
                             [textLabel]="USER_PERMISSIONS_CONSTANTS.ROLES_LABEL"
@@ -53,11 +63,17 @@
           [dataSource]="registrationRows()"
           class="user-permissions-table"
         >
-          <ng-container matColumnDef="name">
+          <ng-container matColumnDef="firstName">
             <mat-header-cell *matHeaderCellDef>
-              {{ REGISTRATION_REQUESTS_CONSTANTS.NAME_LABEL }}
+              {{ REGISTRATION_REQUESTS_CONSTANTS.FIRST_NAME_LABEL }}
             </mat-header-cell>
-            <mat-cell *matCellDef="let row">{{ row.name }}</mat-cell>
+            <mat-cell *matCellDef="let row">{{ row.firstName }}</mat-cell>
+          </ng-container>
+          <ng-container matColumnDef="lastName">
+            <mat-header-cell *matHeaderCellDef>
+              {{ REGISTRATION_REQUESTS_CONSTANTS.LAST_NAME_LABEL }}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">{{ row.lastName }}</mat-cell>
           </ng-container>
           <ng-container matColumnDef="email">
             <mat-header-cell *matHeaderCellDef>
@@ -129,6 +145,18 @@
             {{ USER_PERMISSIONS_CONSTANTS.EMAIL_LABEL }}
           </mat-header-cell>
           <mat-cell *matCellDef="let row">{{ row.email }}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="firstName">
+          <mat-header-cell *matHeaderCellDef>
+            {{ USER_PERMISSIONS_CONSTANTS.FIRST_NAME_LABEL }}
+          </mat-header-cell>
+          <mat-cell *matCellDef="let row">{{ row.firstName }}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="lastName">
+          <mat-header-cell *matHeaderCellDef>
+            {{ USER_PERMISSIONS_CONSTANTS.LAST_NAME_LABEL }}
+          </mat-header-cell>
+          <mat-cell *matCellDef="let row">{{ row.lastName }}</mat-cell>
         </ng-container>
         <ng-container matColumnDef="roles">
           <mat-header-cell *matHeaderCellDef>

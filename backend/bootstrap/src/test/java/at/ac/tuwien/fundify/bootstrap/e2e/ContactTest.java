@@ -34,7 +34,8 @@ class ContactTest {
     void givenValidRequest_whenCreate_thenReturnsNoContentAndDelegatesToService() throws FundifyException {
         // arrange
         TicketCreateWebModel request = new TicketCreateWebModel(
-                "John Doe",
+                "John",
+                "Doe",
                 "Issue with registration",
                 "SUPPORT",
                 "john.doe@example.com",
@@ -55,7 +56,8 @@ class ContactTest {
         ArgumentCaptor<TicketCreate> captor = ArgumentCaptor.forClass(TicketCreate.class);
         verify(ticketingService).createTicket(captor.capture());
         TicketCreate captured = captor.getValue();
-        assertEquals(request.name(), captured.name());
+        assertEquals(request.firstName(), captured.firstName());
+        assertEquals(request.lastName(), captured.lastName());
         assertEquals(request.subject(), captured.subject());
         assertEquals(request.category(), captured.category());
         assertEquals(request.email(), captured.email());
@@ -68,7 +70,8 @@ class ContactTest {
     void givenRegistrationCategory_whenCreate_thenCapturesRequestAndSkipsTicketing() {
         // arrange
         TicketCreateWebModel request = new TicketCreateWebModel(
-                "Jane Doe",
+                "Jane",
+                "Doe",
                 "Account please",
                 "registration",
                 "jane@funder.org",
@@ -87,7 +90,7 @@ class ContactTest {
 
         // registration requests are captured in Fundify, not filed as tickets
         verify(registrationRequestUseCase)
-                .submit("Jane Doe", "jane@funder.org", "Funder", "I would like an account.");
+                .submit("Jane", "Doe", "jane@funder.org", "Funder", "I would like an account.");
         verifyNoInteractions(ticketingService);
     }
 }

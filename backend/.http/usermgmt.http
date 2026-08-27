@@ -18,3 +18,24 @@ Authorization: Bearer {{auth_token}}
   "roles": ["ANNOTATOR"],
   "affiliationId": "univie"
 }
+
+
+### List all users (shows firstName / lastName as stored in Keycloak)
+GET {{baseUrl}}/api/users
+Authorization: Bearer {{auth_token}}
+
+
+### Create (provision) a user with permissions
+POST {{baseUrl}}/api/users
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+# Given name and surname are set once, at provisioning time, and are not
+# changeable afterwards. Roles: oneOf: FUNDER | ADMIN | ANNOTATOR | EXTERNAL_API_CLIENT
+{
+  "email": "jane.doe@univie.ac.at",
+  "firstName": "Jane",
+  "lastName": "Doe",
+  "roles": ["ANNOTATOR"],
+  "affiliationId": "univie"
+}

@@ -2,6 +2,7 @@ package at.ac.tuwien.fundify.adapters.out.keycloak;
 
 import at.ac.tuwien.fundify.application.port.out.keycloak.KeycloakUserRepository;
 import at.ac.tuwien.fundify.domain.common.KeycloakUser;
+import at.ac.tuwien.fundify.domain.common.UserProvisioning;
 import at.ac.tuwien.fundify.domain.common.exceptions.UnexpectedErrorException;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.ws.rs.NotFoundException;
@@ -56,14 +57,18 @@ public class KeycloakAdminUserRepository implements KeycloakUserRepository {
   }
 
   @Override
-  public KeycloakUser create(String email, final String affiliationId) {
+  public KeycloakUser create(UserProvisioning provisioning) {
+    var email = provisioning.email();
     var representation = new UserRepresentation();
     representation.setUsername(email);
     representation.setEmail(email);
+    representation.setFirstName(provisioning.firstName());
+    representation.setLastName(provisioning.lastName());
     representation.setEnabled(true);
     // user must set a password before being able to log in
     representation.setRequiredActions(List.of(UPDATE_PASSWORD_ACTION));
-    representation.setAttributes(Map.of("affiliation_id", List.of(affiliationId)));
+    representation.setAttributes(
+        Map.of("affiliation_id", List.of(provisioning.affiliationId())));
 
     try (Response response = keycloak.realm(realm).users().create(representation)) {
       if (response.getStatus() != Response.Status.CREATED.getStatusCode()) {

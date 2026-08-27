@@ -33,7 +33,14 @@ describe('UserPermissionsEditComponent - registration requests', () => {
   // Controls what the confirmation dialog resolves to when closed.
   let dialogResult: boolean;
 
-  const KEYCLOAK_USERS = [{ id: 'user-1', email: 'existing@uni.org' }];
+  const KEYCLOAK_USERS = [
+    {
+      id: 'user-1',
+      email: 'existing@uni.org',
+      firstName: 'Existing',
+      lastName: 'User',
+    },
+  ];
   const USER_PERMISSIONS = [
     { userId: 'user-1', roles: ['ANNOTATOR', 'FUNDER'], affiliationId: 'TUW' },
   ];
@@ -114,15 +121,22 @@ describe('UserPermissionsEditComponent - registration requests', () => {
     );
   });
 
-  it('prefills email and maps Funder -> FUNDER role', () => {
+  it('prefills email, names and maps Funder -> FUNDER role', () => {
     component.onCreateUserFromRequest({
       id: 'req-1',
+      firstName: 'Jane',
+      lastName: 'Doe',
       email: 'jane@funder.org',
       kindOfInstitution: 'Funder',
     });
 
     expect(component['detailsForm'].controls.userId.value).toBe('jane@funder.org');
     expect(component['detailsForm'].controls.roles.value).toEqual(['FUNDER']);
+    expect(component['detailsForm'].controls.firstName.value).toBe('Jane');
+    expect(component['detailsForm'].controls.lastName.value).toBe('Doe');
+    // a brand new account: the names still have to be fillable
+    expect(component['detailsForm'].controls.firstName.enabled).toBeTrue();
+    expect(component['detailsForm'].controls.lastName.enabled).toBeTrue();
   });
 
   it('maps Research Institute -> ANNOTATOR role (case insensitive)', () => {
@@ -195,6 +209,8 @@ describe('UserPermissionsEditComponent - registration requests', () => {
   it('creating a user from a request deletes the request on success', fakeAsync(() => {
     component.onCreateUserFromRequest({
       id: 'req-1',
+      firstName: 'Jane',
+      lastName: 'Doe',
       email: 'jane@funder.org',
       kindOfInstitution: 'Funder',
     });
@@ -206,6 +222,8 @@ describe('UserPermissionsEditComponent - registration requests', () => {
 
     expect(storeMock.createUserAndUpdatePermissions).toHaveBeenCalledWith(
       'jane@funder.org',
+      'Jane',
+      'Doe',
       ['FUNDER'],
       'andamp'
     );
@@ -214,6 +232,8 @@ describe('UserPermissionsEditComponent - registration requests', () => {
 
   it('a plain create (no request) does not delete any request', fakeAsync(() => {
     component['detailsForm'].controls.userId.setValue('manual@x.org');
+    component['detailsForm'].controls.firstName.setValue('Manual');
+    component['detailsForm'].controls.lastName.setValue('User');
     component['detailsForm'].controls.roles.setValue(['ANNOTATOR']);
     component['detailsForm'].controls.affiliationId.setValue('andamp');
 
@@ -241,5 +261,60 @@ describe('UserPermissionsEditComponent - registration requests', () => {
 
     expect(component['detailsForm'].controls.roles.value).toBeNull();
     expect(component['detailsForm'].controls.affiliationId.value).toBe('');
+  });
+
+  it('shows the names read-only when an existing user is selected', () => {
+    component['detailsForm'].controls.userId.setValue('user-1');
+
+    const { firstName, lastName } = component['detailsForm'].controls;
+    expect(firstName.value).toBe('Existing');
+    expect(lastName.value).toBe('User');
+    // names are set once at provisioning and must not be changeable afterwards
+    expect(firstName.disabled).toBeTrue();
+    expect(lastName.disabled).toBeTrue();
+  });
+
+  it('a disabled name does not block a permissions update', fakeAsync(() => {
+    component['detailsForm'].controls.userId.setValue('user-1');
+    component['detailsForm'].controls.roles.setValue(['FUNDER']);
+    component['detailsForm'].controls.affiliationId.setValue('andamp');
+
+    expect(component['detailsForm'].valid).toBeTrue();
+
+    component.onSave();
+    flushMicrotasks();
+    tick();
+
+    expect(storeMock.updateUserPermissions).toHaveBeenCalledWith(
+      'user-1',
+      ['FUNDER'],
+      'andamp'
+    );
+    expect(storeMock.createUserAndUpdatePermissions).not.toHaveBeenCalled();
+  }));
+
+  it('re-enables the names when switching from an existing user to a new email', () => {
+    component['detailsForm'].controls.userId.setValue('user-1');
+    component['detailsForm'].controls.userId.setValue('new@uni.org');
+
+    const { firstName, lastName } = component['detailsForm'].controls;
+    expect(firstName.enabled).toBeTrue();
+    expect(lastName.enabled).toBeTrue();
+    expect(firstName.value).toBe('');
+    expect(lastName.value).toBe('');
+  });
+
+  it('lists names alongside the email in the user picker', () => {
+    expect(component['userOptions']()[0].label).toBe(
+      'Existing User — existing@uni.org'
+    );
+  });
+
+  it('joins Keycloak names onto the permission rows', () => {
+    const row = component['permissionRows']()[0];
+
+    expect(row.email).toBe('existing@uni.org');
+    expect(row.firstName).toBe('Existing');
+    expect(row.lastName).toBe('User');
   });
 });

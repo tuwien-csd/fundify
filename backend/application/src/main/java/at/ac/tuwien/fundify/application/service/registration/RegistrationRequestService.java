@@ -19,12 +19,13 @@ public class RegistrationRequestService implements RegistrationRequestUseCase {
 
   @Override
   public RegistrationRequest submit(
-      String name, String email, String kindOfInstitution, String message) {
+      String firstName, String lastName, String email, String kindOfInstitution, String message) {
     log.infof("Capturing registration request for email %s", email);
     var request =
         new RegistrationRequest(
             UUID.randomUUID().toString(),
-            name,
+            firstName,
+            lastName,
             email,
             kindOfInstitution,
             message,

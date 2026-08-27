@@ -5,7 +5,7 @@ import at.ac.tuwien.fundify.application.port.in.users.UserPermissionManagementUs
 import at.ac.tuwien.fundify.application.port.out.keycloak.KeycloakUserRepository;
 import at.ac.tuwien.fundify.application.port.out.persistence.UserPermissionRepository;
 import at.ac.tuwien.fundify.domain.common.UserPermissionHolder;
-import at.ac.tuwien.fundify.domain.common.UserRole;
+import at.ac.tuwien.fundify.domain.common.UserProvisioning;
 import io.quarkus.cache.CacheInvalidateAll;
 import io.quarkus.cache.CacheResult;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -33,15 +33,16 @@ public class UserPermissionManagementService implements UserPermissionManagement
 
   @Override
   @CacheInvalidateAll(cacheName = "user-permissions")
-  public UserPermissionHolder createUserWithPermissions(String email, List<UserRole> roles,
-      String affiliationId) {
+  public UserPermissionHolder createUserWithPermissions(UserProvisioning provisioning) {
+    var email = provisioning.email();
     var user = keycloakUserRepository.findByEmail(email)
         .orElseGet(() -> {
           log.infof("No Keycloak user for email %s, provisioning a new account (initiated by %s)",
               email, userService.getCurrentUserIdAndName());
-          return keycloakUserRepository.create(email, affiliationId);
+          return keycloakUserRepository.create(provisioning);
         });
-    return updatePermissions(new UserPermissionHolder(user.id(), roles, affiliationId));
+    return updatePermissions(
+        new UserPermissionHolder(user.id(), provisioning.roles(), provisioning.affiliationId()));
   }
 
   @Override

@@ -14,8 +14,12 @@ export const USER_PERMISSIONS_CONSTANTS = {
   TABLE_TITLE_EXISTING: 'Existing',
   TABLE_TITLE_NEW: 'Create new or change',
   EMAIL_LABEL: 'Email',
+  FIRST_NAME_LABEL: 'Given name',
+  LAST_NAME_LABEL: 'Surname',
   TABLE_COLUMNS: [
     { field: 'email', header: 'Email' },
+    { field: 'firstName', header: 'Given name' },
+    { field: 'lastName', header: 'Surname' },
     { field: 'roles', header: 'Roles' },
     { field: 'affiliationId', header: 'Affiliation ID' },
     { field: 'actions', header: '' },
@@ -31,7 +35,8 @@ export const USER_PERMISSIONS_CONSTANTS = {
 export const REGISTRATION_REQUESTS_CONSTANTS = {
   TABLE_TITLE: 'Registration requests',
   EMPTY: 'No pending registration requests',
-  NAME_LABEL: 'Name',
+  FIRST_NAME_LABEL: 'Given name',
+  LAST_NAME_LABEL: 'Surname',
   EMAIL_LABEL: 'Email',
   INSTITUTION_LABEL: 'Institution',
   MESSAGE_LABEL: 'Message',
@@ -45,7 +50,8 @@ export const REGISTRATION_REQUESTS_CONSTANTS = {
     CONFIRM_LABEL: 'Reject',
   },
   TABLE_COLUMNS: [
-    { field: 'name', header: 'Name' },
+    { field: 'firstName', header: 'Given name' },
+    { field: 'lastName', header: 'Surname' },
     { field: 'email', header: 'Email' },
     { field: 'kindOfInstitution', header: 'Institution' },
     { field: 'message', header: 'Message' },

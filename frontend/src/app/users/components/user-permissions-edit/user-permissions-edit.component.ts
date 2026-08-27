@@ -37,6 +37,7 @@ import {
 } from '@angular/material/table';
 import { SelectFieldComponent } from '../../../shared/components/select-field/select-field.component';
 import { SearchSelectComponent } from '../../../shared/components/search-select/search-select.component';
+import { TextFieldComponent } from '../../../shared/components/text-field/text-field.component';
 import { UsersStore } from '../../signal/users-store';
 import { UniversitiesStore } from '../../../universities/signal/universities-store';
 import { FundersStore } from '../../../funders/signal/funders-store';
@@ -51,6 +52,8 @@ import {
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 type UserPermissionsForm = {
   userId: FormControl<string | null>;
+  firstName: FormControl<string>;
+  lastName: FormControl<string>;
   roles: FormControl<string[] | null>;
   affiliationId: FormControl<string>;
 };
@@ -70,6 +73,7 @@ type UserPermissionsForm = {
     MatCardTitle,
     SelectFieldComponent,
     SearchSelectComponent,
+    TextFieldComponent,
     MatTable,
     MatColumnDef,
     MatHeaderCell,
@@ -98,10 +102,15 @@ export class UserPermissionsEditComponent {
   protected readonly BUTTON_LABELS = BUTTON_LABELS;
 
   protected userOptions = computed(() =>
-    this.store.keycloakUsers().map((u) => ({
-      value: u.id ?? '',
-      label: u.email ?? u.username ?? u.id ?? '',
-    }))
+    this.store.keycloakUsers().map((u) => {
+      const identifier = u.email ?? u.username ?? u.id ?? '';
+      const name = [u.firstName, u.lastName].filter(Boolean).join(' ');
+      return {
+        value: u.id ?? '',
+        // The name is part of the label so the picker can be searched by it too.
+        label: name ? `${name} — ${identifier}` : identifier,
+      };
+    })
   );
 
   // Affiliation is stored as the institution acronym and matched case-insensitively
@@ -147,6 +156,12 @@ export class UserPermissionsEditComponent {
       )
   );
 
+  // Keycloak users per id. Names live in Keycloak only (there is no copy in our
+  // own DB), so both the table and the read-only form fields read them from here.
+  private usersByUserId = computed(
+    () => new Map(this.store.keycloakUsers().map((u) => [u.id ?? '', u]))
+  );
+
   protected readonly displayedColumns =
     USER_PERMISSIONS_CONSTANTS.TABLE_COLUMNS.map((column) => column.field);
 
@@ -160,19 +175,21 @@ export class UserPermissionsEditComponent {
   private pendingRegistrationId = signal<string | null>(null);
 
   protected permissionRows = computed(() => {
-    const emailByUserId = new Map(
-      this.store
-        .keycloakUsers()
-        .map((u) => [u.id ?? '', u.email ?? u.username ?? u.id ?? ''])
-    );
+    const usersByUserId = this.usersByUserId();
     return this.store
       .userPermissions()
-      .map((permission) => ({
-        userId: permission.userId ?? '',
-        email: emailByUserId.get(permission.userId ?? '') ?? permission.userId,
-        roles: (permission.roles ?? []).join(', '),
-        affiliationId: permission.affiliationId ?? '',
-      }))
+      .map((permission) => {
+        const user = usersByUserId.get(permission.userId ?? '');
+        return {
+          userId: permission.userId ?? '',
+          email:
+            user?.email ?? user?.username ?? user?.id ?? permission.userId,
+          firstName: user?.firstName ?? '',
+          lastName: user?.lastName ?? '',
+          roles: (permission.roles ?? []).join(', '),
+          affiliationId: permission.affiliationId ?? '',
+        };
+      })
       .sort(
         (a, b) =>
           a.affiliationId.localeCompare(b.affiliationId) ||
@@ -189,6 +206,14 @@ export class UserPermissionsEditComponent {
 
   detailsForm = this.fb.group<UserPermissionsForm>({
     userId: this.fb.control<string | null>(null, [Validators.required]),
+    firstName: this.fb.control('', {
+      nonNullable: true,
+      validators: [Validators.required],
+    }),
+    lastName: this.fb.control('', {
+      nonNullable: true,
+      validators: [Validators.required],
+    }),
     roles: this.fb.control<string[] | null>(null, [Validators.required]),
     affiliationId: this.fb.control('', {
       nonNullable: true,
@@ -205,14 +230,14 @@ export class UserPermissionsEditComponent {
       this.formValidSignal.set(status === 'VALID');
     });
     this.detailsForm.controls.userId.valueChanges.subscribe((userId) =>
-      this.prefillFromExistingPermissions(userId)
+      this.prefillFromSelectedUser(userId)
     );
   }
 
   // Selecting an existing user shows their current roles and affiliation as the
   // starting point, so the admin edits from the actual state instead of a blank
   // form. Anything else (a cleared field, a freshly typed email) starts empty.
-  private prefillFromExistingPermissions(userId: string | null): void {
+  private prefillFromSelectedUser(userId: string | null): void {
     const permission = userId
       ? this.permissionsByUserId().get(userId)
       : undefined;
@@ -222,11 +247,30 @@ export class UserPermissionsEditComponent {
     this.detailsForm.controls.affiliationId.setValue(
       permission?.affiliationId ?? ''
     );
+
+    // Given name and surname are set once, when the account is provisioned, and
+    // cannot be changed afterwards: for an existing user they are shown as-is and
+    // disabled. Disabling also keeps them out of form.value and out of validity,
+    // so the required validators never block a roles/affiliation update.
+    const existingUser = userId ? this.usersByUserId().get(userId) : undefined;
+    const { firstName, lastName } = this.detailsForm.controls;
+    if (existingUser) {
+      firstName.setValue(existingUser.firstName ?? '');
+      lastName.setValue(existingUser.lastName ?? '');
+      firstName.disable({ emitEvent: false });
+      lastName.disable({ emitEvent: false });
+    } else {
+      firstName.setValue('');
+      lastName.setValue('');
+      firstName.enable({ emitEvent: false });
+      lastName.enable({ emitEvent: false });
+    }
   }
 
   onSave(): void {
     if (!this.detailsForm.valid) return;
-    const { userId, roles, affiliationId } = this.detailsForm.value;
+    const { userId, firstName, lastName, roles, affiliationId } =
+      this.detailsForm.value;
     const selected = userId!;
 
     // An existing selection carries a Keycloak user id; anything else is a
@@ -244,6 +288,8 @@ export class UserPermissionsEditComponent {
       ? this.store.updateUserPermissions(selected, roles ?? [], affiliationId!)
       : this.store.createUserAndUpdatePermissions(
           selected,
+          firstName ?? '',
+          lastName ?? '',
           roles ?? [],
           affiliationId!
         );
@@ -251,6 +297,10 @@ export class UserPermissionsEditComponent {
     save.then((success) => {
       if (success) {
         this.detailsForm.reset();
+        // reset() does not clear the disabled state, so the next entry would
+        // otherwise start with locked (and therefore unfillable) name fields.
+        this.detailsForm.controls.firstName.enable({ emitEvent: false });
+        this.detailsForm.controls.lastName.enable({ emitEvent: false });
         this.formVisible.set(false);
         setTimeout(() => this.formVisible.set(true));
         this.store.loadUserPermissions();
@@ -291,13 +341,20 @@ export class UserPermissionsEditComponent {
   // submitting. The request is deleted on success.
   onCreateUserFromRequest(request: {
     id?: string;
+    firstName?: string;
+    lastName?: string;
     email?: string;
     kindOfInstitution?: string;
   }): void {
     if (!request.email) return;
     this.pendingRegistrationId.set(request.id ?? null);
     this.detailsForm.reset();
+    // Setting userId runs the prefill, which enables the name controls because a
+    // requester's email is never a known Keycloak id. The names the requester
+    // gave are filled in afterwards and stay editable until the account exists.
     this.detailsForm.controls.userId.setValue(request.email);
+    this.detailsForm.controls.firstName.setValue(request.firstName ?? '');
+    this.detailsForm.controls.lastName.setValue(request.lastName ?? '');
     const role = this.roleForInstitution(request.kindOfInstitution);
     if (role) {
       this.detailsForm.controls.roles.setValue([role]);
