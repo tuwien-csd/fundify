@@ -18,6 +18,7 @@ import at.ac.tuwien.fundify.domain.common.UserProvisioning;
 import at.ac.tuwien.fundify.domain.common.UserRole;
 import io.quarkus.cache.Cache;
 import io.quarkus.cache.CacheName;
+import io.quarkus.mailer.MockMailbox;
 import io.quarkus.test.InjectMock;
 import io.quarkus.test.common.http.TestHTTPEndpoint;
 import io.quarkus.test.junit.QuarkusTest;
@@ -47,11 +48,15 @@ class UserTest {
   @InjectMock
   KeycloakUserRepository keycloakUserRepository;
 
+  @Inject
+  MockMailbox mailbox;
+
   @BeforeEach
   void setup() {
     // clear user-permission collection to ensure deterministic behavior for DB override tests
     userPermissionRepository.deleteAll();
     userPermissionsCache.invalidateAll().await().indefinitely();
+    mailbox.clear();
   }
 
   @Test
@@ -202,7 +207,8 @@ class UserTest {
     void givenAdmin_whenCreateUnknownUser_thenProvisionsKeycloakUserWithName() {
       when(keycloakUserRepository.findByEmail("new@univie.ac.at"))
           .thenReturn(java.util.Optional.empty());
-      when(keycloakUserRepository.create(org.mockito.ArgumentMatchers.any()))
+      when(keycloakUserRepository.create(
+          org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.anyString()))
           .thenReturn(new KeycloakUser(
               "kc-new", "new@univie.ac.at", "new@univie.ac.at", "Jane", "Doe", true));
 
@@ -229,15 +235,56 @@ class UserTest {
       // the given name and surname must reach Keycloak, otherwise the realm's
       // full-name mapper cannot produce a `name` claim for the new account
       ArgumentCaptor<UserProvisioning> captor = ArgumentCaptor.forClass(UserProvisioning.class);
-      verify(keycloakUserRepository).create(captor.capture());
+      ArgumentCaptor<String> passwordCaptor = ArgumentCaptor.forClass(String.class);
+      verify(keycloakUserRepository).create(captor.capture(), passwordCaptor.capture());
       var provisioning = captor.getValue();
+      var passwordSetInKeycloak = passwordCaptor.getValue();
       Assertions.assertEquals("new@univie.ac.at", provisioning.email());
       Assertions.assertEquals("Jane", provisioning.firstName());
       Assertions.assertEquals("Doe", provisioning.lastName());
+      Assertions.assertFalse(passwordSetInKeycloak.isBlank());
 
       var fromDb = userPermissionRepository.findByUserId("kc-new").orElseThrow();
       Assertions.assertEquals("univie", fromDb.affiliationId());
       Assertions.assertTrue(fromDb.roles().contains(UserRole.ANNOTATOR));
+
+      // the temporary password is the only way into a provisioned account, so the
+      // welcome mail has to go out and has to carry the very password that was set
+      var sent = mailbox.getMailsSentTo("new@univie.ac.at");
+      Assertions.assertEquals(1, sent.size());
+      var mail = sent.getFirst();
+      Assertions.assertEquals("Your Fundify account has been created", mail.getSubject());
+      Assertions.assertTrue(mail.getHtml().contains("Hello Jane Doe,"));
+      Assertions.assertTrue(mail.getHtml().contains(provisioning.firstName()));
+      Assertions.assertTrue(mail.getHtml().contains(passwordSetInKeycloak));
+    }
+
+    @Test
+    @WithAdminUser
+    void givenAdmin_whenCreateForExistingAccount_thenNoPasswordResetAndNoMail() {
+      when(keycloakUserRepository.findByEmail("known@univie.ac.at"))
+          .thenReturn(java.util.Optional.of(new KeycloakUser(
+              "kc-known", "known@univie.ac.at", "known@univie.ac.at", "Known", "User", true)));
+
+      UserCreationWebModel createRequest = new UserCreationWebModel(
+          "known@univie.ac.at",
+          "Ignored",
+          "Ignored",
+          List.of(UserRole.FUNDER),
+          "TEST_FFG");
+
+      given()
+          .contentType(ContentType.JSON)
+          .body(createRequest)
+          .when()
+          .post()
+          .then()
+          .statusCode(200);
+
+      // reusing an account must not touch its password nor re-send the welcome mail
+      verify(keycloakUserRepository, org.mockito.Mockito.never())
+          .create(org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.anyString());
+      Assertions.assertEquals(0, mailbox.getTotalMessagesSent());
     }
 
     @Test
