@@ -236,7 +236,7 @@ export class CallDetailEditComponent implements OnInit {
       name: [this.call.name],
       acronym: [this.call.acronym],
       targetGroups: [this.call.targetGroups],
-      targetGroupDetails: [this.call.targetGroupDetails],
+      targetGroupSpecified: [this.call.targetGroupSpecified],
       careerStages: [this.call.careerStages],
       thematicOrientations: [this.call.thematicOrientations],
       description: [this.call.description],

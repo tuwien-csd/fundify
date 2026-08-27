@@ -56,7 +56,7 @@ export const CALLS: Call[] = [
       { text: 'TODO de', language: LanguageEnum.GERMAN },
     ],
     targetGroups: [TargetGroupEnum.UNIVERSITY, TargetGroupEnum.GOVERNMENT],
-    targetGroupDetails: [
+    targetGroupSpecified: [
       {
         text:
           'Researchers and scientists at universities and non-university research institutions in ' +
