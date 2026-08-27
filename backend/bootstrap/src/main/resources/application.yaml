@@ -28,6 +28,8 @@ fundify:
   notification:
     email:
       batch-size: 5
+      # Public URL of the Fundify app, used in outgoing mails. Overridden per profile.
+      app-url: "http://localhost:8080"
     every:
       interval:
         email-poll: 5M
@@ -318,6 +320,11 @@ cron:
       from: "fundify.notification@tuwien.ac.at"
       mock: false
   fundify:
+    notification:
+      email:
+        # Staging shares this profile, so it overrides the value via
+        # FUNDIFY_NOTIFICATION_EMAIL_APP_URL (https://fundify-staging.arisnet.ac.at).
+        app-url: "https://fundify.arisnet.ac.at"
     auth:
       permissions:
         enableDebugLogging: true

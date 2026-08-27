@@ -14,6 +14,7 @@ import lombok.extern.jbosslog.JBossLog;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.keycloak.admin.client.CreatedResponseUtil;
 import org.keycloak.admin.client.Keycloak;
+import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 
 @JBossLog
@@ -57,7 +58,7 @@ public class KeycloakAdminUserRepository implements KeycloakUserRepository {
   }
 
   @Override
-  public KeycloakUser create(UserProvisioning provisioning) {
+  public KeycloakUser create(UserProvisioning provisioning, String temporaryPassword) {
     var email = provisioning.email();
     var representation = new UserRepresentation();
     representation.setUsername(email);
@@ -77,8 +78,32 @@ public class KeycloakAdminUserRepository implements KeycloakUserRepository {
                 .formatted(email, response.getStatus()));
       }
       var id = CreatedResponseUtil.getCreatedId(response);
+      setTemporaryPassword(id, email, temporaryPassword);
       return findById(id).orElseThrow(() -> new UnexpectedErrorException(
           "Created Keycloak user %s could not be read back".formatted(id)));
+    }
+  }
+
+  /**
+   * A user created without a credential cannot log in at all: UPDATE_PASSWORD only
+   * runs after a successful authentication, which never happens without a password.
+   * If this fails the account is left in exactly that state, and a retry would reuse
+   * the existing account instead of provisioning it again, so the error names the
+   * address and the manual fix.
+   */
+  private void setTemporaryPassword(String id, String email, String temporaryPassword) {
+    var credential = new CredentialRepresentation();
+    credential.setType(CredentialRepresentation.PASSWORD);
+    credential.setValue(temporaryPassword);
+    credential.setTemporary(true);
+    try {
+      keycloak.realm(realm).users().get(id).resetPassword(credential);
+    } catch (RuntimeException e) {
+      log.errorf(e, "Created Keycloak user %s (%s) but failed to set the temporary password. "
+          + "The account cannot be logged into until a password is set manually in Keycloak.",
+          id, email);
+      throw new UnexpectedErrorException(
+          "Failed to set the temporary password for Keycloak user %s".formatted(id));
     }
   }
 

@@ -14,9 +14,13 @@ public interface KeycloakUserRepository {
   Optional<KeycloakUser> findByEmail(String email);
 
   /**
-   * Creates a new (enabled) Keycloak user from the given provisioning data.
-   * Used to provision accounts that an admin grants permissions
-   * to before the person has ever logged in.
+   * Creates a new (enabled) Keycloak user from the given provisioning data and
+   * sets the temporary password the user needs for their first login. Used to
+   * provision accounts that an admin grants permissions to before the person has
+   * ever logged in.
+   *
+   * <p>The password is marked temporary, so Keycloak forces the user to replace it
+   * on first login.
    */
-  KeycloakUser create(UserProvisioning provisioning);
+  KeycloakUser create(UserProvisioning provisioning, String temporaryPassword);
 }

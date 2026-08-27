@@ -1,7 +1,10 @@
 package at.ac.tuwien.fundify.application.service.users;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -9,6 +12,7 @@ import static org.mockito.Mockito.when;
 
 import at.ac.tuwien.fundify.application.port.common.UserService;
 import at.ac.tuwien.fundify.application.port.out.keycloak.KeycloakUserRepository;
+import at.ac.tuwien.fundify.application.port.out.notification.AccountNotificationService;
 import at.ac.tuwien.fundify.application.port.out.persistence.UserPermissionRepository;
 import at.ac.tuwien.fundify.domain.common.KeycloakUser;
 import at.ac.tuwien.fundify.domain.common.UserPermissionHolder;
@@ -19,6 +23,7 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -34,12 +39,16 @@ class UserPermissionManagementServiceTest {
   @Mock
   private UserService userService;
 
+  @Mock
+  private AccountNotificationService accountNotificationService;
+
   private UserPermissionManagementService service;
 
   @BeforeEach
   void setUp() {
     service = new UserPermissionManagementService(userPermissionRepository,
-        keycloakUserRepository, userService);
+        keycloakUserRepository, userService, accountNotificationService,
+        new TemporaryPasswordGenerator());
   }
 
   @Test
@@ -78,8 +87,10 @@ class UserPermissionManagementServiceTest {
     // assert
     assertEquals(expected, result);
     verify(userPermissionRepository).upsert(expected);
-    // an existing account is reused as-is: its name is deliberately not overwritten
-    verify(keycloakUserRepository, never()).create(any());
+    // an existing account is reused as-is: its name and password are not overwritten,
+    // and the person is not mailed again
+    verify(keycloakUserRepository, never()).create(any(), any());
+    verifyNoInteractions(accountNotificationService);
   }
 
   @Test
@@ -89,10 +100,10 @@ class UserPermissionManagementServiceTest {
     var roles = List.of(UserRole.FUNDER);
     var provisioning = new UserProvisioning(
         "new@univie.ac.at", "New", "User", roles, affiliationId);
+    var created = new KeycloakUser("new-id", "new@univie.ac.at", "new@univie.ac.at", "New", "User",
+        true);
     when(keycloakUserRepository.findByEmail("new@univie.ac.at")).thenReturn(Optional.empty());
-    when(keycloakUserRepository.create(provisioning))
-        .thenReturn(new KeycloakUser("new-id", "new@univie.ac.at", "new@univie.ac.at", "New", "User",
-            true));
+    when(keycloakUserRepository.create(eq(provisioning), anyString())).thenReturn(created);
     var expected = new UserPermissionHolder("new-id", roles, affiliationId);
     when(userPermissionRepository.upsert(expected)).thenReturn(expected);
 
@@ -101,8 +112,17 @@ class UserPermissionManagementServiceTest {
 
     // assert
     assertEquals(expected, result);
-    verify(keycloakUserRepository).create(provisioning);
     verify(userPermissionRepository).upsert(expected);
+
+    // the password that was set in Keycloak has to be the one the user is mailed,
+    // otherwise the account is provisioned but unusable
+    var passwordToKeycloak = ArgumentCaptor.forClass(String.class);
+    verify(keycloakUserRepository).create(eq(provisioning), passwordToKeycloak.capture());
+    var passwordToUser = ArgumentCaptor.forClass(String.class);
+    verify(accountNotificationService)
+        .sendAccountCreatedNotification(eq(created), passwordToUser.capture());
+    assertFalse(passwordToKeycloak.getValue().isBlank());
+    assertEquals(passwordToKeycloak.getValue(), passwordToUser.getValue());
   }
 
   @Test

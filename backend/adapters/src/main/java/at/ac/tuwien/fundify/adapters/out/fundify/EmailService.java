@@ -1,7 +1,9 @@
 package at.ac.tuwien.fundify.adapters.out.fundify;
 
+import at.ac.tuwien.fundify.application.port.out.notification.AccountNotificationService;
 import at.ac.tuwien.fundify.application.port.out.notification.NotificationService;
 import at.ac.tuwien.fundify.application.port.out.notification.SyncErrorNotificationService;
+import at.ac.tuwien.fundify.domain.common.KeycloakUser;
 import at.ac.tuwien.fundify.domain.funding.Call;
 import io.quarkus.mailer.Mail;
 import io.quarkus.mailer.Mailer;
@@ -15,7 +17,8 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 @ApplicationScoped
 @JBossLog
-public class EmailService implements NotificationService, SyncErrorNotificationService {
+public class EmailService
+    implements NotificationService, SyncErrorNotificationService, AccountNotificationService {
 
   public EmailService(Mailer mailer, EmailFactory emailFactory) {
     this.mailer = mailer;
@@ -28,6 +31,9 @@ public class EmailService implements NotificationService, SyncErrorNotificationS
   private final ConcurrentLinkedQueue<Mail> pendingEmails = new ConcurrentLinkedQueue<>();
   @ConfigProperty(name = "fundify.notification.email.batch-size")
   Integer batchSize;
+
+  @ConfigProperty(name = "fundify.notification.email.app-url")
+  String appUrl;
 
   @Override
   public void addNotificationToQueue(Call call) {
@@ -47,6 +53,21 @@ public class EmailService implements NotificationService, SyncErrorNotificationS
     log.infof("Sending sync error notification for provider '%s' to '%s'", memberId, contactEmail);
     Mail mail = emailFactory.createSyncErrorEmail(memberId, contactEmail, errorDetails);
     mailer.send(mail);
+  }
+
+  @Override
+  public void sendAccountCreatedNotification(KeycloakUser user, String temporaryPassword) {
+    log.infof("Sending account created notification to '%s'", user.email());
+    Mail mail = emailFactory.createAccountCreatedEmail(user, temporaryPassword, appUrl);
+    try {
+      mailer.send(mail);
+    } catch (RuntimeException e) {
+      // The account already exists at this point, so a failing mail must not fail the
+      // request. It does leave the user without their password, hence the error log.
+      log.errorf(e, "Failed to send the account created notification to '%s'. "
+          + "The account exists but the user has not received their temporary password.",
+          user.email());
+    }
   }
 
   @Scheduled(every = "{fundify.notification.every.interval.email-poll}")

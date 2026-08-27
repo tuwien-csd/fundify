@@ -106,6 +106,13 @@
       <artifactId>quarkus-mailer</artifactId>
     </dependency>
 
+    <!-- HTML escaping for values interpolated into outgoing mail bodies.
+         Version is managed by the Quarkus BOM. -->
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-text</artifactId>
+    </dependency>
+
     <dependency>
       <groupId>io.swagger.core.v3</groupId>
       <artifactId>swagger-annotations</artifactId>
