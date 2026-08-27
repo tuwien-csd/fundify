@@ -29,6 +29,7 @@
     <failsafe-plugin.version>3.2.5</failsafe-plugin.version>
     <sonar.version>3.10.0.2594</sonar.version>
     <lombok.version>1.18.30</lombok.version>
+    <testcontainers.version>1.21.4</testcontainers.version>
     <argLine/>
   </properties>
   <!-- dependencies that we want to be used by all modules -->
@@ -95,6 +96,13 @@
   -->
   <dependencyManagement>
     <dependencies>
+      <!-- must precede the Quarkus BOM import so this version wins -->
+      <dependency>
+        <groupId>org.testcontainers</groupId>
+        <artifactId>testcontainers</artifactId>
+        <version>${testcontainers.version}</version>
+      </dependency>
+
       <!-- Quarkus "Bill of Materials", i.e. import makes available all dependencies from there including their versions -->
       <dependency>
         <groupId>io.quarkus.platform</groupId>

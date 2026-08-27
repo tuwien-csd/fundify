@@ -30,7 +30,7 @@ class ContactSubmissionServiceTest {
   }
 
   @Test
-  void submit_registrationCategory_capturesRequestAndSkipsTicketing() throws FundifyException {
+  void submit_registrationCategory_capturesRequestAndCreatesTicket() throws FundifyException {
     // arrange
     var submission = new TicketCreate(
         "Jane", "Doe", "Account please", "registration", "jane@funder.org", "Add me", "Funder");
@@ -41,7 +41,7 @@ class ContactSubmissionServiceTest {
     // assert
     verify(registrationRequestUseCase)
         .submit("Jane", "Doe", "jane@funder.org", "Funder", "Add me");
-    verifyNoInteractions(ticketingService);
+    verify(ticketingService).createTicket(submission);
   }
 
   @Test
@@ -56,7 +56,7 @@ class ContactSubmissionServiceTest {
     // assert
     verify(registrationRequestUseCase)
         .submit("Jane", "Doe", "jane@funder.org", "Funder", "Add me");
-    verifyNoInteractions(ticketingService);
+    verify(ticketingService).createTicket(submission);
   }
 
   @Test

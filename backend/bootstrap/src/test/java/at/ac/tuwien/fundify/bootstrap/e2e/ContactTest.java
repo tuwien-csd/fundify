@@ -67,7 +67,7 @@ class ContactTest {
     }
 
     @Test
-    void givenRegistrationCategory_whenCreate_thenCapturesRequestAndSkipsTicketing() {
+    void givenRegistrationCategory_whenCreate_thenCapturesRequestAndCreatesTicket() throws FundifyException {
         // arrange
         TicketCreateWebModel request = new TicketCreateWebModel(
                 "Jane",
@@ -88,9 +88,12 @@ class ContactTest {
                 .then()
                 .statusCode(204);
 
-        // registration requests are captured in Fundify, not filed as tickets
+        // registration requests are captured in Fundify and also filed as tickets
         verify(registrationRequestUseCase)
                 .submit("Jane", "Doe", "jane@funder.org", "Funder", "I would like an account.");
-        verifyNoInteractions(ticketingService);
+        ArgumentCaptor<TicketCreate> captor = ArgumentCaptor.forClass(TicketCreate.class);
+        verify(ticketingService).createTicket(captor.capture());
+        assertEquals(request.email(), captor.getValue().email());
+        assertEquals(request.category(), captor.getValue().category());
     }
 }
