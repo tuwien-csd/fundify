@@ -2,8 +2,26 @@
   margin: 0 0 0.75rem;
 }
 
-.user-search-select {
-  min-width: 22rem;
+.user-permissions-form-row {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+
+  // Let every field shrink and wrap instead of overflowing the card.
+  > * {
+    flex: 1 1 12rem;
+    min-width: 0;
+  }
+
+  .user-search-select {
+    flex: 2 1 18rem;
+  }
+
+  .submit-button {
+    flex: 0 0 auto;
+    margin: 0;
+  }
 }
 
 .user-permissions-table-section {
