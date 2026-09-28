@@ -1,0 +1,14 @@
+<span
+  #textElement
+  class="expandable-text"
+  [class.collapsed]="!expanded()"
+  [class.faded]="!expanded() && overflowing()"
+  [style.--collapsed-lines]="collapsedLines"
+  >{{ text }}</span
+>
+@if (overflowing()) {
+  <button mat-button class="toggle-button" (click)="toggle()">
+    <mat-icon>{{ expanded() ? 'expand_less' : 'expand_more' }}</mat-icon>
+    {{ expanded() ? LABELS.SHOW_LESS : LABELS.SHOW_MORE }}
+  </button>
+}
