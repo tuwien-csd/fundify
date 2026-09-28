@@ -33,6 +33,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
 import lombok.extern.jbosslog.JBossLog;
 
 @JBossLog
@@ -95,7 +96,10 @@ public class EuTenderToRisMapper {
         call.setMinProjectDuration(null);
         call.setMaxProjectDuration(null);
 
-        call.setAmount(topicVolume(parseBudget(meta), meta));
+        List<EuTenderBudgetOverview.BudgetTopicAction> topicActions = topicActions(parseBudget(meta), meta);
+        call.setAmount(topicVolume(topicActions));
+        call.setMinProjectVolume(contribution(topicActions, EuTenderBudgetOverview.BudgetTopicAction::getMinContribution, true));
+        call.setMaxProjectVolume(contribution(topicActions, EuTenderBudgetOverview.BudgetTopicAction::getMaxContribution, false));
 
         call.setDmpRequired(true);
         call.setDmpGuidelines("DMP required for submission");
@@ -103,22 +107,63 @@ public class EuTenderToRisMapper {
     }
 
     /**
-     * Relevant is the budget available for this topic (project), not the total volume of the call,
-     * so only the budget entry belonging to this topic is summed up.
+     * The budget entries belonging to this topic, or {@code null} if there is no budget overview at all.
+     * Returns an empty list if a budget overview exists but none of its entries match this topic.
      */
-    private RisVolume topicVolume(EuTenderBudgetOverview budget, EuTenderMetadata meta) {
+    private List<EuTenderBudgetOverview.BudgetTopicAction> topicActions(EuTenderBudgetOverview budget, EuTenderMetadata meta) {
         if (budget == null || budget.getBudgetTopicActionMap() == null || budget.getBudgetTopicActionMap().isEmpty()) {
             return null;
         }
+        List<EuTenderBudgetOverview.BudgetTopicAction> actions = findTopicActions(budget.getBudgetTopicActionMap(), meta);
+        return actions != null ? actions : List.of();
+    }
 
-        List<EuTenderBudgetOverview.BudgetTopicAction> topicActions =
-            findTopicActions(budget.getBudgetTopicActionMap(), meta);
+    /**
+     * Relevant is the budget available for this topic (project), not the total volume of the call,
+     * so only the budget entry belonging to this topic is summed up.
+     */
+    private RisVolume topicVolume(List<EuTenderBudgetOverview.BudgetTopicAction> topicActions) {
+        if (topicActions == null) {
+            return null;
+        }
+        return eur(sumBudget(topicActions));
+    }
 
-        long total = sumBudget(topicActions);
+    /**
+     * Min/max project volume come from the "Contributions" column of the topic's budget table,
+     * i.e. the EU contribution per project, not the overall topic budget.
+     */
+    private RisVolume contribution(List<EuTenderBudgetOverview.BudgetTopicAction> topicActions,
+                                   Function<EuTenderBudgetOverview.BudgetTopicAction, Long> getter, boolean min) {
+        List<Long> values = new ArrayList<>();
+        collectContributions(topicActions, getter, values);
+        return values.stream()
+            .reduce(min ? Math::min : Math::max)
+            .map(this::eur)
+            .orElse(null);
+    }
 
+    private void collectContributions(List<EuTenderBudgetOverview.BudgetTopicAction> actions,
+                                      Function<EuTenderBudgetOverview.BudgetTopicAction, Long> getter, List<Long> values) {
+        if (actions == null) {
+            return;
+        }
+        for (EuTenderBudgetOverview.BudgetTopicAction action : actions) {
+            if (action == null) {
+                continue;
+            }
+            if (getter.apply(action) != null) {
+                values.add(getter.apply(action));
+            } else if (action.getBudgetTopicActionMap() != null) {
+                action.getBudgetTopicActionMap().values().forEach(nested -> collectContributions(nested, getter, values));
+            }
+        }
+    }
+
+    private RisVolume eur(long amount) {
         RisVolume volume = new RisVolume();
         volume.setCurrency("EUR");
-        volume.setAmount(BigDecimal.valueOf(total));
+        volume.setAmount(BigDecimal.valueOf(amount));
         return volume;
     }
 

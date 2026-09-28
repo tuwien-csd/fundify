@@ -11,8 +11,8 @@ import lombok.Setter;
  * Parsed from the JSON string inside {@code metadata.budgetOverview[0]}.
  * Used to derive:
  *   - Funding.amount           (sum of all budgetYearMap values for the matching topic)
- *   - Funding.minProjectVolume (maxcontribution if present)
- *   - Funding.maxProjectVolume (maxcontribution if present)
+ *   - Funding.minProjectVolume (minContribution of the matching topic, if present)
+ *   - Funding.maxProjectVolume (maxContribution of the matching topic, if present)
  * Example JSON:
  * <pre>
  * {
@@ -23,6 +23,8 @@ import lombok.Setter;
  *       "deadlineModel": "single-stage",
  *       "deadlineDates": ["11 June 2020"],
  *       "budgetYearMap": { "2020": 20000000 },
+ *       "minContribution": 10000000,
+ *       "maxContribution": 10000000,
  *       "budgetTopicActionMap": {}
  *     }]
  *   },

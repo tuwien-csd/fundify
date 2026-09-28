@@ -268,6 +268,66 @@ class EuTenderToRisMapperTest {
     }
 
     @Test
+    void toRisCall_withContributions_setsProjectVolumeOfOwnTopic() {
+        EuTenderMetadata meta = metaWithTitle("Contribution Test");
+        meta.setCcm2Id(List.of("topic2"));
+        meta.setBudgetOverview(List.of("""
+            {
+              "budgetTopicActionMap": {
+                "topic1": [{"budgetYearMap": {"2023": 50000000}, "minContribution": 20000000, "maxContribution": 25000000}],
+                "topic2": [{"budgetYearMap": {"2023": 40000000}, "minContribution": 10000000, "maxContribution": 10000000}]
+              }
+            }
+            """));
+
+        RisCall call = (RisCall) mapper.toRisCall(resultWith(meta));
+
+        assertEquals(0, BigDecimal.valueOf(40000000).compareTo(call.getAmount().getAmount()));
+        assertNotNull(call.getMinProjectVolume());
+        assertNotNull(call.getMaxProjectVolume());
+        assertEquals(0, BigDecimal.valueOf(10000000).compareTo(call.getMinProjectVolume().getAmount()));
+        assertEquals(0, BigDecimal.valueOf(10000000).compareTo(call.getMaxProjectVolume().getAmount()));
+        assertEquals("EUR", call.getMaxProjectVolume().getCurrency());
+    }
+
+    @Test
+    void toRisCall_withMultipleActionsForTopic_usesLowestMinAndHighestMaxContribution() {
+        EuTenderMetadata meta = metaWithTitle("Contribution Test");
+        meta.setBudgetOverview(List.of("""
+            {
+              "budgetTopicActionMap": {
+                "topic1": [
+                  {"budgetYearMap": {"2023": 10000000}, "minContribution": 2000000, "maxContribution": 3000000},
+                  {"budgetYearMap": {"2024": 10000000}, "minContribution": 1000000, "maxContribution": 4000000}
+                ]
+              }
+            }
+            """));
+
+        RisCall call = (RisCall) mapper.toRisCall(resultWith(meta));
+
+        assertEquals(0, BigDecimal.valueOf(1000000).compareTo(call.getMinProjectVolume().getAmount()));
+        assertEquals(0, BigDecimal.valueOf(4000000).compareTo(call.getMaxProjectVolume().getAmount()));
+    }
+
+    @Test
+    void toRisCall_withoutContributions_doesNotSetProjectVolume() {
+        EuTenderMetadata meta = metaWithTitle("Contribution Test");
+        meta.setBudgetOverview(List.of("""
+            {
+              "budgetTopicActionMap": {
+                "topic1": [{"budgetYearMap": {"2023": 3000000}}]
+              }
+            }
+            """));
+
+        RisCall call = (RisCall) mapper.toRisCall(resultWith(meta));
+
+        assertNull(call.getMinProjectVolume());
+        assertNull(call.getMaxProjectVolume());
+    }
+
+    @Test
     void toRisCall_withMatchingKeyword_mapsToSubject() {
         EuTenderMetadata meta = metaWithTitle("Test");
         // "Mathematics" is an exact match for OEFOS code "101"
