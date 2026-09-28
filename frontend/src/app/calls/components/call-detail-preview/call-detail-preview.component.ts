@@ -46,6 +46,7 @@ import {
   CallVersionHistoryDialogComponent,
   CallVersionHistoryDialogData,
 } from '../call-version-history-dialog/call-version-history-dialog.component';
+import { ExpandableTextComponent } from '../../../shared/components/expandable-text/expandable-text.component';
 
 @Component({
   selector: 'app-call-detail-preview',
@@ -61,6 +62,7 @@ import {
     MatButton,
     MatIcon,
     MatTooltip,
+    ExpandableTextComponent,
   ],
 })
 export class CallDetailPreviewComponent implements OnInit {
@@ -81,7 +83,12 @@ export class CallDetailPreviewComponent implements OnInit {
 
   permissions!: ActionPermissions;
 
-  callDetails: { label: string; value: string; href?: string }[] = [];
+  callDetails: {
+    label: string;
+    value: string;
+    href?: string;
+    expandable?: boolean;
+  }[] = [];
   isValid!: boolean;
 
   ngOnInit(): void {
@@ -200,6 +207,7 @@ export class CallDetailPreviewComponent implements OnInit {
       {
         label: this.CALL_DETAILS_CONSTANTS.DESCRIPTION_LABEL,
         value: this.formatTranslatedText(this.call.description),
+        expandable: true,
       },
       {
         label: this.CALL_DETAILS_CONSTANTS.ELIGIBLE_APPLICANTS_LABEL,

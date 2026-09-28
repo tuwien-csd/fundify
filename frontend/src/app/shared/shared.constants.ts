@@ -94,3 +94,8 @@ export const FORM_STATUS_MESSAGES = {
   VALIDATION_ERROR:
     'The form is not valid. Please check the fields marked in red.',
 };
+
+export const EXPANDABLE_TEXT_LABELS = {
+  SHOW_MORE: 'Show more',
+  SHOW_LESS: 'Show less',
+};
