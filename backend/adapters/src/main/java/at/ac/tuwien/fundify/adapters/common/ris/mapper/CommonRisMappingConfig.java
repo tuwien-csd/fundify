@@ -105,11 +105,11 @@ public interface CommonRisMappingConfig {
   }
 
     default  EAnswerYN map(Boolean value) {
-        return value != null && value ? EAnswerYN.YES : EAnswerYN.NO;
+        return value == null ? null : (value ? EAnswerYN.YES : EAnswerYN.NO);
     }
 
     default  Boolean map(EAnswerYN value) {
-        return value == EAnswerYN.YES;
+        return value == null ? null : value == EAnswerYN.YES;
     }
 
     default  LocalDateTime offsetDateTimeToLocalDateTime(OffsetDateTime offsetDateTime) {
