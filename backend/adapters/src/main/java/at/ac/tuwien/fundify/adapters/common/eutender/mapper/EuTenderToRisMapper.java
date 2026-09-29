@@ -101,8 +101,7 @@ public class EuTenderToRisMapper {
         call.setMinProjectVolume(contribution(topicActions, EuTenderBudgetOverview.BudgetTopicAction::getMinContribution, true));
         call.setMaxProjectVolume(contribution(topicActions, EuTenderBudgetOverview.BudgetTopicAction::getMaxContribution, false));
 
-        call.setDmpRequired(true);
-        call.setDmpGuidelines("DMP required for submission");
+        call.setDmpRequired(false);
          return call;
     }
 

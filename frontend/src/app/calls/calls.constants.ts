@@ -83,7 +83,7 @@ export const CALL_DETAILS_CONSTANTS = {
   CALL_STAGE_DETAILS_LABEL: 'Description',
   CALL_STAGE_DATE_RANGE_LABEL: 'Date Range',
   MODE_OF_SUBMISSION_LABEL: 'Mode of Submission',
-  DMP_REQUIRED_LABEL: 'DMP Required?',
+  DMP_REQUIRED_LABEL: 'DMP Required for Submission',
   DMP_GUIDELINES_LABEL: 'DMP Guidelines',
   DMP_GUIDELINES_PLACEHOLDER: 'Enter Url for DMP Guidelines',
   PROJECT_START_DETAILS_LABEL: 'Project Start Details',
