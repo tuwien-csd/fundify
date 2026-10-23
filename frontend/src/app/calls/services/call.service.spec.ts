@@ -58,7 +58,7 @@ describe('CallService', () => {
     it('should return an Observable of Call[]', (done) => {
       service.getCalls().subscribe((calls) => {
         expect(calls).toEqual([{ id: '1' }, { id: '2' }]);
-        expect(mockBackendService.client.GET).toHaveBeenCalledWith('/api/call');
+        expect(mockBackendService.client.GET).toHaveBeenCalledWith('/api/calls');
         done();
       });
     });
@@ -79,7 +79,7 @@ describe('CallService', () => {
       tick();
 
       expect(backendServiceSpy.get).toHaveBeenCalledWith(
-        `call${ApiPath.ENTITY_LIST_BY_FUNDER_APPEND_PARAMETER}${affiliationId}`,
+        `calls${ApiPath.ENTITY_LIST_BY_FUNDER_APPEND_PARAMETER}${affiliationId}`,
         {
           params: new HttpParams().set(
             ApiPath.QUERY_PARAM_STATUS,
@@ -101,7 +101,7 @@ describe('CallService', () => {
       tick();
 
       expect(backendServiceSpy.get).toHaveBeenCalledWith(
-        `call${ApiPath.ENTITY_LIST}`,
+        `calls`,
         {
           params: new HttpParams().set(
             ApiPath.QUERY_PARAM_STATUS,
@@ -123,7 +123,7 @@ describe('CallService', () => {
       tick();
 
       expect(backendServiceSpy.get).toHaveBeenCalledWith(
-        `call${ApiPath.ENTITY_BY_ID_APPEND_PARAMETER}1`
+        `calls/1`
       );
       expect(result).toEqual(mockCall);
     }));
@@ -139,7 +139,7 @@ describe('CallService', () => {
       tick();
 
       expect(backendServiceSpy.put).toHaveBeenCalledWith(
-        `call${ApiPath.UPDATE_ENTITY}`,
+        `calls/1`,
         mockCall
       );
       expect(result).toEqual(mockCall);
@@ -156,7 +156,7 @@ describe('CallService', () => {
       tick();
 
       expect(backendServiceSpy.post).toHaveBeenCalledWith(
-        `call${ApiPath.ADD_ENTITY}`,
+        `calls`,
         mockCall
       );
       expect(result).toEqual(mockCall);
@@ -174,7 +174,7 @@ describe('CallService', () => {
       tick();
 
       expect(backendServiceSpy.delete).toHaveBeenCalledWith(
-        `call${ApiPath.DELETE_ENTITY}${callId}`
+        `calls/${callId}`
       );
       expect(result).toEqual(mockCall);
     }));

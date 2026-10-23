@@ -1,12 +1,9 @@
 package at.ac.tuwien.fundify.bootstrap.e2e;
 
-import static at.ac.tuwien.fundify.adapters.in.rest.constants.FundingEntityMethodPath.ADD_ENTITY;
-import static at.ac.tuwien.fundify.adapters.in.rest.constants.FundingEntityMethodPath.DELETE_ENTITY_BY_ID_REPLACE_PARAMTER;
-import static at.ac.tuwien.fundify.adapters.in.rest.constants.FundingEntityMethodPath.ENTITY_BY_ID_REPLACE_PARAMETER;
-import static at.ac.tuwien.fundify.adapters.in.rest.constants.FundingEntityMethodPath.ENTITY_LIST;
+import static at.ac.tuwien.fundify.adapters.in.rest.constants.FundingEntityMethodPath.BY_ID;
 import static at.ac.tuwien.fundify.adapters.in.rest.constants.FundingEntityMethodPath.ENTITY_UPDATE_SUBSCRIPTIONS;
+import static at.ac.tuwien.fundify.adapters.in.rest.constants.FundingEntityMethodPath.ENTITY_VERSIONS;
 import static at.ac.tuwien.fundify.adapters.in.rest.constants.FundingEntityMethodPath.QUERY_PARAM_STATUS;
-import static at.ac.tuwien.fundify.adapters.in.rest.constants.FundingEntityMethodPath.UPDATE_ENTITY;
 import static at.ac.tuwien.fundify.bootstrap.utils.TestConstants.*;
 import static io.restassured.RestAssured.given;
 
@@ -16,6 +13,7 @@ import at.ac.tuwien.fundify.adapters.in.rest.resources.CallResource;
 import at.ac.tuwien.fundify.adapters.out.fundify.EmailService;
 import at.ac.tuwien.fundify.adapters.out.persistence.mongo.annotating.UniversityMongoEntity;
 import at.ac.tuwien.fundify.adapters.out.persistence.mongo.funding.CallMongoEntity;
+import at.ac.tuwien.fundify.adapters.out.persistence.mongo.funding.CallVersionMongoEntity;
 import at.ac.tuwien.fundify.adapters.out.persistence.mongo.funding.FunderMongoEntity;
 import at.ac.tuwien.fundify.bootstrap.utils.users.WithAdminUser;
 import at.ac.tuwien.fundify.bootstrap.utils.users.WithFFGFunderUser;
@@ -34,6 +32,7 @@ import io.quarkus.mailer.MockMailbox;
 import io.quarkus.test.common.http.TestHTTPEndpoint;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.security.TestSecurity;
+import io.restassured.common.mapper.TypeRef;
 import io.restassured.http.ContentType;
 import jakarta.inject.Inject;
 
@@ -100,6 +99,8 @@ class CallTest {
 
   @BeforeEach
   void setup() {
+    CallVersionMongoEntity.deleteAll();
+
     FunderMongoEntity existingFunder = new FunderMongoEntity();
     existingFunder.id = new ObjectId(funderId);
     existingFunder.acronym = FFG_FUNDER_AFFILIATION;
@@ -164,7 +165,7 @@ class CallTest {
         .contentType(ContentType.JSON)
         .body(requestCall)
         .when()
-        .post(ADD_ENTITY)
+        .post()
         .then()
         .statusCode(200)
         .extract()
@@ -189,7 +190,7 @@ class CallTest {
         .contentType(ContentType.JSON)
         .body(requestCall)
         .when()
-        .post(ADD_ENTITY)
+        .post()
         .then()
         .statusCode(200)
         .extract()
@@ -216,7 +217,7 @@ class CallTest {
         .contentType(ContentType.JSON)
         .body(requestCall)
         .when()
-        .post(ADD_ENTITY)
+        .post()
         .then()
         .statusCode(200)
         .extract()
@@ -241,7 +242,7 @@ class CallTest {
         .contentType(ContentType.JSON)
         .body(requestCall)
         .when()
-        .post(ADD_ENTITY)
+        .post()
         .then()
         .statusCode(200)
         .extract()
@@ -269,7 +270,7 @@ class CallTest {
         .contentType(ContentType.JSON)
         .body(requestCall)
         .when()
-        .post(ADD_ENTITY)
+        .post()
         .then()
         .statusCode(400);
   }
@@ -336,7 +337,7 @@ class CallTest {
         .contentType(ContentType.JSON)
         .body(requestCall)
         .when()
-        .put(UPDATE_ENTITY)
+        .put(callId)
         .then()
         .statusCode(200)
         .extract()
@@ -371,7 +372,7 @@ class CallTest {
         .contentType(ContentType.JSON)
         .body(requestCall)
         .when()
-        .put(UPDATE_ENTITY)
+        .put(callId)
         .then()
         .statusCode(200)
         .extract()
@@ -395,7 +396,7 @@ class CallTest {
               .contentType(ContentType.JSON)
               .body(requestCall)
               .when()
-              .post(ADD_ENTITY)
+              .post()
               .then()
               .statusCode(200)
               .extract()
@@ -422,7 +423,7 @@ class CallTest {
                 .contentType(ContentType.JSON)
                 .body(requestCall)
                 .when()
-                .put(UPDATE_ENTITY)
+                .put(callId)
                 .then()
                 .statusCode(200)
                 .extract()
@@ -450,7 +451,7 @@ class CallTest {
         .contentType(ContentType.JSON)
         .body(requestCall)
         .when()
-        .put(UPDATE_ENTITY)
+        .put(callId)
         .then()
         .statusCode(200)
         .extract()
@@ -480,7 +481,7 @@ class CallTest {
         .contentType(ContentType.JSON)
         .body(requestCall)
         .when()
-        .put(UPDATE_ENTITY)
+        .put(validId)
         .then()
         .statusCode(404);
   }
@@ -491,7 +492,7 @@ class CallTest {
 
     given()
         .when()
-        .delete(DELETE_ENTITY_BY_ID_REPLACE_PARAMTER, callId)
+        .delete(BY_ID, callId)
         .then()
         .statusCode(204);
 
@@ -520,7 +521,7 @@ class CallTest {
     CallWebModel[] calls = given()
         .when()
         .queryParam(QUERY_PARAM_STATUS, EPublicationStatus.PUBLISHED)
-        .get(ENTITY_LIST)
+        .get()
         .then()
         .statusCode(200)
         .extract()
@@ -539,7 +540,7 @@ class CallTest {
 
     CallWebModel call = given()
         .when()
-        .get(ENTITY_BY_ID_REPLACE_PARAMETER, existingCall.id.toHexString())
+        .get(BY_ID, existingCall.id.toHexString())
         .then()
         .statusCode(200)
         .extract()
@@ -555,7 +556,7 @@ class CallTest {
 
     given()
         .when()
-        .get(ENTITY_BY_ID_REPLACE_PARAMETER, unknownId)
+        .get(BY_ID, unknownId)
         .then()
         .statusCode(404);
   }
@@ -567,7 +568,7 @@ class CallTest {
 
     given()
         .when()
-        .get(ENTITY_BY_ID_REPLACE_PARAMETER, invalidId)
+        .get(BY_ID, invalidId)
         .then()
         .statusCode(404);
   }
@@ -586,7 +587,7 @@ class CallTest {
               .contentType(ContentType.JSON)
               .body(requestCall)
               .when()
-              .post(ADD_ENTITY)
+              .post()
               .then()
               .statusCode(200)
               .extract()
@@ -613,7 +614,7 @@ class CallTest {
               .contentType(ContentType.JSON)
               .body(requestCall)
               .when()
-              .put(UPDATE_ENTITY)
+              .put(callIdExternal)
               .then()
               .statusCode(200)
               .extract()
@@ -628,11 +629,43 @@ class CallTest {
   void when_Delete_ExternalCall_AsCallOwner_then_CallIsDeleted() {
       given()
         .when()
-        .delete(DELETE_ENTITY_BY_ID_REPLACE_PARAMTER, callIdExternal)
+        .delete(BY_ID, callIdExternal)
         .then()
         .statusCode(204);
 
       Assertions.assertNull(CallMongoEntity.findById(new ObjectId(callIdExternal)));
+  }
+
+  @Test
+  @WithFFGFunderUser
+  void givenNoVersions_whenGetVersions_thenReturnsEmptyList() {
+    List<CallVersionWebModel> versions = given()
+        .when()
+        .get(ENTITY_VERSIONS, callId)
+        .then()
+        .statusCode(200)
+        .extract()
+        .as(new TypeRef<>() {});
+
+    Assertions.assertEquals(0, versions.size());
+  }
+
+  @Test
+  @WithFFGFunderUser
+  void givenExistingVersion_whenGetVersions_thenReturnsList() {
+    CallVersionMongoEntity version = new CallVersionMongoEntity();
+    version.callId = new ObjectId(callId);
+    version.persist();
+
+    List<CallVersionWebModel> versions = given()
+        .when()
+        .get(ENTITY_VERSIONS, callId)
+        .then()
+        .statusCode(200)
+        .extract()
+        .as(new TypeRef<>() {});
+
+    Assertions.assertEquals(1, versions.size());
   }
 
   @Nested
@@ -654,7 +687,7 @@ class CallTest {
           .contentType(ContentType.JSON)
           .body(requestCall)
           .when()
-          .post(ADD_ENTITY)
+          .post()
           .then()
           .statusCode(403);
     }
@@ -673,7 +706,7 @@ class CallTest {
           .contentType(ContentType.JSON)
           .body(requestCall)
           .when()
-          .post(ADD_ENTITY)
+          .post()
           .then()
           .statusCode(200);
     }
@@ -694,7 +727,7 @@ class CallTest {
           .contentType(ContentType.JSON)
           .body(requestCall)
           .when()
-          .put(UPDATE_ENTITY)
+          .put(callId)
           .then()
           .statusCode(403);
     }
@@ -713,7 +746,7 @@ class CallTest {
           .contentType(ContentType.JSON)
           .body(requestCall)
           .when()
-          .put(UPDATE_ENTITY)
+          .put(callIdManagedBySync)
           .then()
           .statusCode(403);
     }
@@ -724,7 +757,7 @@ class CallTest {
     void when_Delete_CallIdAsUnaffiliatedUser_then_ReturnForbidden() {
       given()
           .when()
-          .delete(DELETE_ENTITY_BY_ID_REPLACE_PARAMTER, callId)
+          .delete(BY_ID, callId)
           .then()
           .statusCode(403);
     }
@@ -734,7 +767,7 @@ class CallTest {
     void when_Delete_CallManagedThroughSync_then_ReturnForbidden() {
       given()
           .when()
-          .delete(DELETE_ENTITY_BY_ID_REPLACE_PARAMTER, callIdManagedBySync)
+          .delete(BY_ID, callIdManagedBySync)
           .then()
           .statusCode(403);
     }

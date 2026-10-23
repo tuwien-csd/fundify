@@ -147,7 +147,7 @@ public class IssueFactory {
 
     // Bullet list with key/value pairs (skip blanks)
     List<Map<String, Object>> listItems = new ArrayList<>();
-    addListItemIfPresent(listItems, "Name", input.name());
+    addListItemIfPresent(listItems, "Name", input.fullName());
     addListItemIfPresent(listItems, "Email", input.email());
     addListItemIfPresent(listItems, "Category", input.category());
     addListItemIfPresent(listItems, "Kind of institution", input.kindOfInstitution());

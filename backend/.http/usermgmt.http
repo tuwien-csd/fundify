@@ -2,19 +2,40 @@
 POST {{tokenEndpoint}}
 Content-Type: application/x-www-form-urlencoded
 
-grant_type=password&client_id=admin-cli&username= {{admin.username}}&password={{admin.password}}
+grant_type=password&client_id=fundify&username= {{admin.username}}&password={{admin.password}}
 
 > {% client.global.set("auth_token", response.body.access_token) %}
 
 
 ### Update permissions of user
-@userId = changeme
+@userId = e5bb35a2-7825-4c57-ac3b-dea484c3e26c
 PUT {{baseUrl}}/api/users/{{userId}}/permissions
 Content-Type: application/json
 Authorization: Bearer {{auth_token}}
 
 # Roles: oneOf: FUNDER | ADMIN | ANNOTATOR | EXTERNAL_API_CLIENT
 {
-  "roles": ["FUNDER"],
-  "affiliationId": "andamp"
+  "roles": ["ANNOTATOR"],
+  "affiliationId": "univie"
+}
+
+
+### List all users (shows firstName / lastName as stored in Keycloak)
+GET {{baseUrl}}/api/users
+Authorization: Bearer {{auth_token}}
+
+
+### Create (provision) a user with permissions
+POST {{baseUrl}}/api/users
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+# Given name and surname are set once, at provisioning time, and are not
+# changeable afterwards. Roles: oneOf: FUNDER | ADMIN | ANNOTATOR | EXTERNAL_API_CLIENT
+{
+  "email": "jane.doe@univie.ac.at",
+  "firstName": "Jane",
+  "lastName": "Doe",
+  "roles": ["ANNOTATOR"],
+  "affiliationId": "univie"
 }

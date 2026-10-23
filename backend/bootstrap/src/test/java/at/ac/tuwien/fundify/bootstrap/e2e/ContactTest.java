@@ -3,9 +3,11 @@ package at.ac.tuwien.fundify.bootstrap.e2e;
 import static io.restassured.RestAssured.given;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 import at.ac.tuwien.fundify.adapters.in.rest.dto.TicketCreateWebModel;
 import at.ac.tuwien.fundify.adapters.in.rest.resources.ContactResource;
+import at.ac.tuwien.fundify.application.port.in.registration.RegistrationRequestUseCase;
 import at.ac.tuwien.fundify.application.port.out.ticketing.TicketingService;
 import at.ac.tuwien.fundify.domain.common.exceptions.FundifyException;
 import at.ac.tuwien.fundify.domain.ticketing.TicketCreate;
@@ -25,11 +27,15 @@ class ContactTest {
     @InjectMock
     TicketingService ticketingService;
 
+    @InjectMock
+    RegistrationRequestUseCase registrationRequestUseCase;
+
     @Test
     void givenValidRequest_whenCreate_thenReturnsNoContentAndDelegatesToService() throws FundifyException {
         // arrange
         TicketCreateWebModel request = new TicketCreateWebModel(
-                "John Doe",
+                "John",
+                "Doe",
                 "Issue with registration",
                 "SUPPORT",
                 "john.doe@example.com",
@@ -50,11 +56,44 @@ class ContactTest {
         ArgumentCaptor<TicketCreate> captor = ArgumentCaptor.forClass(TicketCreate.class);
         verify(ticketingService).createTicket(captor.capture());
         TicketCreate captured = captor.getValue();
-        assertEquals(request.name(), captured.name());
+        assertEquals(request.firstName(), captured.firstName());
+        assertEquals(request.lastName(), captured.lastName());
         assertEquals(request.subject(), captured.subject());
         assertEquals(request.category(), captured.category());
         assertEquals(request.email(), captured.email());
         assertEquals(request.message(), captured.message());
         assertEquals(request.kindOfInstitution(), captured.kindOfInstitution());
+        verifyNoInteractions(registrationRequestUseCase);
+    }
+
+    @Test
+    void givenRegistrationCategory_whenCreate_thenCapturesRequestAndCreatesTicket() throws FundifyException {
+        // arrange
+        TicketCreateWebModel request = new TicketCreateWebModel(
+                "Jane",
+                "Doe",
+                "Account please",
+                "registration",
+                "jane@funder.org",
+                "I would like an account.",
+                "Funder"
+        );
+
+        // act & assert HTTP
+        given()
+                .contentType(ContentType.JSON)
+                .body(request)
+                .when()
+                .post()
+                .then()
+                .statusCode(204);
+
+        // registration requests are captured in Fundify and also filed as tickets
+        verify(registrationRequestUseCase)
+                .submit("Jane", "Doe", "jane@funder.org", "Funder", "I would like an account.");
+        ArgumentCaptor<TicketCreate> captor = ArgumentCaptor.forClass(TicketCreate.class);
+        verify(ticketingService).createTicket(captor.capture());
+        assertEquals(request.email(), captor.getValue().email());
+        assertEquals(request.category(), captor.getValue().category());
     }
 }

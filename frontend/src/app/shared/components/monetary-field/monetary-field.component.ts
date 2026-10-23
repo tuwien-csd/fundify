@@ -78,7 +78,7 @@ export class MonetaryFieldComponent
   constants = MONETARY_LABELS;
   validators = VALIDATORS;
 
-  currencyCodes: CurrencyEnum[] = [CurrencyEnum.USD, CurrencyEnum.EUR];
+  currencyCodes: CurrencyEnum[] = Object.values(CurrencyEnum);
 
   constructor() {
     this.monetaryForm = this.fb.group({

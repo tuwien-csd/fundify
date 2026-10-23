@@ -42,7 +42,7 @@ describe('CallDetailEditComponent', () => {
           acronym: new FormControl(CALLS[0].acronym),
           description: new FormControl(CALLS[0].description),
           targetGroups: new FormControl(CALLS[0].targetGroups),
-          targetGroupDetails: new FormControl(CALLS[0].targetGroupDetails),
+          targetGroupSpecified: new FormControl(CALLS[0].targetGroupSpecified),
           careerStages: new FormControl(CALLS[0].careerStages),
           thematicOrientations: new FormControl(CALLS[0].thematicOrientations),
           eligibleApplicants: new FormControl(CALLS[0].eligibleApplicants),

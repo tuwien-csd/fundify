@@ -22,6 +22,7 @@ import { EntryOriginEnum } from '../../../shared/models/enums/entry-origin.enum'
 import { ActionPermissions } from '../../../core/models/ActionPermissions';
 import { PermissionService } from '../../../core/auth/services/permission.service';
 import { Call } from '../../models/call.interface';
+import { IdentifierTypeEnum } from '../../../shared/models/enums/identifier-type.enum';
 import {
   LOCAL_STORAGE_KEYS,
   LocalStorageService,
@@ -40,6 +41,12 @@ import { MatChip } from '@angular/material/chips';
 import { MatButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { MatTooltip } from '@angular/material/tooltip';
+import { MatDialog } from '@angular/material/dialog';
+import {
+  CallVersionHistoryDialogComponent,
+  CallVersionHistoryDialogData,
+} from '../call-version-history-dialog/call-version-history-dialog.component';
+import { ExpandableTextComponent } from '../../../shared/components/expandable-text/expandable-text.component';
 
 @Component({
   selector: 'app-call-detail-preview',
@@ -55,12 +62,14 @@ import { MatTooltip } from '@angular/material/tooltip';
     MatButton,
     MatIcon,
     MatTooltip,
+    ExpandableTextComponent,
   ],
 })
 export class CallDetailPreviewComponent implements OnInit {
   private localStorageService = inject(LocalStorageService);
   private permissionService = inject(PermissionService);
   private validationService = inject(CallValidationService);
+  private dialog = inject(MatDialog);
 
   protected readonly CALL_DETAILS_CONSTANTS = CALL_DETAILS_CONSTANTS;
   protected readonly BUTTON_LABELS = BUTTON_LABELS;
@@ -74,7 +83,12 @@ export class CallDetailPreviewComponent implements OnInit {
 
   permissions!: ActionPermissions;
 
-  callDetails: { label: string; value: string }[] = [];
+  callDetails: {
+    label: string;
+    value: string;
+    href?: string;
+    expandable?: boolean;
+  }[] = [];
   isValid!: boolean;
 
   ngOnInit(): void {
@@ -94,6 +108,24 @@ export class CallDetailPreviewComponent implements OnInit {
 
   onPublish(): void {
     this.publish.emit(this.call);
+  }
+
+  onShowHistory(): void {
+    const data: CallVersionHistoryDialogData = {
+      callId: this.call.id!,
+      currentFields: {
+        name: this.call.name,
+        description: this.call.description,
+        eligibleApplicants: this.call.eligibleApplicants,
+        callStages: this.call.callStages,
+        callVolumeAmount: this.call.callVolumeAmount,
+        website: this.call.website,
+      },
+    };
+    this.dialog.open(CallVersionHistoryDialogComponent, {
+      width: '680px',
+      data,
+    });
   }
 
   private initPermissions(): void {
@@ -132,6 +164,14 @@ export class CallDetailPreviewComponent implements OnInit {
         label: this.CALL_DETAILS_CONSTANTS.RIS_ID_LABEL,
         value: this.call.risId ?? CALL_DETAILS_CONSTANTS.PLACEHOLDER,
       },
+      ...(this.getEuId()
+        ? [
+            {
+              label: this.CALL_DETAILS_CONSTANTS.EU_ID_LABEL,
+              value: this.getEuId()!,
+            },
+          ]
+        : []),
       {
         label: this.CALL_DETAILS_CONSTANTS.PART_OF_LABEL,
         value: this.formatFundingRef(this.call.partOf),
@@ -152,7 +192,7 @@ export class CallDetailPreviewComponent implements OnInit {
       },
       {
         label: this.CALL_DETAILS_CONSTANTS.TARGET_GROUP_SPECIFIED_LABEL,
-        value: this.formatTranslatedText(this.call.targetGroupDetails),
+        value: this.formatTranslatedText(this.call.targetGroupSpecified),
       },
       {
         label: this.CALL_DETAILS_CONSTANTS.CAREER_STAGE_LABEL,
@@ -167,6 +207,7 @@ export class CallDetailPreviewComponent implements OnInit {
       {
         label: this.CALL_DETAILS_CONSTANTS.DESCRIPTION_LABEL,
         value: this.formatTranslatedText(this.call.description),
+        expandable: true,
       },
       {
         label: this.CALL_DETAILS_CONSTANTS.ELIGIBLE_APPLICANTS_LABEL,
@@ -210,6 +251,7 @@ export class CallDetailPreviewComponent implements OnInit {
         label: this.CALL_DETAILS_CONSTANTS.WEBSITE_LABEL,
         value:
           this.call.website?.join(', ') ?? CALL_DETAILS_CONSTANTS.PLACEHOLDER,
+        href: this.formatHref(this.call.website?.[0]),
       },
       {
         label: this.CALL_DETAILS_CONSTANTS.CONTACTS_LABEL,
@@ -233,30 +275,30 @@ export class CallDetailPreviewComponent implements OnInit {
           this.call.eligibleApplicantsScope ??
           CALL_DETAILS_CONSTANTS.PLACEHOLDER,
       },
-       {
-         label: this.CALL_DETAILS_CONSTANTS.ELIGIBLE_APPLICANTS_REGION_LABEL,
-         value:
-           this.call.eligibleApplicantsRegions?.join(', ') ??
-           CALL_DETAILS_CONSTANTS.PLACEHOLDER,
-       },
-       {
-         label: this.CALL_DETAILS_CONSTANTS.ELIGIBLE_TARGET_REGIONS_LABEL,
-         value:
-           this.call.eligibleTargetRegions?.join(', ') ??
-           CALL_DETAILS_CONSTANTS.PLACEHOLDER,
-       },
-       {
-         label: this.CALL_DETAILS_CONSTANTS.ELIGIBLE_SOURCE_REGIONS_LABEL,
-         value:
-           this.call.eligibleSourceRegions?.join(', ') ??
-           CALL_DETAILS_CONSTANTS.PLACEHOLDER,
-       },
-       {
-         label: this.CALL_DETAILS_CONSTANTS.MODE_OF_SUBMISSION_LABEL,
-         value:
-           this.call.submissionModes?.join(', ') ??
-           CALL_DETAILS_CONSTANTS.PLACEHOLDER,
-       },
+      {
+        label: this.CALL_DETAILS_CONSTANTS.ELIGIBLE_APPLICANTS_REGION_LABEL,
+        value:
+          this.call.eligibleApplicantsRegions?.join(', ') ??
+          CALL_DETAILS_CONSTANTS.PLACEHOLDER,
+      },
+      {
+        label: this.CALL_DETAILS_CONSTANTS.ELIGIBLE_TARGET_REGIONS_LABEL,
+        value:
+          this.call.eligibleTargetRegions?.join(', ') ??
+          CALL_DETAILS_CONSTANTS.PLACEHOLDER,
+      },
+      {
+        label: this.CALL_DETAILS_CONSTANTS.ELIGIBLE_SOURCE_REGIONS_LABEL,
+        value:
+          this.call.eligibleSourceRegions?.join(', ') ??
+          CALL_DETAILS_CONSTANTS.PLACEHOLDER,
+      },
+      {
+        label: this.CALL_DETAILS_CONSTANTS.MODE_OF_SUBMISSION_LABEL,
+        value:
+          this.call.submissionModes?.join(', ') ??
+          CALL_DETAILS_CONSTANTS.PLACEHOLDER,
+      },
       {
         label: this.CALL_DETAILS_CONSTANTS.CHARACTERISTICS_LABEL,
         value:
@@ -325,6 +367,17 @@ export class CallDetailPreviewComponent implements OnInit {
     ];
   }
 
+  /**
+   * The stored EU ID carries the internal ccm2 id of the call as a suffix
+   * (e.g. 'HORIZON-CL5-2027-07-D3-17-[50161357]') to stay unique for syncing.
+   * Only the topic identifier is of interest for the user, so the suffix is hidden.
+   */
+  private getEuId(): string | undefined {
+    return this.call.identifiers
+      ?.find((i) => i.type === IdentifierTypeEnum.EU_ID)
+      ?.value?.replace(/-\[[^\]]*]$/, '');
+  }
+
   private formatDateRange(
     dateRange: DateRange | undefined,
     datePipe: DatePipe
@@ -347,13 +400,25 @@ export class CallDetailPreviewComponent implements OnInit {
     return `${this.CALL_DETAILS_CONSTANTS.DURATION_SUB_LABELS[0]}: ${duration.months || 0}, ${this.CALL_DETAILS_CONSTANTS.DURATION_SUB_LABELS[1]}: ${duration.days || 0}`;
   }
 
+  private formatHref(url: URL | string | undefined): string | undefined {
+    const value = url?.toString().trim();
+    if (!value) {
+      return undefined;
+    }
+    return /^https?:\/\//i.test(value) ? value : `https://${value}`;
+  }
+
   private formatMonetaryNumber(
     monetaryNumber: MonetaryNumber | undefined
   ): string {
-    if (!monetaryNumber) {
+    if (!monetaryNumber || monetaryNumber.amount == null) {
       return this.CALL_DETAILS_CONSTANTS.PLACEHOLDER;
     }
-    return monetaryNumber.amount + ' ' + monetaryNumber.currency;
+    return (
+      monetaryNumber.amount.toLocaleString('de-DE') +
+      ' ' +
+      monetaryNumber.currency
+    );
   }
 
   private formatTranslatedTextList(
@@ -413,7 +478,7 @@ export class CallDetailPreviewComponent implements OnInit {
 
   private formatFundingRef(funderRef: FundingEntityRef | undefined): string {
     return funderRef
-      ? `${this.formatTranslatedText(funderRef.name)} (${funderRef.id})`
+      ? `${this.formatTranslatedText(funderRef.name)}`
       : CALL_DETAILS_CONSTANTS.PLACEHOLDER;
   }
 

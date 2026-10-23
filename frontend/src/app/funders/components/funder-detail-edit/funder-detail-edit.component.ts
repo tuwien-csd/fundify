@@ -167,7 +167,7 @@ export class FunderDetailEditComponent {
       crossRefDoi: form.crossRefDoi ?? undefined,
       website: form.website ?? '',
       submissionSystem: form.submissionSystem ?? undefined,
-      risId: this.funder()?.risId ?? undefined,
+      risId: form.risId ?? undefined,
       identifiers: this.funder()?.identifiers ?? undefined,
       externallyAdministered: form.externallyAdministered ?? false,
     };

@@ -4,7 +4,8 @@ import { InstitutionKindEnum } from '../shared/models/enums/institutionKind.enum
 import { NotificationService } from '../shared/services/notification-service.service';
 
 export type TicketCreate = {
-  name: string;
+  firstName: string;
+  lastName: string;
   subject: string;
   category: string;
   email: string;

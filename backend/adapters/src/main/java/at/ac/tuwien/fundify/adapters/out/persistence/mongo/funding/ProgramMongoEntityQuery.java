@@ -12,6 +12,7 @@ import at.ac.tuwien.fundify.domain.funding.Program;
 import at.ac.tuwien.fundify.domain.funding.ProgramReference;
 import at.ac.tuwien.fundify.domain.funding.vo.enums.EAustrianState;
 import at.ac.tuwien.fundify.domain.funding.vo.enums.ERegionalScope;
+import org.bson.Document;
 import jakarta.enterprise.context.ApplicationScoped;
 import java.util.List;
 import java.util.Optional;
@@ -101,7 +102,8 @@ public class ProgramMongoEntityQuery implements ProgramQuery {
                         .withFunderId(funderId)
                         .withApplicantsScope(applicantsScope)
                         .withStatus(status)
-                        .build()
+                        .build(),
+            new Document("_id", 1)
         ).list();
         return ProgramMongoEntityMapper.INSTANCE.toDomain(result, mongoCrossReferenceResolver);
     }

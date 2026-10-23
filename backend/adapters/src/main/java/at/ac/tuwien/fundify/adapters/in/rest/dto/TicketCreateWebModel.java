@@ -1,23 +1,28 @@
 package at.ac.tuwien.fundify.adapters.in.rest.dto;
 
-import lombok.NonNull;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 
 public record TicketCreateWebModel(
     @Schema(required = true)
-    @NonNull
-    String name,
+    @NotBlank
+    String firstName,
     @Schema(required = true)
-    @NonNull
+    @NotBlank
+    String lastName,
+    @Schema(required = true)
+    @NotBlank
     String subject,
     @Schema(required = true)
-    @NonNull
+    @NotBlank
     String category,
     @Schema(required = true)
-    @NonNull
+    @NotBlank
+    @Email
     String email,
     @Schema(required = true)
-    @NonNull
+    @NotBlank
     String message,
     @Schema(required = false)
     String kindOfInstitution

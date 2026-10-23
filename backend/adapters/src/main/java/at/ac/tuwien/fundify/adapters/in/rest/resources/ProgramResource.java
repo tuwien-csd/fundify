@@ -1,8 +1,11 @@
 package at.ac.tuwien.fundify.adapters.in.rest.resources;
 
+import static at.ac.tuwien.fundify.adapters.in.rest.constants.FundingEntityMethodPath.ENTITY_VERSIONS;
 import static at.ac.tuwien.fundify.adapters.in.rest.constants.FundingEntityMethodPath.PATH_PARAM_ID;
 
+import at.ac.tuwien.fundify.adapters.in.rest.dto.ProgramVersionWebModel;
 import at.ac.tuwien.fundify.adapters.in.rest.dto.ProgramWebModel;
+import at.ac.tuwien.fundify.adapters.in.rest.mapper.ProgramVersionWebModelMapper;
 import at.ac.tuwien.fundify.adapters.in.rest.dto.ValidationGroups;
 import at.ac.tuwien.fundify.adapters.in.rest.mapper.ProgramWebModelMapper;
 import at.ac.tuwien.fundify.application.port.in.programs.ProgramAccessor;
@@ -14,6 +17,7 @@ import at.ac.tuwien.fundify.domain.common.exceptions.FundifyException;
 import io.quarkus.security.Authenticated;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.groups.ConvertGroup;
+import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
@@ -28,7 +32,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.jbosslog.JBossLog;
 import jakarta.validation.Valid;
 
-@Path("/api/program")
+@Path("/api/programs")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 @Authenticated
@@ -55,6 +59,9 @@ public class ProgramResource {
   @RolesAllowed({UserRole.Names.FUNDER, UserRole.Names.ADMIN})
   @Path("/{id}")
   public ProgramWebModel update(@PathParam(PATH_PARAM_ID) String programId, @Valid @ConvertGroup(to = ValidationGroups.Put.class) ProgramWebModel programWebModel) throws FundifyException {
+    if (!programId.equals(programWebModel.id())) {
+      throw new BadRequestException("Path ID does not match body ID");
+    }
     return ProgramWebModelMapper.INSTANCE.fromDomain(
         programUseCase.updateProgram(ProgramWebModelMapper.INSTANCE.toDomain(programWebModel))
     );
@@ -80,5 +87,12 @@ public class ProgramResource {
       throws EntityNotFoundException {
     return ProgramWebModelMapper.INSTANCE.fromDomain(
         programAccessor.getById(new ProgramId(programId)));
+  }
+
+  @GET
+  @Path(ENTITY_VERSIONS)
+  public List<ProgramVersionWebModel> getVersions(@PathParam(PATH_PARAM_ID) String programId) {
+    return ProgramVersionWebModelMapper.fromDomain(
+        programAccessor.getVersionsByProgramId(new ProgramId(programId)));
   }
 }

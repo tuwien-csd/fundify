@@ -52,11 +52,10 @@ export interface Call {
   submissionModes?: ModeOfSubmissionEnum[];
   contacts?: Contact[];
   funder?: FundingEntityRef;
-  subscribed?: boolean;
   // optional fields
   acronym?: string;
   identifiers?: Identifier[];
-  targetGroupDetails?: TranslatedText[];
+  targetGroupSpecified?: TranslatedText[];
   thematicOrientations?: TranslatedText[][];
   description?: TranslatedText[];
   careerStages?: CareerStageEnum[];

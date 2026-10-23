@@ -7,6 +7,8 @@ import {
   OnInit,
   Output,
 } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+import { ProgramVersionHistoryDialogComponent, ProgramVersionHistoryDialogData } from '../program-version-history-dialog/program-version-history-dialog.component';
 import { ViewEnum } from 'src/app/shared/models/enums/view.enum';
 import { TranslatedText } from 'src/app/shared/models/interfaces/translated-text.interface';
 import { PROGRAM_DETAILS_CONSTANTS } from '../../programs.constants';
@@ -58,6 +60,7 @@ export class ProgramDetailComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly programStore = inject(ProgramStore);
+  private readonly dialog = inject(MatDialog);
 
   protected readonly CONSTANTS = PROGRAM_DETAILS_CONSTANTS;
   protected readonly BUTTON_LABELS = BUTTON_LABELS;
@@ -82,6 +85,17 @@ export class ProgramDetailComponent implements OnInit {
 
   onEdit(): void {
     this.router.navigate(['./edit'], { relativeTo: this.route });
+  }
+
+  onShowHistory(): void {
+    const data: ProgramVersionHistoryDialogData = {
+      programId: this.program().id!,
+      currentFields: {
+        description: this.program().description,
+        duration: this.program().duration,
+      },
+    };
+    this.dialog.open(ProgramVersionHistoryDialogComponent, { width: '680px', data });
   }
 
   onPublish(): void {

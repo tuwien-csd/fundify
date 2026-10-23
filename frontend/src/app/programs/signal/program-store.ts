@@ -28,7 +28,7 @@ export const ProgramStore = signalStore(
   withMethods(({ backendService, notificationService, ...store }) => ({
     async fetchAll(): Promise<void> {
       try {
-        const response = await backendService.client.GET('/api/program');
+        const response = await backendService.client.GET('/api/programs');
         if (response.data) {
           patchState(store, setAllEntities(response.data));
         } else {
@@ -41,7 +41,7 @@ export const ProgramStore = signalStore(
       }
     },
     async create(program: ProgramWebModel) {
-      const { data, error } = await backendService.client.POST('/api/program', {
+      const { data, error } = await backendService.client.POST('/api/programs', {
         body: program,
       });
       if (data) {
@@ -60,7 +60,7 @@ export const ProgramStore = signalStore(
     },
     async update(program: ProgramWebModel) {
       const { data, error } = await backendService.client.PUT(
-        '/api/program/{id}',
+        '/api/programs/{id}',
         {
           body: program,
           params: {
@@ -87,7 +87,7 @@ export const ProgramStore = signalStore(
     async delete(programId: string): Promise<void> {
       try {
         const { response } = await backendService.client.DELETE(
-          '/api/program/{id}',
+          '/api/programs/{id}',
           {
             params: {
               path: {

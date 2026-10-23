@@ -8,8 +8,9 @@ import {
 } from '@angular/material/sidenav';
 import { SidebarComponent } from './ui/sidebar.component';
 import { NgClass } from '@angular/common';
-import { RouterOutlet } from '@angular/router';
+import { RouterLink, RouterOutlet } from '@angular/router';
 import { FooterComponent } from './ui/footer.component';
+import { ROUTER_LINKS } from '../../router-links.constants';
 
 @Component({
   selector: 'app-layout',
@@ -33,6 +34,18 @@ import { FooterComponent } from './ui/footer.component';
               }"
             >
               <section class="main-content">
+                @if (authService.missingPermissions()) {
+                  <div class="missing-permissions-banner" role="alert">
+                    <span>
+                      Your account has no permissions assigned yet. Please reach
+                      out to an administrator via the
+                      <a [routerLink]="'/' + ROUTER_LINKS.CONTACT"
+                        >contact page</a
+                      >
+                      to get access.
+                    </span>
+                  </div>
+                }
                 <router-outlet></router-outlet>
               </section>
             </mat-sidenav-content>
@@ -65,8 +78,10 @@ import { FooterComponent } from './ui/footer.component';
     NgClass,
     RouterOutlet,
     FooterComponent,
+    RouterLink,
   ],
 })
 export class LayoutComponent {
   authService = inject(AuthService);
+  protected readonly ROUTER_LINKS = ROUTER_LINKS;
 }

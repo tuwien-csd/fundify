@@ -48,6 +48,8 @@ import { RouterLink } from '@angular/router';
 import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
 import { ProgramDisplayPipe } from './pipes/program-display.pipe';
 import { ProgramStore } from './signal/program-store';
+import { MatDialog } from '@angular/material/dialog';
+import { ProgramVersionHistoryDialogComponent, ProgramVersionHistoryDialogData } from './components/program-version-history-dialog/program-version-history-dialog.component';
 
 @Component({
   selector: 'app-programs',
@@ -87,6 +89,7 @@ import { ProgramStore } from './signal/program-store';
 })
 export class ProgramsComponent implements OnDestroy {
   private readonly programStore = inject(ProgramStore);
+  private readonly dialog = inject(MatDialog);
   permissionService = inject(PermissionService);
 
   protected readonly ROUTER_LINKS = ROUTER_LINKS;
@@ -148,6 +151,17 @@ export class ProgramsComponent implements OnDestroy {
 
   onDelete(programId: string): void {
     this.programStore.delete(programId);
+  }
+
+  onShowHistory(program: ProgramWebModel): void {
+    const data: ProgramVersionHistoryDialogData = {
+      programId: program.id!,
+      currentFields: {
+        description: program.description,
+        duration: program.duration,
+      },
+    };
+    this.dialog.open(ProgramVersionHistoryDialogComponent, { width: '680px', data });
   }
 
   toggleHideClosedPrograms(event: MatSlideToggleChange) {

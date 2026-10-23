@@ -5,6 +5,7 @@ import {
   withHooks,
   withMethods,
   withProps,
+  withState,
 } from '@ngrx/signals';
 import {
   addEntities,
@@ -26,6 +27,7 @@ import { SubscriptionStatus } from '../../shared/models/enums/call-subscription.
 export const CallsStore = signalStore(
   { providedIn: 'root' },
   withEntities<CallWebModel>(),
+  withState({ isLoading: false }),
   withProps(() => ({
     backendService: inject(BackendServiceV2),
     notificationService: inject(NotificationService),
@@ -35,7 +37,7 @@ export const CallsStore = signalStore(
       callToCreate: CallCreateWebModel
     ): Promise<CallWebModel | undefined> {
       try {
-        const response = await backendService.client.POST('/api/call/add', {
+        const response = await backendService.client.POST('/api/calls', {
           body: callToCreate,
         });
         if (response.data) {
@@ -58,7 +60,8 @@ export const CallsStore = signalStore(
       callToUpdate: CallUpdateWebModel
     ): Promise<CallWebModel | undefined> {
       try {
-        const response = await backendService.client.PUT('/api/call/update', {
+        const response = await backendService.client.PUT('/api/calls/{id}', {
+          params: { path: { id: callToUpdate.id } },
           body: callToUpdate,
         });
         if (response.data) {
@@ -78,8 +81,9 @@ export const CallsStore = signalStore(
       }
     },
     async fetchAll(): Promise<void> {
+      patchState(store, { isLoading: true });
       try {
-        const response = await backendService.client.GET('/api/call');
+        const response = await backendService.client.GET('/api/calls');
         if (response.data) {
           patchState(store, addEntities(response.data));
         } else {
@@ -89,18 +93,17 @@ export const CallsStore = signalStore(
         }
       } catch (error) {
         console.error('Error fetching calls:', error);
+      } finally {
+        patchState(store, { isLoading: false });
       }
     },
     async fetchById(id: string): Promise<CallWebModel | undefined> {
       try {
-        const response = await backendService.client.GET(
-          '/api/call/detail/{id}',
-          {
-            params: {
-              path: { id: id },
-            },
-          }
-        );
+        const response = await backendService.client.GET('/api/calls/{id}', {
+          params: {
+            path: { id: id },
+          },
+        });
         if (response.data) {
           const call: CallWebModel = response.data;
           patchState(store, addEntity(call));
@@ -115,14 +118,11 @@ export const CallsStore = signalStore(
     },
     async deleteById(id: string): Promise<void> {
       try {
-        const response = await backendService.client.DELETE(
-          '/api/call/delete/{id}',
-          {
-            params: {
-              path: { id: id },
-            },
-          }
-        );
+        const response = await backendService.client.DELETE('/api/calls/{id}', {
+          params: {
+            path: { id: id },
+          },
+        });
         if (response.response.status === 204) {
           patchState(store, removeEntity(id));
         } else {
@@ -140,7 +140,7 @@ export const CallsStore = signalStore(
     ): Promise<void> {
       try {
         const response = await backendService.client.PATCH(
-          '/api/call/{id}/subscriptions',
+          '/api/calls/{id}/subscriptions',
           {
             params: {
               path: { id: id },

@@ -2,9 +2,9 @@ package at.ac.tuwien.fundify.application.port.in.calls;
 
 import at.ac.tuwien.fundify.domain.common.CallId;
 import at.ac.tuwien.fundify.domain.common.EPublicationStatus;
-import at.ac.tuwien.fundify.domain.common.FunderId;
 import at.ac.tuwien.fundify.domain.common.exceptions.EntityNotFoundException;
 import at.ac.tuwien.fundify.domain.funding.Call;
+import at.ac.tuwien.fundify.domain.funding.CallVersion;
 import java.util.List;
 
 public interface CallAccessor {
@@ -15,7 +15,5 @@ public interface CallAccessor {
 
     List<Call> getByStatus(EPublicationStatus status);
 
-    List<Call> getByFunder(FunderId funderId);
-
-    List<Call> getByFunderAndStatus(FunderId funderId, EPublicationStatus status);
+    List<CallVersion> getVersionsByCallId(CallId callId);
 }

@@ -162,6 +162,18 @@ paths:
             Vocabulary: [Target group - Vocabulary](https://documentation.forschungsdaten.at/?page_id=322)
           schema:
             $ref: '#/components/schemas/RisTargetGroup'
+        - name: page[page]
+          in: query
+          schema:
+            type: integer
+            format: int32
+            default: 0
+        - name: page[size]
+          in: query
+          schema:
+            type: integer
+            format: int32
+            default: 20
       responses:
         "200":
           description: Successful operation
@@ -518,6 +530,7 @@ components:
         - INFRASTRUCTURE
         - NETWORKING
         - MOBILITY_PROGRAMME
+        - EU_FUNDING
       type: string
     RisFundingType:
       enum:
@@ -550,6 +563,7 @@ components:
         - ROR
         - RINGGOLD
         - RIS_SYNERGY
+        - EU_ID
       type: string
     RisLegalType:
       enum:
@@ -648,6 +662,7 @@ components:
         - INDEPENDENT_RESEARCHER
         - GOVERNMENT
         - UNIVERSITY_COLLEGE_OF_TEACHER_EDUCATION
+        - EU_FUNDING
       type: string
     RisText:
       type: object

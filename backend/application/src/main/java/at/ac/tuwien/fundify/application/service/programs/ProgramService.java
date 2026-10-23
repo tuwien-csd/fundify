@@ -4,6 +4,7 @@ import at.ac.tuwien.fundify.application.port.common.UserService;
 import at.ac.tuwien.fundify.application.port.in.programs.ProgramUseCase;
 import at.ac.tuwien.fundify.application.port.out.persistence.FunderRepository;
 import at.ac.tuwien.fundify.application.port.out.persistence.ProgramRepository;
+import at.ac.tuwien.fundify.domain.funding.vo.enums.EUpdateSource;
 import at.ac.tuwien.fundify.application.service.common.BasePermissionService;
 import at.ac.tuwien.fundify.domain.common.EPublicationStatus;
 import at.ac.tuwien.fundify.domain.common.FunderId;
@@ -29,6 +30,7 @@ import lombok.extern.jbosslog.JBossLog;
 public class ProgramService implements ProgramUseCase {
 
   private final ProgramRepository programRepository;
+  private final ProgramVersioningService programVersioningService;
   private final BasePermissionService basePermissionService;
   private final FunderRepository funderRepository;
   private final UserService userService;
@@ -41,7 +43,7 @@ public class ProgramService implements ProgramUseCase {
     Funder funder = funderRepository.findById(funderId)
         .orElseThrow(() -> EntityNotFoundException.funderNotFound(funderId.toString()));
 
-    if (!currentUserMayWrite(program, funder.getAcronym())) {
+    if (currentUserMayNotWrite(program, funder.getAcronym())) {
       throw new InsufficientPermissionsException();
     }
 
@@ -80,7 +82,7 @@ public class ProgramService implements ProgramUseCase {
         .orElseThrow(() -> EntityNotFoundException.programNotFound(program.getId().value()));
     FunderReference funder = program.getFunder();
 
-    if (!currentUserMayWrite(programFromDb, funder.acronym())) {
+    if (currentUserMayNotWrite(programFromDb, funder.acronym())) {
       throw new InsufficientPermissionsException(programFromDb.getId().value());
     }
 
@@ -91,6 +93,7 @@ public class ProgramService implements ProgramUseCase {
         updateLastSyncDate(program);
       }
     }
+    programVersioningService.createVersionIfChanged(programFromDb, program, EUpdateSource.MANUAL);
     return programRepository.update(program).orElseThrow(
         () -> new UnexpectedErrorException("Error updating program with ID: " + programFromDb.getId().value()));
   }
@@ -102,7 +105,7 @@ public class ProgramService implements ProgramUseCase {
     final var program = programRepository.findById(id)
         .orElseThrow(() -> EntityNotFoundException.programNotFound(id.value()));
 
-    if (!currentUserMayWrite(program, program.getFunder().acronym())) {
+    if (currentUserMayNotWrite(program, program.getFunder().acronym())) {
       throw new InsufficientPermissionsException(program.getId().value());
     }
 
@@ -114,6 +117,7 @@ public class ProgramService implements ProgramUseCase {
     if (!deleted) {
       throw new UnexpectedErrorException("Error deleting program with ID: " + id);
     }
+    programVersioningService.deleteVersions(id);
   }
 
   private void updateLastSyncDate(Program program) {
@@ -122,19 +126,19 @@ public class ProgramService implements ProgramUseCase {
   }
 
 
-  private boolean currentUserMayWrite(Program program, String funderAcronym) {
+  private boolean currentUserMayNotWrite(Program program, String funderAcronym) {
     //If the program is managed through the sync, it cannot be updated via the API.
     if (EEntryOrigin.ENDPOINT.equals(program.getEntryOrigin())) {
       log.infof(
           "Program with id '%s' cannot be updated via the API because it is managed through the sync.",
           program.getId().value());
-      return false;
+      return true;
     }
     //Admins can write all other programs.
     if (userService.isUserAdmin()) {
-      return true;
+      return false;
     }
     //Else, funders can only write programs they are affiliated with.
-    return basePermissionService.currentUserIsAffiliatedWith(funderAcronym);
+    return !basePermissionService.currentUserIsAffiliatedWith(funderAcronym);
   }
 }

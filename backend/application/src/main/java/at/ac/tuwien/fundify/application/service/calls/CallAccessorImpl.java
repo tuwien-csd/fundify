@@ -2,13 +2,14 @@ package at.ac.tuwien.fundify.application.service.calls;
 
 import at.ac.tuwien.fundify.application.port.in.calls.CallAccessor;
 import at.ac.tuwien.fundify.application.port.out.persistence.CallQuery;
+import at.ac.tuwien.fundify.application.port.out.persistence.CallVersionRepository;
 import at.ac.tuwien.fundify.application.service.common.BasePermissionService;
 import at.ac.tuwien.fundify.domain.common.CallId;
 import at.ac.tuwien.fundify.domain.common.CallOwner;
 import at.ac.tuwien.fundify.domain.common.EPublicationStatus;
-import at.ac.tuwien.fundify.domain.common.FunderId;
 import at.ac.tuwien.fundify.domain.common.exceptions.EntityNotFoundException;
 import at.ac.tuwien.fundify.domain.funding.Call;
+import at.ac.tuwien.fundify.domain.funding.CallVersion;
 import jakarta.enterprise.context.ApplicationScoped;
 import java.util.List;
 import java.util.Optional;
@@ -20,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 public class CallAccessorImpl implements CallAccessor {
 
     private final CallQuery callQuery;
+    private final CallVersionRepository callVersionRepository;
     private final BasePermissionService basePermissionService;
 
     @Override
@@ -41,13 +43,8 @@ public class CallAccessorImpl implements CallAccessor {
     }
 
     @Override
-    public List<Call> getByFunder(FunderId funderId) {
-        return callQuery.find(funderId);
-    }
-
-    @Override
-    public List<Call> getByFunderAndStatus(FunderId funderId, EPublicationStatus status) {
-        return callQuery.find(funderId, status);
+    public List<CallVersion> getVersionsByCallId(CallId callId) {
+        return callVersionRepository.findByCallId(callId);
     }
 
   /**

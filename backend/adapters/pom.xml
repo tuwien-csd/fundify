@@ -69,6 +69,11 @@
     </dependency>
     <dependency>
       <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-resteasy-multipart</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>io.quarkus</groupId>
       <artifactId>quarkus-config-yaml</artifactId>
     </dependency>
     <dependency>
@@ -101,6 +106,13 @@
       <artifactId>quarkus-mailer</artifactId>
     </dependency>
 
+    <!-- HTML escaping for values interpolated into outgoing mail bodies.
+         Version is managed by the Quarkus BOM. -->
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-text</artifactId>
+    </dependency>
+
     <dependency>
       <groupId>io.swagger.core.v3</groupId>
       <artifactId>swagger-annotations</artifactId>
@@ -110,6 +122,10 @@
     <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-smallrye-fault-tolerance</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-keycloak-admin-resteasy-client</artifactId>
     </dependency>
 
     <!-- Test scope -->
@@ -197,32 +213,6 @@
               <!--  -->
               <!-- We also need to set the same prefix in the funding-spec.json file discriminator settings  -->
               <!--  -->
-              <modelNamePrefix>Ris</modelNamePrefix>
-              <configOptions>
-                <jakarta>true</jakarta>
-                <dateLibrary>java8</dateLibrary>
-                <library>resteasy</library>
-                <sourceFolder>src/main/java</sourceFolder>
-              </configOptions>
-            </configuration>
-          </execution>
-          <execution>
-            <?m2e execute onConfiguration?>
-            <id>orgunit</id>
-            <goals>
-              <goal>generate</goal>
-            </goals>
-            <configuration>
-              <inputSpec>${project.basedir}/src/main/resources/openapi/orgunit-spec-v1.json
-              </inputSpec>
-              <language>java</language>
-              <generateModels>true</generateModels>
-              <modelPackage>at.ac.tuwien.fundify.adapters.common.ris.model.v1</modelPackage>
-              <generateApis>false</generateApis>
-              <generateSupportingFiles>false</generateSupportingFiles>
-              <generateModelTests>false</generateModelTests>
-              <generateModelDocumentation>true</generateModelDocumentation>
-              <templateDirectory>${project.basedir}/src/main/resources/templates</templateDirectory>
               <modelNamePrefix>Ris</modelNamePrefix>
               <configOptions>
                 <jakarta>true</jakarta>

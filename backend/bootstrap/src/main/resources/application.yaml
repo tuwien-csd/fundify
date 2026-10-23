@@ -28,6 +28,8 @@ fundify:
   notification:
     email:
       batch-size: 5
+      # Public URL of the Fundify app, used in outgoing mails. Overridden per profile.
+      app-url: "http://localhost:8080"
     every:
       interval:
         email-poll: 5M
@@ -40,6 +42,7 @@ fundify:
         id: "fwf-test"
         enabled: false
         base-url: "https://risapi.test.fwf.ac.at"
+        contact-email: ""
         credentials:
           id: "<set this in your .env in the bootstrap module>"
           secret: "<set this in your .env in the bootstrap module>"
@@ -48,6 +51,7 @@ fundify:
         id: "fwf"
         enabled: false
         base-url: "https://risapi.prod.fwf.ac.at"
+        contact-email: ""
         credentials:
           id: "<set this in your .env in the bootstrap module>"
           secret: "<set this in your .env in the bootstrap module>"
@@ -57,6 +61,17 @@ fundify:
         id: "wwtf"
         enabled: true
         base-url: "https://fundingportal.wwtf.at"
+        contact-email: ""
+      eutender:
+        # No auth needed, API is public
+        id: "eutender"
+        enabled: true
+        base-url: "https://api.tech.ec.europa.eu/search-api/prod/rest/search?apiKey=SEDIA&text=***"
+        contact-email: ""
+  keycloak:
+    admin:
+      server-url: http://localhost:8083
+      realm: refop-dev
 
 frontend:
   auth:
@@ -93,6 +108,15 @@ quarkus:
   oidc: # This is used to verify the bearer tokens sent by users
     auth-server-url: ${refop.auth.server.url}
 
+  keycloak:
+    admin-client:
+      server-url: ${fundify.keycloak.admin.server-url}
+      realm: master
+      client-id: admin-cli
+      username: ${KEYCLOAK_ADMIN_USERNAME:admin}
+      password: ${KEYCLOAK_ADMIN_PASSWORD:admin}
+      grant-type: PASSWORD
+
   # Below configuration acquires tokens for the sync from external funding providers
   oidc-client:
     fwf-test:
@@ -119,6 +143,10 @@ quarkus:
       read-timeout: 10000
     wwtf:
       url: ${fundify.external-fundings.data-providers.wwtf.base-url}
+      connect-timeout: 5000
+      read-timeout: 10000
+    eutender:
+      url: ${fundify.external-fundings.data-providers.eutender.base-url}
       connect-timeout: 5000
       read-timeout: 10000
 
@@ -265,6 +293,9 @@ cron:
         auth-source: admin
     oidc:
       auth-server-url: http://keycloak:8080/realms/refop-dev
+    keycloak:
+      admin-client:
+        server-url: http://keycloak:8080
     http:
       cors:
         ~: true
@@ -289,6 +320,11 @@ cron:
       from: "fundify.notification@tuwien.ac.at"
       mock: false
   fundify:
+    notification:
+      email:
+        # Staging shares this profile, so it overrides the value via
+        # FUNDIFY_NOTIFICATION_EMAIL_APP_URL (https://fundify-staging.arisnet.ac.at).
+        app-url: "https://fundify.arisnet.ac.at"
     auth:
       permissions:
         enableDebugLogging: true

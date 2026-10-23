@@ -10,6 +10,10 @@ import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideNativeDateAdapter } from '@angular/material/core';
 import { OAuthServiceMock } from '../../../testing/mocks/OAuthService.mock';
+import { MatDialog } from '@angular/material/dialog';
+import { CallVersionHistoryDialogComponent } from '../call-version-history-dialog/call-version-history-dialog.component';
+import { IdentifierTypeEnum } from '../../../shared/models/enums/identifier-type.enum';
+import { CALL_DETAILS_CONSTANTS } from '../../calls.constants';
 
 describe('CallDetailPreviewComponent', () => {
   let component: CallDetailPreviewComponent;
@@ -47,6 +51,7 @@ describe('CallDetailPreviewComponent', () => {
         { provide: LocalStorageService, useValue: mockLocalStorageService },
         { provide: PermissionService, useValue: mockPermissionService },
         { provide: CallValidationService, useValue: mockValidationService },
+        { provide: MatDialog, useValue: { open: jasmine.createSpy('open') } },
       ],
     }).compileComponents();
   });
@@ -89,5 +94,33 @@ describe('CallDetailPreviewComponent', () => {
     spyOn(component.edit, 'emit');
     component.onEdit();
     expect(component.edit.emit).toHaveBeenCalledWith(ViewEnum.EDIT);
+  });
+
+  it('should hide the internal ccm2 id suffix of the EU ID', () => {
+    component.call = {
+      ...CALLS[0],
+      identifiers: [
+        {
+          type: IdentifierTypeEnum.EU_ID,
+          value: 'HORIZON-CL5-2027-07-D3-17-[50161357]',
+        },
+      ],
+    };
+    component.ngOnInit();
+
+    const euId = component.callDetails.find(
+      (detail) => detail.label === CALL_DETAILS_CONSTANTS.EU_ID_LABEL
+    );
+    expect(euId?.value).toBe('HORIZON-CL5-2027-07-D3-17');
+  });
+
+  it('should open CallVersionHistoryDialog on onShowHistory', () => {
+    const dialog = TestBed.inject(MatDialog);
+    component.call = { ...CALLS[0], id: 'test-id' };
+    component.onShowHistory();
+    expect(dialog.open).toHaveBeenCalledWith(
+      CallVersionHistoryDialogComponent,
+      jasmine.objectContaining({ width: '680px' })
+    );
   });
 });

@@ -14,6 +14,7 @@ test.describe('Tests for institution administration', () => {
       await page.getByRole('link', { name: 'Institutions' }).click();
       await page.getByRole('button', { name: 'new' }).click();
       await page.getByRole('textbox', { name: 'Name' }).fill('Test Funder');
+      await page.getByRole('textbox', { name: 'Acronym' }).fill('TF');
       await page
         .getByRole('combobox', { name: 'Language' })
         .locator('svg')

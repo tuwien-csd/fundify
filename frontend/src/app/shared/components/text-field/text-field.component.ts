@@ -142,9 +142,10 @@ export class TextFieldComponent
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: This was disabled during the proper setup of eslint. If you touch this code, fix it properly.
   writeValue(value: any) {
-    if (value) {
-      this.textForm.setValue({ text: value }, { emitEvent: false });
-    }
+    // An empty value has to be written through as well, otherwise clearing or
+    // resetting the outer control leaves the previous text visible in the input
+    // while the form value is already empty.
+    this.textForm.setValue({ text: value ?? null }, { emitEvent: false });
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars -- TODO: This was disabled during the proper setup of eslint. If you touch this code, fix it properly.

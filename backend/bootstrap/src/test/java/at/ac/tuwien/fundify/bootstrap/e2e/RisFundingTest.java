@@ -414,7 +414,7 @@ class RisFundingTest {
                 .extract().as(RisAnnotatedCall.class);
 
         Assertions.assertEquals("testCall", result.getCall().getAcronym());
-        Assertions.assertEquals(mockCallRisId.toString(), result.getCall().getIdentifiers().get(0).getValue());
+        Assertions.assertEquals(mockCallRisId.toString(), result.getCall().getIdentifiers().getFirst().getValue());
     }
 
     @Test
@@ -478,7 +478,7 @@ class RisFundingTest {
 
         Assertions.assertEquals(1, result.length);
         Assertions.assertEquals(ETargetGroup.RESEARCH_INSTITUTE.toString(),
-                result[0].getCall().getTargetGroups().get(0).toString());
+                result[0].getCall().getTargetGroups().getFirst().toString());
     }
 
     @Test
@@ -725,6 +725,80 @@ class RisFundingTest {
         Assertions.assertEquals(1, result.length);
     }
 
+
+  @Nested
+  @QuarkusTest
+  @TestHTTPEndpoint(RisFundingResource.class)
+  @TestSecurity(authorizationEnabled = false)
+  class PaginationTests {
+
+    @BeforeEach
+    void setUp() {
+      CallMongoEntity.deleteAll();
+      ProgramMongoEntity.deleteAll();
+    }
+
+    @Test
+    void givenPageSize_whenList_thenReturnsPageSizedResult() {
+      for (int i = 0; i < 3; i++) {
+        CallMongoEntity call = new CallMongoEntity();
+        call.status = EPublicationStatus.PUBLISHED;
+        call.fundingType = ECallType.CALL;
+        call.persist();
+      }
+
+      RisFunding[] result = given()
+          .queryParam("page[page]", 0)
+          .queryParam("page[size]", 2)
+          .when()
+          .get("/v1/fundings")
+          .then()
+          .statusCode(200)
+          .extract().as(RisFunding[].class);
+
+      Assertions.assertEquals(2, result.length);
+    }
+
+    @Test
+    void givenSecondPage_whenList_thenReturnsRemainingItems() {
+      for (int i = 0; i < 3; i++) {
+        CallMongoEntity call = new CallMongoEntity();
+        call.status = EPublicationStatus.PUBLISHED;
+        call.fundingType = ECallType.CALL;
+        call.persist();
+      }
+
+      RisFunding[] result = given()
+          .queryParam("page[page]", 1)
+          .queryParam("page[size]", 2)
+          .when()
+          .get("/v1/fundings")
+          .then()
+          .statusCode(200)
+          .extract().as(RisFunding[].class);
+
+      Assertions.assertEquals(1, result.length);
+    }
+
+    @Test
+    void givenPageBeyondResults_whenList_thenReturnsEmptyList() {
+      CallMongoEntity call = new CallMongoEntity();
+      call.status = EPublicationStatus.PUBLISHED;
+      call.fundingType = ECallType.CALL;
+      call.persist();
+
+      RisFunding[] result = given()
+          .queryParam("page[page]", 5)
+          .queryParam("page[size]", 20)
+          .when()
+          .get("/v1/fundings")
+          .then()
+          .statusCode(200)
+          .extract().as(RisFunding[].class);
+
+      Assertions.assertEquals(0, result.length);
+    }
+  }
 
   @Nested
   @QuarkusTest

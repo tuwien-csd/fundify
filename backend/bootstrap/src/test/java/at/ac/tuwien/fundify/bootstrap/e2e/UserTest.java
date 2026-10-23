@@ -2,15 +2,24 @@ package at.ac.tuwien.fundify.bootstrap.e2e;
 
 import static io.restassured.RestAssured.given;
 
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import at.ac.tuwien.fundify.adapters.in.rest.dto.UserCreationWebModel;
 import at.ac.tuwien.fundify.adapters.in.rest.dto.UserPermissionsUpdateWebModel;
 import at.ac.tuwien.fundify.adapters.in.rest.resources.UserResource;
 import at.ac.tuwien.fundify.adapters.out.persistence.mongo.user.UserPermissionMongoRepository;
+import at.ac.tuwien.fundify.application.port.out.keycloak.KeycloakUserRepository;
 import at.ac.tuwien.fundify.bootstrap.utils.users.WithAdminUser;
 import at.ac.tuwien.fundify.bootstrap.utils.users.WithFFGFunderUser;
+import at.ac.tuwien.fundify.domain.common.KeycloakUser;
 import at.ac.tuwien.fundify.domain.common.UserPermissionHolder;
+import at.ac.tuwien.fundify.domain.common.UserProvisioning;
 import at.ac.tuwien.fundify.domain.common.UserRole;
 import io.quarkus.cache.Cache;
 import io.quarkus.cache.CacheName;
+import io.quarkus.mailer.MockMailbox;
+import io.quarkus.test.InjectMock;
 import io.quarkus.test.common.http.TestHTTPEndpoint;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.security.TestSecurity;
@@ -21,6 +30,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 @QuarkusTest
 @TestHTTPEndpoint(UserResource.class)
@@ -35,11 +45,18 @@ class UserTest {
   @CacheName("user-permissions")
   Cache userPermissionsCache;
 
+  @InjectMock
+  KeycloakUserRepository keycloakUserRepository;
+
+  @Inject
+  MockMailbox mailbox;
+
   @BeforeEach
   void setup() {
     // clear user-permission collection to ensure deterministic behavior for DB override tests
     userPermissionRepository.deleteAll();
     userPermissionsCache.invalidateAll().await().indefinitely();
+    mailbox.clear();
   }
 
   @Test
@@ -143,6 +160,245 @@ class UserTest {
           .pathParam("id", targetUserId)
           .when()
           .put("/{id}/permissions")
+          .then()
+          .statusCode(403);
+    }
+  }
+
+  @Nested
+  @TestHTTPEndpoint(UserResource.class)
+  class GetAllUsers {
+
+    @Test
+    @WithAdminUser
+    void givenAdmin_whenGetAllUsers_thenReturnsKeycloakUsers() {
+      when(keycloakUserRepository.findAll()).thenReturn(List.of(
+          new KeycloakUser("kc-1", "alice", "alice@example.com", "Alice", "A", true),
+          new KeycloakUser("kc-2", "bob", "bob@example.com", "Bob", "B", false)));
+
+      given()
+          .when()
+          .get()
+          .then()
+          .statusCode(200)
+          .body("size()", org.hamcrest.Matchers.is(2))
+          .body("[0].id", org.hamcrest.Matchers.is("kc-1"))
+          .body("[0].email", org.hamcrest.Matchers.is("alice@example.com"))
+          .body("[1].username", org.hamcrest.Matchers.is("bob"));
+    }
+
+    @Test
+    @WithFFGFunderUser
+    void givenNonAdmin_whenGetAllUsers_thenForbidden() {
+      given()
+          .when()
+          .get()
+          .then()
+          .statusCode(403);
+    }
+  }
+
+  @Nested
+  @TestHTTPEndpoint(UserResource.class)
+  class CreateUser {
+
+    @Test
+    @WithAdminUser
+    void givenAdmin_whenCreateUnknownUser_thenProvisionsKeycloakUserWithName() {
+      when(keycloakUserRepository.findByEmail("new@univie.ac.at"))
+          .thenReturn(java.util.Optional.empty());
+      when(keycloakUserRepository.create(
+          org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.anyString()))
+          .thenReturn(new KeycloakUser(
+              "kc-new", "new@univie.ac.at", "new@univie.ac.at", "Jane", "Doe", true));
+
+      UserCreationWebModel createRequest = new UserCreationWebModel(
+          "new@univie.ac.at",
+          "Jane",
+          "Doe",
+          List.of(UserRole.ANNOTATOR),
+          "univie");
+
+      UserPermissionHolder created = given()
+          .contentType(ContentType.JSON)
+          .body(createRequest)
+          .when()
+          .post()
+          .then()
+          .statusCode(200)
+          .extract()
+          .as(UserPermissionHolder.class);
+
+      Assertions.assertEquals("kc-new", created.userId());
+      Assertions.assertEquals("univie", created.affiliationId());
+
+      // the given name and surname must reach Keycloak, otherwise the realm's
+      // full-name mapper cannot produce a `name` claim for the new account
+      ArgumentCaptor<UserProvisioning> captor = ArgumentCaptor.forClass(UserProvisioning.class);
+      ArgumentCaptor<String> passwordCaptor = ArgumentCaptor.forClass(String.class);
+      verify(keycloakUserRepository).create(captor.capture(), passwordCaptor.capture());
+      var provisioning = captor.getValue();
+      var passwordSetInKeycloak = passwordCaptor.getValue();
+      Assertions.assertEquals("new@univie.ac.at", provisioning.email());
+      Assertions.assertEquals("Jane", provisioning.firstName());
+      Assertions.assertEquals("Doe", provisioning.lastName());
+      Assertions.assertFalse(passwordSetInKeycloak.isBlank());
+
+      var fromDb = userPermissionRepository.findByUserId("kc-new").orElseThrow();
+      Assertions.assertEquals("univie", fromDb.affiliationId());
+      Assertions.assertTrue(fromDb.roles().contains(UserRole.ANNOTATOR));
+
+      // the temporary password is the only way into a provisioned account, so the
+      // welcome mail has to go out and has to carry the very password that was set
+      var sent = mailbox.getMailsSentTo("new@univie.ac.at");
+      Assertions.assertEquals(1, sent.size());
+      var mail = sent.getFirst();
+      Assertions.assertEquals("Your Fundify account has been created", mail.getSubject());
+      Assertions.assertTrue(mail.getHtml().contains("Hello Jane Doe,"));
+      Assertions.assertTrue(mail.getHtml().contains(provisioning.firstName()));
+      Assertions.assertTrue(mail.getHtml().contains(passwordSetInKeycloak));
+    }
+
+    @Test
+    @WithAdminUser
+    void givenAdmin_whenCreateForExistingAccount_thenNoPasswordResetAndNoMail() {
+      when(keycloakUserRepository.findByEmail("known@univie.ac.at"))
+          .thenReturn(java.util.Optional.of(new KeycloakUser(
+              "kc-known", "known@univie.ac.at", "known@univie.ac.at", "Known", "User", true)));
+
+      UserCreationWebModel createRequest = new UserCreationWebModel(
+          "known@univie.ac.at",
+          "Ignored",
+          "Ignored",
+          List.of(UserRole.FUNDER),
+          "TEST_FFG");
+
+      given()
+          .contentType(ContentType.JSON)
+          .body(createRequest)
+          .when()
+          .post()
+          .then()
+          .statusCode(200);
+
+      // reusing an account must not touch its password nor re-send the welcome mail
+      verify(keycloakUserRepository, org.mockito.Mockito.never())
+          .create(org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.anyString());
+      Assertions.assertEquals(0, mailbox.getTotalMessagesSent());
+    }
+
+    @Test
+    @WithAdminUser
+    void givenAdmin_whenCreateWithBlankName_thenBadRequest() {
+      UserCreationWebModel createRequest = new UserCreationWebModel(
+          "new@univie.ac.at",
+          " ",
+          "",
+          List.of(UserRole.ANNOTATOR),
+          "univie");
+
+      given()
+          .contentType(ContentType.JSON)
+          .body(createRequest)
+          .when()
+          .post()
+          .then()
+          .statusCode(400);
+    }
+
+    @Test
+    @WithFFGFunderUser
+    void givenNonAdmin_whenCreateUser_thenForbidden() {
+      UserCreationWebModel createRequest = new UserCreationWebModel(
+          "new@univie.ac.at",
+          "Jane",
+          "Doe",
+          List.of(UserRole.ANNOTATOR),
+          "univie");
+
+      given()
+          .contentType(ContentType.JSON)
+          .body(createRequest)
+          .when()
+          .post()
+          .then()
+          .statusCode(403);
+    }
+  }
+
+  @Nested
+  @TestHTTPEndpoint(UserResource.class)
+  class GetAllPermissions {
+
+    @Test
+    @WithAdminUser
+    void givenAdmin_whenGetAllPermissions_thenReturnsPersistedPermissions() {
+      userPermissionRepository.upsert(new UserPermissionHolder(
+          "user-a", List.of(UserRole.ANNOTATOR), "univie"));
+      userPermissionRepository.upsert(new UserPermissionHolder(
+          "user-b", List.of(UserRole.FUNDER), "TEST_FFG"));
+
+      UserPermissionHolder[] permissions = given()
+          .when()
+          .get("/permissions")
+          .then()
+          .statusCode(200)
+          .extract()
+          .as(UserPermissionHolder[].class);
+
+      Assertions.assertEquals(2, permissions.length);
+    }
+
+    @Test
+    @WithFFGFunderUser
+    void givenNonAdmin_whenGetAllPermissions_thenForbidden() {
+      given()
+          .when()
+          .get("/permissions")
+          .then()
+          .statusCode(403);
+    }
+  }
+
+  @Nested
+  @TestHTTPEndpoint(UserResource.class)
+  class DeletePermissions {
+
+    @Test
+    @WithAdminUser
+    void givenAdmin_whenDeletePermissions_thenRemovedFromDbAndReturnsNoContent() {
+      String targetUserId = "user-to-delete";
+      userPermissionRepository.upsert(new UserPermissionHolder(
+          targetUserId, List.of(UserRole.ANNOTATOR), "univie"));
+
+      given()
+          .pathParam("id", targetUserId)
+          .when()
+          .delete("/{id}/permissions")
+          .then()
+          .statusCode(204);
+
+      Assertions.assertTrue(userPermissionRepository.findByUserId(targetUserId).isEmpty());
+    }
+
+    @Test
+    @WithAdminUser
+    void givenAdmin_whenDeleteUnknownUser_thenStillReturnsNoContent() {
+      given()
+          .pathParam("id", "does-not-exist")
+          .when()
+          .delete("/{id}/permissions")
+          .then()
+          .statusCode(204);
+    }
+
+    @Test
+    @WithFFGFunderUser
+    void givenNonAdmin_whenDeletePermissions_thenForbidden() {
+      given()
+          .pathParam("id", "some_user")
+          .when()
+          .delete("/{id}/permissions")
           .then()
           .statusCode(403);
     }
