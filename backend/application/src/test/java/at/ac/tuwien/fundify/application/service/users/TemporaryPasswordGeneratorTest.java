@@ -27,7 +27,7 @@ class TemporaryPasswordGeneratorTest {
       assertTrue(password.matches(".*[a-z].*"), () -> "no lower-case letter in " + password);
       assertTrue(password.matches(".*[A-Z].*"), () -> "no upper-case letter in " + password);
       assertTrue(password.matches(".*[0-9].*"), () -> "no digit in " + password);
-      assertTrue(password.matches(".*[!#$%&*+\\-=?@^_].*"),
+      assertTrue(password.matches(".*[!#$%*+\\-=?@^_].*"),
           () -> "no special character in " + password);
     }
   }
@@ -40,7 +40,7 @@ class TemporaryPasswordGeneratorTest {
 
     // quotes, angle brackets, backslashes and whitespace would make the value
     // awkward to embed in HTML, JSON or a shell command
-    assertTrue(passwords.matches("[a-zA-Z0-9!#$%&*+\\-=?@^_]+"),
+    assertTrue(passwords.matches("[a-zA-Z0-9!#$%*+\\-=?@^_]+"),
         "generated passwords contain a character outside the intended alphabet");
   }
 

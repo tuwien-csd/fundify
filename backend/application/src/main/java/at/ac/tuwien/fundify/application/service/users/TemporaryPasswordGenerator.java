@@ -21,9 +21,9 @@ public class TemporaryPasswordGenerator {
   private static final String LOWER = "abcdefghijklmnopqrstuvwxyz";
   private static final String UPPER = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   private static final String DIGITS = "0123456789";
-  /** Quotes, angle brackets and backslashes are left out so the value stays safe to
+  /** Quotes, angle brackets, ampersands and backslashes are left out so the value stays safe to
    * embed in HTML, JSON and shell contexts without depending on escaping. */
-  private static final String SPECIAL = "!#$%&*+-=?@^_";
+  private static final String SPECIAL = "!#$%*+-=?@^_";
 
   private static final List<String> REQUIRED_GROUPS = List.of(LOWER, UPPER, DIGITS, SPECIAL);
   private static final String ALPHABET = LOWER + UPPER + DIGITS + SPECIAL;
